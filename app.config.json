@@ -1,0 +1,23 @@
+{
+  "expo": {
+    "name": "novaan-mobile",
+    "slug": "novaan-mobile",
+    "extra": {
+      "eas": {
+        "projectId": "babc80ee-da56-4401-95da-3f9272aa68cf"
+      }
+    },
+    "android": {
+      "package": "com.saltytuna.novaanmobile"
+    },
+    "ios": {
+      "bundleIdentifier": "com.saltytuna.novaanmobile"
+    },
+    "updates": {
+      "requestHeaders": {
+        "expo-channel-name": "main"
+      }
+    },
+    "runtimeVersion": "1.0.1"
+  }
+}
