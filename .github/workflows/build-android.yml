@@ -6,11 +6,9 @@ name: Expo Build APK CI
 on:
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
 
 jobs:
-  install-dependencies:
+  build-android-apk:
 
     runs-on: ubuntu-latest
 

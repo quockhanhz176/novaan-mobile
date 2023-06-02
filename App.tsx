@@ -1,6 +1,8 @@
-import { StyleSheet, Text, View } from 'react-native';
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+import React from "react";
+import { StyleSheet, Text, View } from "react-native";
 
-export default function App() {
+function App() {
   return (
     <View style={styles.container}>
       <Text>Open up App.tsx to start working on your app!</Text>
@@ -11,8 +13,10 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
+
+export default App;
