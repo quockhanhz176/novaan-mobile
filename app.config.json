@@ -11,7 +11,8 @@
       "package": "com.saltytuna.novaanmobile"
     },
     "ios": {
-      "bundleIdentifier": "com.saltytuna.novaanmobile"
+      "bundleIdentifier": "com.saltytuna.novaanmobile",
+      "usesNonExemptEncryption": false
     },
     "updates": {
       "requestHeaders": {

@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "dotenv": "^16.0.3",
+    "dotenv": "^16.1.4",
     "expo": "~48.0.18",
     "expo-dev-client": "~2.2.1",
     "expo-splash-screen": "~0.18.2",
@@ -10,7 +10,8 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-native": "0.71.8",
-    "react-native-web": "~0.18.7"
+    "react-native-web": "~0.18.7",
+    "expo-secure-store": "~12.1.1"
   },
   "devDependencies": {
     "@babel/core": "^7.19.3",
