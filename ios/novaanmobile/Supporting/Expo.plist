@@ -14,8 +14,8 @@
       <string>main</string>
     </dict>
     <key>EXUpdatesRuntimeVersion</key>
-    <string>1.0.1</string>
+    <string>exposdk:48.0.0</string>
     <key>EXUpdatesURL</key>
-    <string>https://exp.host/@saltytuna/novaan-mobile</string>
+    <string>https://u.expo.dev/babc80ee-da56-4401-95da-3f9272aa68cf</string>
   </dict>
 </plist>

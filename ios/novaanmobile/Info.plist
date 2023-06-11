@@ -25,6 +25,7 @@
       <dict>
         <key>CFBundleURLSchemes</key>
         <array>
+          <string>novaan</string>
           <string>com.saltytuna.novaanmobile</string>
         </array>
       </dict>
