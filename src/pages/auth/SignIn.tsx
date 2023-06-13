@@ -2,14 +2,13 @@ import { type RootStackParamList } from "App";
 import React, { useState, type ReactElement } from "react";
 import { Text, TextInput, View, TouchableOpacity, Alert } from "react-native";
 import { type NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { useForm, Controller } from "react-hook-form";
 
 import { authInputStyles } from "@/components/auth/AuthInput";
 import AuthButton from "@/components/auth/AuthButton";
 import {
     SIGN_IN_WRONG_USERNAME_PASSWORD,
     SIGN_IN_ERROR_OCCURED,
-    COMMON_ALERT_TITLE,
-    COMMON_FIELD_WRONG_FORMAT,
     SIGN_IN_EMAIL_TITLE,
     COMMON_EMPTY_FIELD_NOT_ALLOWED,
     SIGN_IN_EMAIL_PLACEHOLDER,
@@ -19,34 +18,44 @@ import {
     SIGN_IN_FORGET_PASSWORD,
     SIGN_IN_CREATE_ACCOUNT_TITLE,
     SIGN_IN_CREATE_ACCOUNT_BUTTON_TITLE,
+    AUTH_EMAIL_INVALID,
+    AUTH_PASSWORD_TOO_SHORT,
 } from "@/common/messages";
 import authApi from "@/api/auth/AuthApi";
 import { COLOR_CRIMSON } from "@/common/colors";
-import { validateText } from "@/common/utils";
+import OverlayLoading from "@/components/common/OverlayLoading";
 
 interface SignInProps {
     navigation: NativeStackNavigationProp<RootStackParamList, "SignIn">;
 }
 
+interface FormData {
+    email: string;
+    password: string;
+}
+
 const SignIn = (props: SignInProps): ReactElement<SignInProps> => {
     const { navigation } = props;
 
-    const [email, setEmail] = useState<string>("");
-    const [password, setPassword] = useState<string>("");
-    const [validEmail, setValidEmail] = useState(true);
-    const [validPassword, setValidPassword] = useState(true);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const {
+        handleSubmit,
+        control,
+        formState: { errors },
+    } = useForm<FormData>({
+        defaultValues: {
+            email: "",
+            password: "",
+        },
+        mode: "all",
+    });
 
-    const errorTextDefaultClass = `italic text-[${COLOR_CRIMSON}] text-xs`;
+    const errorTextStyle = `italic text-[${COLOR_CRIMSON}] text-xs`;
 
-    const handleSignIn = async (): Promise<void> => {
-        if (!validEmail || !validPassword) {
-            Alert.alert(COMMON_ALERT_TITLE, COMMON_FIELD_WRONG_FORMAT);
-            return;
-        }
-
-        const promise = authApi.signIn(email, password);
+    const handleSignIn = async (data: FormData): Promise<void> => {
+        setIsLoading(true);
         try {
-            const response = await promise;
+            const response = await authApi.signIn(data.email, data.password);
             if (response.success) {
                 navigation.navigate("MainScreen");
             } else {
@@ -55,14 +64,9 @@ const SignIn = (props: SignInProps): ReactElement<SignInProps> => {
         } catch (error) {
             alert(SIGN_IN_ERROR_OCCURED);
             console.error(`fail: ${String(error)}`);
+        } finally {
+            setIsLoading(false);
         }
-    };
-
-    const validateEmail = (): void => {
-        validateText(email, /\s*[^\s]+\s*/, setValidEmail);
-    };
-    const validatePassword = (): void => {
-        validateText(password, /\s*[^\s]+\s*/, setValidPassword);
     };
 
     const handleSignUpRedirect = (): void => {
@@ -70,68 +74,98 @@ const SignIn = (props: SignInProps): ReactElement<SignInProps> => {
     };
 
     return (
-        <View className="flex-1 my-16 mx-8">
-            <View>
-                <Text className="text-4xl font-bold">Xin chào</Text>
-            </View>
-            <View className="mt-16 w-full">
+        <>
+            <View className="flex-1 my-16 mx-8">
                 <View>
-                    <Text>{SIGN_IN_EMAIL_TITLE}</Text>
-                    <Text
-                        className={
-                            errorTextDefaultClass +
-                            " " +
-                            (validEmail ? "hidden" : "flex")
-                        }
-                    >
-                        {COMMON_EMPTY_FIELD_NOT_ALLOWED}
+                    <Text className="text-4xl font-bold">Xin chào</Text>
+                </View>
+                <View className="mt-16 w-full">
+                    <View>
+                        <Text>{SIGN_IN_EMAIL_TITLE}</Text>
+                    </View>
+                    <Controller
+                        control={control}
+                        name="email"
+                        rules={{
+                            required: true,
+                            pattern:
+                                /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
+                        }}
+                        render={({ field: { onChange, onBlur, value } }) => (
+                            <TextInput
+                                className={authInputStyles.textInput}
+                                onBlur={onBlur}
+                                onChangeText={onChange}
+                                value={value}
+                                placeholder={SIGN_IN_EMAIL_PLACEHOLDER}
+                            />
+                        )}
+                    />
+                    <View className="mt-2">
+                        {errors.email?.type === "required" && (
+                            <Text className={errorTextStyle}>
+                                {COMMON_EMPTY_FIELD_NOT_ALLOWED}
+                            </Text>
+                        )}
+                        {errors.email?.type === "pattern" && (
+                            <Text className={errorTextStyle}>
+                                {AUTH_EMAIL_INVALID}
+                            </Text>
+                        )}
+                    </View>
+                    <View>
+                        <Text className="mt-6">{SIGN_IN_PASSWORD_TITLE}</Text>
+                    </View>
+                    <Controller
+                        control={control}
+                        name="password"
+                        rules={{ required: true, minLength: 8 }}
+                        render={({ field: { onChange, onBlur, value } }) => (
+                            <TextInput
+                                textContentType="password"
+                                secureTextEntry={true}
+                                className={authInputStyles.textInput}
+                                onBlur={onBlur}
+                                onChangeText={onChange}
+                                value={value}
+                                placeholder={SIGN_IN_PASSWORD_PLACEHOLDER}
+                            />
+                        )}
+                    />
+                    <View className="mt-2">
+                        {errors.password?.type === "required" && (
+                            <Text className={errorTextStyle}>
+                                {COMMON_EMPTY_FIELD_NOT_ALLOWED}
+                            </Text>
+                        )}
+                        {errors.password?.type === "minLength" && (
+                            <Text className={errorTextStyle}>
+                                {AUTH_PASSWORD_TOO_SHORT}
+                            </Text>
+                        )}
+                    </View>
+                </View>
+                <View className="mt-6">
+                    <Text style={{ color: "#FFCD80" }}>
+                        {SIGN_IN_FORGET_PASSWORD}
                     </Text>
                 </View>
-                <TextInput
-                    className={authInputStyles.textInput}
-                    onChangeText={setEmail}
-                    defaultValue={email}
-                    placeholder={SIGN_IN_EMAIL_PLACEHOLDER}
-                    onTextInput={validateEmail}
-                />
-                <View>
-                    <Text className="mt-8">{SIGN_IN_PASSWORD_TITLE}</Text>
-                    <Text
-                        className={
-                            errorTextDefaultClass +
-                            " " +
-                            (validPassword ? "hidden" : "flex")
-                        }
-                    >
-                        {COMMON_EMPTY_FIELD_NOT_ALLOWED}
-                    </Text>
+                <View className="mt-4">
+                    <AuthButton
+                        title={SIGN_IN_SIGN_IN_BUTTON_TITLE}
+                        onPress={handleSubmit(handleSignIn)}
+                        disabled={isLoading}
+                    />
                 </View>
-                <TextInput
-                    className={authInputStyles.textInput}
-                    onChangeText={setPassword}
-                    defaultValue={password}
-                    textContentType="password"
-                    placeholder={SIGN_IN_PASSWORD_PLACEHOLDER}
-                    secureTextEntry={true}
-                    onTextInput={validatePassword}
-                />
+                <View className="mt-40 flex-row justify-center">
+                    <Text>{SIGN_IN_CREATE_ACCOUNT_TITLE}</Text>
+                    <TouchableOpacity onPress={handleSignUpRedirect}>
+                        <Text>{SIGN_IN_CREATE_ACCOUNT_BUTTON_TITLE}</Text>
+                    </TouchableOpacity>
+                </View>
             </View>
-            <View className="mt-4">
-                <Text style={{ color: "#FFCD80" }}>{SIGN_IN_FORGET_PASSWORD}</Text>
-            </View>
-            <View className="mt-4">
-                <AuthButton
-                    title={SIGN_IN_SIGN_IN_BUTTON_TITLE}
-                    onPress={handleSignIn}
-                />
-            </View>
-            <View className="mt-40 flex-row justify-center">
-                <Text>{SIGN_IN_CREATE_ACCOUNT_TITLE}</Text>
-                <TouchableOpacity onPress={handleSignUpRedirect}>
-                    <Text>{SIGN_IN_CREATE_ACCOUNT_BUTTON_TITLE}</Text>
-                </TouchableOpacity>
-            </View>
-        </View>
+            {isLoading && <OverlayLoading />}
+        </>
     );
 };
 
