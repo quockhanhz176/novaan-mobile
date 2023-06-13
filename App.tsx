@@ -6,7 +6,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import SignIn from "./src/pages/auth/SignIn";
 import SignUp from "./src/pages/auth/SignUp";
-import MainScreen from "./src/pages/home/MainScreen";
+import MainScreens from "./src/pages/MainScreens";
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 export type RootStackParamList = {
@@ -38,7 +38,7 @@ const App = () => {
                     />
                     <RootStack.Screen
                         name="MainScreen"
-                        component={MainScreen}
+                        component={MainScreens}
                         options={{ title: "Main Screen" }}
                     />
                 </RootStack.Navigator>
