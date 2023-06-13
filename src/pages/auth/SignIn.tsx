@@ -3,8 +3,8 @@ import React, { useState, type ReactElement } from "react";
 import { Text, TextInput, View, TouchableOpacity } from "react-native";
 import { type NativeStackNavigationProp } from "@react-navigation/native-stack";
 
-import { authInputStyles } from "components/auth/AuthInput";
-import AuthButton from "components/auth/AuthButton";
+import { authInputStyles } from "@/components/auth/AuthInput";
+import AuthButton from "@/components/auth/AuthButton";
 
 interface SignInProps {
     navigation: NativeStackNavigationProp<RootStackParamList, "SignIn">;
@@ -16,7 +16,7 @@ const SignIn = (props: SignInProps): ReactElement<SignInProps> => {
     const [accountId, setAccountId] = useState<string>("");
     const [password, setPassword] = useState<string>("");
 
-    const handleSignIn = (): void => {
+    const handleSignIn = async (): Promise<void> => {
         navigation.navigate("MainScreen");
     };
 

@@ -32,6 +32,12 @@
       <dict>
         <key>CFBundleURLSchemes</key>
         <array>
+          <string>com.googleusercontent.apps.674305079034-vpki28hmqj8ckbf0ekcbmj5q79fj0kl2</string>
+        </array>
+      </dict>
+      <dict>
+        <key>CFBundleURLSchemes</key>
+        <array>
           <string>exp+novaan-mobile</string>
         </array>
       </dict>

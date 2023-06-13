@@ -1,11 +1,6 @@
-import dotenv from "dotenv";
 import { getKeychainValue } from "../keychain/KeychainService";
 import { type Undefinable } from "../types/common";
-dotenv.config();
-
-const API_URL = process.env.API_URL;
-const API_TIMEOUT = process.env.API_TIMEOUT;
-const KEYCHAIN_ID = process.env.KEYCHAIN_ID;
+import { API_URL, API_TIMEOUT, KEYCHAIN_ID } from "@env";
 
 interface RequestConfig {
     timeout: number;
@@ -19,7 +14,7 @@ enum HttpMethod {
     DELETE = "DELETE",
 }
 
-export default class BaseApi {
+class BaseApi {
     private readonly apiURL: string;
     private readonly keychainId: string;
 
@@ -32,7 +27,6 @@ export default class BaseApi {
         }
 
         this.apiURL = API_URL;
-        this.keychainId = KEYCHAIN_ID;
     }
 
     getDefaultConfig(): RequestConfig {
@@ -65,7 +59,7 @@ export default class BaseApi {
     }
 
     async get<ResponseType>(
-        url: string,
+        url: string = "",
         requestConfig?: RequestConfig
     ): Promise<ResponseType> {
         return await this.sendRequestBase(url, HttpMethod.GET, requestConfig);
@@ -145,3 +139,5 @@ export default class BaseApi {
         return await response.json();
     }
 }
+
+export default BaseApi;

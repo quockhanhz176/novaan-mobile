@@ -3,8 +3,8 @@ import React, { useState, type ReactElement } from "react";
 import { Text, TextInput, View, TouchableOpacity } from "react-native";
 import { type NativeStackNavigationProp } from "@react-navigation/native-stack";
 
-import { authInputStyles } from "components/auth/AuthInput";
-import AuthButton from "components/auth/AuthButton";
+import { authInputStyles } from "@/components/auth/AuthInput";
+import AuthButton from "@/components/auth/AuthButton";
 
 interface SignUpProps {
     navigation: NativeStackNavigationProp<RootStackParamList, "SignIn">;
