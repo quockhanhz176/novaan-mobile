@@ -1,4 +1,4 @@
-export default interface SignUpResponse {
+export interface SignUpResponse {
     success: boolean;
     token: string;
 }

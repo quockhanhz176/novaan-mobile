@@ -1,6 +1,10 @@
 import BaseApi from "../BaseApi";
-import type SignInRequest from "./types/SignInRequest";
-import type SignInResponse from "./types/SignInResponse";
+import {
+    type SignInResponse,
+    type SignInRequest,
+    type SignUpRequest,
+    type SignUpResponse,
+} from "./types";
 
 const SIGNIN_URL = "auth/signin";
 
@@ -20,7 +24,7 @@ const signUp = async (
     usernameOrEmail: string,
     password: string
 ): Promise<SignInResponse> => {
-    return await baseApi.post<SignInRequest, SignInResponse>(SIGNIN_URL, {
+    return await baseApi.post<SignUpRequest, SignUpResponse>(SIGNIN_URL, {
         usernameOrEmail,
         password,
     });
