@@ -1,5 +1,5 @@
 import { getKeychainValue } from "@/keychain/KeychainService";
-import { type Undefinable } from "@/common/types/common";
+import { type Undefinable } from "@/common/types";
 import { API_URL, API_TIMEOUT, KEYCHAIN_ID } from "@env";
 
 interface RequestConfig {
