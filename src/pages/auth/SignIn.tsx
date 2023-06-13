@@ -20,9 +20,10 @@ import {
     SIGN_IN_CREATE_ACCOUNT_BUTTON_TITLE,
     AUTH_EMAIL_INVALID,
     AUTH_PASSWORD_TOO_SHORT,
+    SIGN_IN_GREETING,
 } from "@/common/messages";
 import authApi from "@/api/auth/AuthApi";
-import { COLOR_CRIMSON } from "@/common/colors";
+import { COLOR_CRIMSON, COLOR_ZOMP } from "@/common/colors";
 import OverlayLoading from "@/components/common/OverlayLoading";
 
 interface SignInProps {
@@ -50,6 +51,7 @@ const SignIn = (props: SignInProps): ReactElement<SignInProps> => {
         mode: "all",
     });
 
+    // TODO: find out why doesn't native wind color work
     const errorTextStyle = `italic text-[${COLOR_CRIMSON}] text-xs`;
 
     const handleSignIn = async (data: FormData): Promise<void> => {
@@ -77,7 +79,9 @@ const SignIn = (props: SignInProps): ReactElement<SignInProps> => {
         <>
             <View className="flex-1 my-16 mx-8">
                 <View>
-                    <Text className="text-4xl font-bold">Xin chào</Text>
+                    <Text className="text-4xl font-bold">
+                        {SIGN_IN_GREETING}
+                    </Text>
                 </View>
                 <View className="mt-16 w-full">
                     <View>
@@ -103,12 +107,18 @@ const SignIn = (props: SignInProps): ReactElement<SignInProps> => {
                     />
                     <View className="mt-2">
                         {errors.email?.type === "required" && (
-                            <Text className={errorTextStyle}>
+                            <Text
+                                className={errorTextStyle}
+                                style={Styles.errorMessageStyle}
+                            >
                                 {COMMON_EMPTY_FIELD_NOT_ALLOWED}
                             </Text>
                         )}
                         {errors.email?.type === "pattern" && (
-                            <Text className={errorTextStyle}>
+                            <Text
+                                className={errorTextStyle}
+                                style={Styles.errorMessageStyle}
+                            >
                                 {AUTH_EMAIL_INVALID}
                             </Text>
                         )}
@@ -134,19 +144,25 @@ const SignIn = (props: SignInProps): ReactElement<SignInProps> => {
                     />
                     <View className="mt-2">
                         {errors.password?.type === "required" && (
-                            <Text className={errorTextStyle}>
+                            <Text
+                                className={errorTextStyle}
+                                style={Styles.errorMessageStyle}
+                            >
                                 {COMMON_EMPTY_FIELD_NOT_ALLOWED}
                             </Text>
                         )}
                         {errors.password?.type === "minLength" && (
-                            <Text className={errorTextStyle}>
+                            <Text
+                                className={errorTextStyle}
+                                style={Styles.errorMessageStyle}
+                            >
                                 {AUTH_PASSWORD_TOO_SHORT}
                             </Text>
                         )}
                     </View>
                 </View>
                 <View className="mt-6">
-                    <Text style={{ color: "#FFCD80" }}>
+                    <Text style={{ color: COLOR_ZOMP }}>
                         {SIGN_IN_FORGET_PASSWORD}
                     </Text>
                 </View>
@@ -160,13 +176,21 @@ const SignIn = (props: SignInProps): ReactElement<SignInProps> => {
                 <View className="mt-40 flex-row justify-center">
                     <Text>{SIGN_IN_CREATE_ACCOUNT_TITLE}</Text>
                     <TouchableOpacity onPress={handleSignUpRedirect}>
-                        <Text>{SIGN_IN_CREATE_ACCOUNT_BUTTON_TITLE}</Text>
+                        <Text style={{ color: COLOR_ZOMP }}>
+                            {SIGN_IN_CREATE_ACCOUNT_BUTTON_TITLE}
+                        </Text>
                     </TouchableOpacity>
                 </View>
             </View>
             {isLoading && <OverlayLoading />}
         </>
     );
+};
+
+const Styles = {
+    errorMessageStyle: {
+        color: COLOR_CRIMSON,
+    },
 };
 
 export default SignIn;
