@@ -1,5 +1,5 @@
-import { getKeychainValue } from "../keychain/KeychainService";
-import { type Undefinable } from "../types/common";
+import { getKeychainValue } from "@/keychain/KeychainService";
+import { type Undefinable } from "@/common/types/common";
 import { API_URL, API_TIMEOUT, KEYCHAIN_ID } from "@env";
 
 interface RequestConfig {
@@ -135,6 +135,8 @@ class BaseApi {
         });
 
         clearTimeout(timeoutId);
+
+        console.log(JSON.stringify(response));
 
         return await response.json();
     }
