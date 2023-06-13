@@ -1,6 +1,6 @@
 import { type RootStackParamList } from "App";
 import React, { useState, type ReactElement } from "react";
-import { Text, TextInput, View, TouchableOpacity, Alert } from "react-native";
+import { Text, TextInput, View, TouchableOpacity } from "react-native";
 import { type NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useForm, Controller } from "react-hook-form";
 
