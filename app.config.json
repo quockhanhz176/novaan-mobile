@@ -5,6 +5,7 @@
         "slug": "novaan-mobile",
         "currentFullName": "Novaan",
         "originalFullName": "Novaan",
+        "backgroundColor": "#ffffff",
         "extra": {
             "eas": {
                 "projectId": "babc80ee-da56-4401-95da-3f9272aa68cf"

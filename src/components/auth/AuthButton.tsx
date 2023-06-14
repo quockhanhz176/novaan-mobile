@@ -13,8 +13,7 @@ const AuthButton = (props: AuthButtonProps): ReactElement<AuthButtonProps> => {
     return (
         <TouchableOpacity
             onPress={onPress}
-            className="w-full px-8 py-4 rounded-lg items-center"
-            style={{ backgroundColor: "#149575" }}
+            className="w-full px-8 py-4 rounded-lg items-center bg-cprimary-300"
             disabled={disabled}
         >
             <Text className="text-lg font-semibold text-white">{title}</Text>

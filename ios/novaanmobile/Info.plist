@@ -59,6 +59,8 @@
         </dict>
       </dict>
     </dict>
+    <key>RCTRootViewBackgroundColor</key>
+    <integer>4294967295</integer>
     <key>UILaunchStoryboardName</key>
     <string>SplashScreen</string>
     <key>UIRequiredDeviceCapabilities</key>

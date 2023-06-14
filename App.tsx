@@ -24,6 +24,9 @@ const App = () => {
                 <RootStack.Navigator
                     screenOptions={{
                         headerShown: false,
+                        contentStyle: {
+                            backgroundColor: "#FFFFFF",
+                        },
                     }}
                 >
                     <RootStack.Screen

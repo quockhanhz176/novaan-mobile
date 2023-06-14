@@ -74,3 +74,5 @@ ios
 .expo
 # Github config
 .github
+
+package-lock.json
