@@ -12,14 +12,11 @@
             }
         },
         "android": {
-            "package": "com.saltytuna.novaanmobile",
-            "googleServicesFile": "./google-services.json"
+            "package": "com.saltytuna.novaanmobile"
         },
         "ios": {
-            "bundleIdentifier": "com.saltytuna.novaanmobile",
-            "googleServicesFile": "./GoogleService-Info.plist"
+            "bundleIdentifier": "com.saltytuna.novaanmobile"
         },
-        "plugins": ["@react-native-google-signin/google-signin"],
         "updates": {
             "requestHeaders": {
                 "expo-channel-name": "main"
@@ -29,6 +26,6 @@
         "runtimeVersion": {
             "policy": "sdkVersion"
         },
-        "scheme": "novaan"
+        "scheme": "novaanapp"
     }
 }

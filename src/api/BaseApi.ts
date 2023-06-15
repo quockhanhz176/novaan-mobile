@@ -136,8 +136,6 @@ class BaseApi {
 
         clearTimeout(timeoutId);
 
-        console.log(JSON.stringify(response));
-
         return response;
     }
 }

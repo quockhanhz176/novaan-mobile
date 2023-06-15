@@ -102,13 +102,13 @@ const SignUp = (props: SignUpProps): ReactElement<SignUpProps> => {
 
     return (
         <>
-            <View className="flex-1 my-16 mx-8">
+            <View className="flex-1 mt-20 mx-8">
                 <View>
-                    <Text className="text-2xl font-bold">
+                    <Text className="text-4xl font-bold">
                         Tạo tài khoản mới
                     </Text>
                 </View>
-                <View className="mt-8 w-full">
+                <View className="mt-10 w-full">
                     <Text>{SIGN_UP_EMAIL_TITLE}</Text>
                     <Controller
                         control={control}
@@ -138,7 +138,8 @@ const SignUp = (props: SignUpProps): ReactElement<SignUpProps> => {
                             <ErrorText>{AUTH_EMAIL_INVALID}</ErrorText>
                         )}
                     </View>
-                    <Text className="mt-8">{SIGN_UP_USERNAME_TITLE}</Text>
+
+                    <Text className="mt-6">{SIGN_UP_USERNAME_TITLE}</Text>
                     <Controller
                         control={control}
                         name="username"
@@ -167,7 +168,7 @@ const SignUp = (props: SignUpProps): ReactElement<SignUpProps> => {
                         )}
                     </View>
 
-                    <Text className="mt-8">{SIGN_UP_PASSWORD_TITLE}</Text>
+                    <Text className="mt-6">{SIGN_UP_PASSWORD_TITLE}</Text>
                     <Controller
                         control={control}
                         name="password"
@@ -198,7 +199,7 @@ const SignUp = (props: SignUpProps): ReactElement<SignUpProps> => {
                         )}
                     </View>
 
-                    <Text className="mt-8">
+                    <Text className="mt-6">
                         {SIGN_UP_REENTER_PASSWORD_TITLE}
                     </Text>
                     <Controller
@@ -236,19 +237,23 @@ const SignUp = (props: SignUpProps): ReactElement<SignUpProps> => {
                         )}
                     </View>
                 </View>
+
                 <View className="mt-8">
                     <AuthButton
                         title={SIGN_UP_SIGN_UP_BUTTON_TITLE}
                         onPress={handleSubmit(handleSignUp)}
                     />
                 </View>
-                <View className="mt-4 flex-row justify-center">
-                    <Text>{SIGN_UP_SIGN_IN_TITLE}</Text>
-                    <TouchableOpacity onPress={handleSignInRedirect}>
-                        <Text className="text-cprimary-200">
-                            {SIGN_UP_SIGN_IN_BUTTON_TITLE}
-                        </Text>
-                    </TouchableOpacity>
+
+                <View className="flex-1 items-center justify-center">
+                    <View className="flex-row justify-center">
+                        <Text>{SIGN_UP_SIGN_IN_TITLE}</Text>
+                        <TouchableOpacity onPress={handleSignInRedirect}>
+                            <Text className="text-cprimary-300">
+                                {SIGN_UP_SIGN_IN_BUTTON_TITLE}
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
                 </View>
             </View>
             {isLoading && <OverlayLoading />}

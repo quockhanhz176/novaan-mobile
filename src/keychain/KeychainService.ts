@@ -18,10 +18,12 @@ export const getKeychainValue = async (key: string): Promise<string> => {
     return keychain;
 };
 
-export const deleteKeychainValue = async (key: string): Promise<void> => {
+export const deleteKeychainValue = async (key: string): Promise<boolean> => {
     try {
         await SecureStore.deleteItemAsync(key);
     } catch {
-        console.log("Keychain not found");
+        return false;
     }
+
+    return true;
 };

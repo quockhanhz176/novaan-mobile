@@ -1,8 +1,9 @@
+export type SignUpErrReason = "email exists" | "username exists" | "unknown";
 export type SignUpResponse =
     | {
           success: true;
       }
     | {
           success: false;
-          reason: "email exists" | "username exists" | "unknown";
+          reason: SignUpErrReason;
       };

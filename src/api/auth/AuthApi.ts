@@ -4,10 +4,15 @@ import {
     type SignInRequest,
     type SignUpRequest,
     type SignUpResponse,
+    type SignInGoogleRequest,
+    type SignUpErrReason,
 } from "./types";
 
 const SIGN_IN_URL = "auth/signin";
 const SIGN_UP_URL = "auth/signup";
+const SIGNIN_GOOGLE_URL = "auth/google";
+
+// TODO: Change this to error code later
 const SIGN_UP_EMAIL_EXIST_ERROR =
     "This email had been associated with another account.";
 const SIGN_UP_USERNAME_EXIST_ERROR =
@@ -36,31 +41,53 @@ const signUp = async (
         password,
         email,
     });
+
     if (!response.ok) {
-        const responseBody: null | {
-            Success: boolean;
-            Body: { Message: string };
-        } = await response.json();
-        const message = responseBody?.Body.Message;
+        const body = await response.json();
+        const message = body?.body.message;
+
+        // TODO: Change this to error code later
+        let errMessage: SignUpErrReason = "unknown";
+        switch (message) {
+            case SIGN_UP_EMAIL_EXIST_ERROR:
+                errMessage = "email exists";
+                break;
+            case SIGN_UP_USERNAME_EXIST_ERROR:
+                errMessage = "username exists";
+                break;
+        }
         return {
             success: false,
-            reason:
-                message === SIGN_UP_EMAIL_EXIST_ERROR
-                    ? "email exists"
-                    : message === SIGN_UP_USERNAME_EXIST_ERROR
-                    ? "username exists"
-                    : "unknown",
+            reason: errMessage,
         };
     }
-
     return {
         success: true,
     };
 };
 
+const signInWithGoogle = async (token: string): Promise<SignInResponse> => {
+    try {
+        const response = await baseApi.post<SignInGoogleRequest>(
+            SIGNIN_GOOGLE_URL,
+            {
+                token,
+            }
+        );
+        if (!response.ok) {
+            throw new Error();
+        }
+        return await response.json();
+    } catch (err) {
+        console.log("Sign in with Google ERR", err);
+        throw err;
+    }
+};
+
 const authApi = {
     signIn,
     signUp,
+    signInWithGoogle,
 };
 
 export default authApi;
