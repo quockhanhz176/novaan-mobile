@@ -8,7 +8,7 @@ import { authInputStyles } from "@/components/auth/AuthInput";
 import AuthButton from "@/components/auth/AuthButton";
 import {
     SIGN_IN_WRONG_USERNAME_PASSWORD,
-    SIGN_IN_ERROR_OCCURED,
+    COMMON_SERVER_CONNECTION_FAIL_ERROR,
     SIGN_IN_EMAIL_TITLE,
     COMMON_EMPTY_FIELD_NOT_ALLOWED,
     SIGN_IN_EMAIL_PLACEHOLDER,
@@ -21,10 +21,10 @@ import {
     AUTH_EMAIL_INVALID,
     AUTH_PASSWORD_TOO_SHORT,
     SIGN_IN_GREETING,
-} from "@/common/messages";
+} from "@/common/strings";
 import authApi from "@/api/auth/AuthApi";
-import { COLOR_ZOMP } from "@/common/colors";
 import OverlayLoading from "@/components/common/OverlayLoading";
+import ErrorText from "@/components/common/ErrorText";
 
 interface SignInProps {
     navigation: NativeStackNavigationProp<RootStackParamList, "SignIn">;
@@ -51,8 +51,6 @@ const SignIn = (props: SignInProps): ReactElement<SignInProps> => {
         mode: "all",
     });
 
-    const errorTextStyle = "italic text-xs text-cwarning";
-
     const handleSignIn = async (data: FormData): Promise<void> => {
         setIsLoading(true);
         try {
@@ -63,7 +61,7 @@ const SignIn = (props: SignInProps): ReactElement<SignInProps> => {
                 alert(SIGN_IN_WRONG_USERNAME_PASSWORD);
             }
         } catch (error) {
-            alert(SIGN_IN_ERROR_OCCURED);
+            alert(COMMON_SERVER_CONNECTION_FAIL_ERROR);
             console.error(`fail: ${String(error)}`);
         } finally {
             setIsLoading(false);
@@ -107,14 +105,12 @@ const SignIn = (props: SignInProps): ReactElement<SignInProps> => {
 
                     <View className="mt-2">
                         {errors.email?.type === "required" && (
-                            <Text className={errorTextStyle}>
+                            <ErrorText>
                                 {COMMON_EMPTY_FIELD_NOT_ALLOWED}
-                            </Text>
+                            </ErrorText>
                         )}
                         {errors.email?.type === "pattern" && (
-                            <Text className={errorTextStyle}>
-                                {AUTH_EMAIL_INVALID}
-                            </Text>
+                            <ErrorText>{AUTH_EMAIL_INVALID}</ErrorText>
                         )}
                     </View>
 
@@ -140,14 +136,12 @@ const SignIn = (props: SignInProps): ReactElement<SignInProps> => {
 
                     <View className="mt-2">
                         {errors.password?.type === "required" && (
-                            <Text className={errorTextStyle}>
+                            <ErrorText>
                                 {COMMON_EMPTY_FIELD_NOT_ALLOWED}
-                            </Text>
+                            </ErrorText>
                         )}
                         {errors.password?.type === "minLength" && (
-                            <Text className={errorTextStyle}>
-                                {AUTH_PASSWORD_TOO_SHORT}
-                            </Text>
+                            <ErrorText>{AUTH_PASSWORD_TOO_SHORT}</ErrorText>
                         )}
                     </View>
                 </View>
@@ -169,7 +163,7 @@ const SignIn = (props: SignInProps): ReactElement<SignInProps> => {
                     <View className="flex-row justify-center">
                         <Text>{SIGN_IN_CREATE_ACCOUNT_TITLE}</Text>
                         <TouchableOpacity onPress={handleSignUpRedirect}>
-                            <Text style={{ color: COLOR_ZOMP }}>
+                            <Text className="text-cprimary-200">
                                 {SIGN_IN_CREATE_ACCOUNT_BUTTON_TITLE}
                             </Text>
                         </TouchableOpacity>

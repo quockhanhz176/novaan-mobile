@@ -58,18 +58,18 @@ class BaseApi {
         return headers;
     }
 
-    async get<ResponseType>(
+    async get(
         url: string = "",
         requestConfig?: RequestConfig
-    ): Promise<ResponseType> {
+    ): Promise<Response> {
         return await this.sendRequestBase(url, HttpMethod.GET, requestConfig);
     }
 
-    async post<RequestType, ResponseType>(
+    async post<RequestType>(
         url: string,
         body: RequestType,
         requestConfig?: RequestConfig
-    ): Promise<ResponseType> {
+    ): Promise<Response> {
         return await this.sendRequestBase(
             url,
             HttpMethod.POST,
@@ -78,11 +78,11 @@ class BaseApi {
         );
     }
 
-    async put<RequestType, ResponseType>(
+    async put<RequestType>(
         url: string,
         body: RequestType,
         requestConfig?: RequestConfig
-    ): Promise<ResponseType> {
+    ): Promise<Response> {
         return await this.sendRequestBase(
             url,
             HttpMethod.PUT,
@@ -91,10 +91,10 @@ class BaseApi {
         );
     }
 
-    async delete<ResponseType>(
+    async delete(
         url: string,
         requestConfig?: RequestConfig
-    ): Promise<ResponseType> {
+    ): Promise<Response> {
         return await this.sendRequestBase(
             url,
             HttpMethod.DELETE,
@@ -107,7 +107,7 @@ class BaseApi {
         method: string,
         requestConfig: Undefinable<RequestConfig> = this.getDefaultConfig(),
         body?: any
-    ): Promise<any> {
+    ): Promise<Response> {
         const headers = await this.getHeaders(
             requestConfig.authorizationRequired
         );
@@ -138,7 +138,7 @@ class BaseApi {
 
         console.log(JSON.stringify(response));
 
-        return await response.json();
+        return response;
     }
 }
 

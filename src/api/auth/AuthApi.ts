@@ -6,7 +6,12 @@ import {
     type SignUpResponse,
 } from "./types";
 
-const SIGNIN_URL = "auth/signin";
+const SIGN_IN_URL = "auth/signin";
+const SIGN_UP_URL = "auth/signup";
+const SIGN_UP_EMAIL_EXIST_ERROR =
+    "This email had been associated with another account.";
+const SIGN_UP_USERNAME_EXIST_ERROR =
+    "This username had been associated with another account.";
 
 const baseApi = new BaseApi();
 
@@ -14,20 +19,43 @@ const signIn = async (
     usernameOrEmail: string,
     password: string
 ): Promise<SignInResponse> => {
-    return await baseApi.post<SignInRequest, SignInResponse>(SIGNIN_URL, {
+    const response = await baseApi.post<SignInRequest>(SIGN_IN_URL, {
         usernameOrEmail,
         password,
     });
+    return await response.json();
 };
 
 const signUp = async (
-    usernameOrEmail: string,
+    username: string,
+    email: string,
     password: string
-): Promise<SignInResponse> => {
-    return await baseApi.post<SignUpRequest, SignUpResponse>(SIGNIN_URL, {
-        usernameOrEmail,
+): Promise<SignUpResponse> => {
+    const response = await baseApi.post<SignUpRequest>(SIGN_UP_URL, {
+        username,
         password,
+        email,
     });
+    if (!response.ok) {
+        const responseBody: null | {
+            Success: boolean;
+            Body: { Message: string };
+        } = await response.json();
+        const message = responseBody?.Body.Message;
+        return {
+            success: false,
+            reason:
+                message === SIGN_UP_EMAIL_EXIST_ERROR
+                    ? "email exists"
+                    : message === SIGN_UP_USERNAME_EXIST_ERROR
+                    ? "username exists"
+                    : "unknown",
+        };
+    }
+
+    return {
+        success: true,
+    };
 };
 
 const authApi = {

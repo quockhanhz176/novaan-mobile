@@ -1,23 +1,99 @@
 import { type RootStackParamList } from "App";
 import React, { useState, type ReactElement } from "react";
-import { Text, TextInput, View, TouchableOpacity } from "react-native";
+import { Text, TextInput, View, TouchableOpacity, Alert } from "react-native";
 import { type NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import { authInputStyles } from "@/components/auth/AuthInput";
 import AuthButton from "@/components/auth/AuthButton";
+import {
+    AUTH_EMAIL_INVALID,
+    AUTH_PASSWORD_TOO_SHORT,
+    AUTH_USERNAME_TOO_SHORT,
+    COMMON_EMPTY_FIELD_NOT_ALLOWED,
+    COMMON_SERVER_CONNECTION_FAIL_ERROR,
+    SIGN_UP_EMAIL_EXISTS_ERROR,
+    SIGN_UP_EMAIL_PLACEHOLDER,
+    SIGN_UP_EMAIL_TITLE,
+    SIGN_UP_FAIL_TITLE,
+    SIGN_UP_PASSWORD_PLACEHOLDER,
+    SIGN_UP_PASSWORD_TITLE,
+    SIGN_UP_REENTER_PASSWORD_DIFFERENT_ERROR,
+    SIGN_UP_REENTER_PASSWORD_PLACEHOLDER,
+    SIGN_UP_REENTER_PASSWORD_TITLE,
+    SIGN_UP_SIGN_IN_BUTTON_TITLE,
+    SIGN_UP_SIGN_IN_TITLE,
+    SIGN_UP_SIGN_UP_BUTTON_TITLE,
+    SIGN_UP_SUCCESS_MESSAGE,
+    SIGN_UP_SUCCESS_TITLE,
+    SIGN_UP_USERNAME_EXISTS_ERROR,
+    SIGN_UP_USERNAME_PLACEHOLDER,
+    SIGN_UP_USERNAME_TITLE,
+    SIGN_UP_UNKNOWN_ERROR,
+} from "@/common/strings";
+import authApi from "@/api/auth/AuthApi";
+import OverlayLoading from "@/components/common/OverlayLoading";
+import { useForm, Controller } from "react-hook-form";
+import ErrorText from "@/components/common/ErrorText";
 
 interface SignUpProps {
     navigation: NativeStackNavigationProp<RootStackParamList, "SignIn">;
 }
 
+interface FormData {
+    username: string;
+    email: string;
+    password: string;
+    reenterPassword: string;
+}
+
 const SignUp = (props: SignUpProps): ReactElement<SignUpProps> => {
     const { navigation } = props;
 
-    const [accountId, setAccountId] = useState<string>("");
-    const [password, setPassword] = useState<string>("");
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const {
+        handleSubmit,
+        control,
+        watch,
+        formState: { errors },
+    } = useForm<FormData>({
+        defaultValues: {
+            username: "",
+            email: "",
+            password: "",
+            reenterPassword: "",
+        },
+        mode: "all",
+    });
 
-    const handleSignUp = (): void => {
-        console.log("Sign In");
+    const handleSignUp = async (data: FormData): Promise<void> => {
+        setIsLoading(true);
+        try {
+            const response = await authApi.signUp(
+                data.username,
+                data.email,
+                data.password
+            );
+            if (!response.success) {
+                const failureMessage =
+                    response.reason === "email exists"
+                        ? SIGN_UP_EMAIL_EXISTS_ERROR
+                        : response.reason === "username exists"
+                        ? SIGN_UP_USERNAME_EXISTS_ERROR
+                        : SIGN_UP_UNKNOWN_ERROR;
+                Alert.alert(SIGN_UP_FAIL_TITLE, failureMessage);
+                return;
+            }
+
+            Alert.alert(SIGN_UP_SUCCESS_TITLE, SIGN_UP_SUCCESS_MESSAGE);
+            navigation.navigate("SignIn");
+        } catch (error) {
+            Alert.alert(
+                SIGN_UP_FAIL_TITLE,
+                COMMON_SERVER_CONNECTION_FAIL_ERROR
+            );
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const handleSignInRedirect = (): void => {
@@ -25,61 +101,158 @@ const SignUp = (props: SignUpProps): ReactElement<SignUpProps> => {
     };
 
     return (
-        <View className="flex-1 my-16 mx-8">
-            <View>
-                <Text className="text-2xl font-bold">Tạo tài khoản mới</Text>
+        <>
+            <View className="flex-1 my-16 mx-8">
+                <View>
+                    <Text className="text-2xl font-bold">
+                        Tạo tài khoản mới
+                    </Text>
+                </View>
+                <View className="mt-8 w-full">
+                    <Text>{SIGN_UP_EMAIL_TITLE}</Text>
+                    <Controller
+                        control={control}
+                        name="email"
+                        rules={{
+                            required: true,
+                            pattern:
+                                /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
+                        }}
+                        render={({ field: { onChange, onBlur, value } }) => (
+                            <TextInput
+                                className={authInputStyles.textInput}
+                                onBlur={onBlur}
+                                onChangeText={onChange}
+                                value={value}
+                                placeholder={SIGN_UP_EMAIL_PLACEHOLDER}
+                            />
+                        )}
+                    />
+                    <View className="mt-2">
+                        {errors.email?.type === "required" && (
+                            <ErrorText>
+                                {COMMON_EMPTY_FIELD_NOT_ALLOWED}
+                            </ErrorText>
+                        )}
+                        {errors.email?.type === "pattern" && (
+                            <ErrorText>{AUTH_EMAIL_INVALID}</ErrorText>
+                        )}
+                    </View>
+                    <Text className="mt-8">{SIGN_UP_USERNAME_TITLE}</Text>
+                    <Controller
+                        control={control}
+                        name="username"
+                        rules={{
+                            required: true,
+                            minLength: 6,
+                        }}
+                        render={({ field: { onChange, onBlur, value } }) => (
+                            <TextInput
+                                className={authInputStyles.textInput}
+                                onBlur={onBlur}
+                                onChangeText={onChange}
+                                value={value}
+                                placeholder={SIGN_UP_USERNAME_PLACEHOLDER}
+                            />
+                        )}
+                    />
+                    <View className="mt-2">
+                        {errors.username?.type === "required" && (
+                            <ErrorText>
+                                {COMMON_EMPTY_FIELD_NOT_ALLOWED}
+                            </ErrorText>
+                        )}
+                        {errors.username?.type === "minLength" && (
+                            <ErrorText>{AUTH_USERNAME_TOO_SHORT}</ErrorText>
+                        )}
+                    </View>
+
+                    <Text className="mt-8">{SIGN_UP_PASSWORD_TITLE}</Text>
+                    <Controller
+                        control={control}
+                        name="password"
+                        rules={{
+                            required: true,
+                            minLength: 8,
+                        }}
+                        render={({ field: { onChange, onBlur, value } }) => (
+                            <TextInput
+                                className={authInputStyles.textInput}
+                                onBlur={onBlur}
+                                onChangeText={onChange}
+                                value={value}
+                                textContentType="password"
+                                secureTextEntry={true}
+                                placeholder={SIGN_UP_PASSWORD_PLACEHOLDER}
+                            />
+                        )}
+                    />
+                    <View className="mt-2">
+                        {errors.password?.type === "required" && (
+                            <ErrorText>
+                                {COMMON_EMPTY_FIELD_NOT_ALLOWED}
+                            </ErrorText>
+                        )}
+                        {errors.password?.type === "minLength" && (
+                            <ErrorText>{AUTH_PASSWORD_TOO_SHORT}</ErrorText>
+                        )}
+                    </View>
+
+                    <Text className="mt-8">
+                        {SIGN_UP_REENTER_PASSWORD_TITLE}
+                    </Text>
+                    <Controller
+                        control={control}
+                        name="reenterPassword"
+                        rules={{
+                            required: true,
+                            validate: (value, formValues) =>
+                                value === watch("password"),
+                        }}
+                        render={({ field: { onChange, onBlur, value } }) => (
+                            <TextInput
+                                className={authInputStyles.textInput}
+                                onBlur={onBlur}
+                                onChangeText={onChange}
+                                value={value}
+                                textContentType="password"
+                                secureTextEntry={true}
+                                placeholder={
+                                    SIGN_UP_REENTER_PASSWORD_PLACEHOLDER
+                                }
+                            />
+                        )}
+                    />
+                    <View className="mt-2">
+                        {errors.reenterPassword?.type === "required" && (
+                            <ErrorText>
+                                {COMMON_EMPTY_FIELD_NOT_ALLOWED}
+                            </ErrorText>
+                        )}
+                        {errors.reenterPassword?.type === "validate" && (
+                            <ErrorText>
+                                {SIGN_UP_REENTER_PASSWORD_DIFFERENT_ERROR}
+                            </ErrorText>
+                        )}
+                    </View>
+                </View>
+                <View className="mt-8">
+                    <AuthButton
+                        title={SIGN_UP_SIGN_UP_BUTTON_TITLE}
+                        onPress={handleSubmit(handleSignUp)}
+                    />
+                </View>
+                <View className="mt-4 flex-row justify-center">
+                    <Text>{SIGN_UP_SIGN_IN_TITLE}</Text>
+                    <TouchableOpacity onPress={handleSignInRedirect}>
+                        <Text className="text-cprimary-200">
+                            {SIGN_UP_SIGN_IN_BUTTON_TITLE}
+                        </Text>
+                    </TouchableOpacity>
+                </View>
             </View>
-            <View className="mt-8 w-full">
-                <Text>Tài khoản email</Text>
-                <TextInput
-                    className={authInputStyles.textInput}
-                    onChangeText={setAccountId}
-                    defaultValue={accountId}
-                    placeholder="Nhập tài khoản email của bạn"
-                />
-                <Text className="mt-8">Tên đăng nhập</Text>
-                <TextInput
-                    className={authInputStyles.textInput}
-                    onChangeText={setPassword}
-                    defaultValue={password}
-                    textContentType="none"
-                    placeholder="Nhập tên đăng nhập"
-                />
-                <Text className="mt-8">Tên</Text>
-                <TextInput
-                    className={authInputStyles.textInput}
-                    onChangeText={setPassword}
-                    defaultValue={password}
-                    textContentType="none"
-                    placeholder="Nhập tên của bạn"
-                />
-                <Text className="mt-8">Mật khẩu</Text>
-                <TextInput
-                    className={authInputStyles.textInput}
-                    onChangeText={setPassword}
-                    defaultValue={password}
-                    textContentType="password"
-                    placeholder="Nhập mật khẩu của bạn"
-                />
-                <Text className="mt-8">Nhập lại mật khẩu</Text>
-                <TextInput
-                    className={authInputStyles.textInput}
-                    onChangeText={setPassword}
-                    defaultValue={password}
-                    textContentType="password"
-                    placeholder="Nhập lại mật khẩu của bạn"
-                />
-            </View>
-            <View className="mt-8">
-                <AuthButton title="Đăng ký" onPress={handleSignUp} />
-            </View>
-            <View className="mt-4 flex-row justify-center">
-                <Text>Bạn đã có tài khoản? </Text>
-                <TouchableOpacity onPress={handleSignInRedirect}>
-                    <Text>Đăng nhập</Text>
-                </TouchableOpacity>
-            </View>
-        </View>
+            {isLoading && <OverlayLoading />}
+        </>
     );
 };
 

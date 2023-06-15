@@ -1,4 +1,8 @@
-export interface SignUpResponse {
-    success: boolean;
-    token: string;
-}
+export type SignUpResponse =
+    | {
+          success: true;
+      }
+    | {
+          success: false;
+          reason: "email exists" | "username exists" | "unknown";
+      };
