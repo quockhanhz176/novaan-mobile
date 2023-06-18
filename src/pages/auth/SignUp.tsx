@@ -8,7 +8,6 @@ import AuthButton from "@/components/auth/AuthButton";
 import {
     AUTH_EMAIL_INVALID,
     AUTH_PASSWORD_TOO_SHORT,
-    AUTH_USERNAME_TOO_SHORT,
     COMMON_EMPTY_FIELD_NOT_ALLOWED,
     COMMON_SERVER_CONNECTION_FAIL_ERROR,
     SIGN_UP_EMAIL_EXISTS_ERROR,
@@ -26,9 +25,10 @@ import {
     SIGN_UP_SUCCESS_MESSAGE,
     SIGN_UP_SUCCESS_TITLE,
     SIGN_UP_USERNAME_EXISTS_ERROR,
-    SIGN_UP_USERNAME_PLACEHOLDER,
-    SIGN_UP_USERNAME_TITLE,
     SIGN_UP_UNKNOWN_ERROR,
+    SIGN_UP_NAME_PLACEHOLDER,
+    SIGN_UP_NAME_TITLE,
+    AUTH_NAME_INVALID,
 } from "@/common/strings";
 import authApi from "@/api/auth/AuthApi";
 import OverlayLoading from "@/components/common/OverlayLoading";
@@ -40,7 +40,7 @@ interface SignUpProps {
 }
 
 interface FormData {
-    username: string;
+    displayName: string;
     email: string;
     password: string;
     reenterPassword: string;
@@ -57,7 +57,7 @@ const SignUp = (props: SignUpProps): ReactElement<SignUpProps> => {
         formState: { errors },
     } = useForm<FormData>({
         defaultValues: {
-            username: "",
+            displayName: "",
             email: "",
             password: "",
             reenterPassword: "",
@@ -69,7 +69,7 @@ const SignUp = (props: SignUpProps): ReactElement<SignUpProps> => {
         setIsLoading(true);
         try {
             const response = await authApi.signUp(
-                data.username,
+                data.displayName,
                 data.email,
                 data.password
             );
@@ -139,13 +139,13 @@ const SignUp = (props: SignUpProps): ReactElement<SignUpProps> => {
                         )}
                     </View>
 
-                    <Text className="mt-6">{SIGN_UP_USERNAME_TITLE}</Text>
+                    <Text className="mt-6">{SIGN_UP_NAME_TITLE}</Text>
                     <Controller
                         control={control}
-                        name="username"
+                        name="displayName"
                         rules={{
                             required: true,
-                            minLength: 6,
+                            pattern: /^([a-zA-Z]+\s?)+[a-zA-Z]+$/,
                         }}
                         render={({ field: { onChange, onBlur, value } }) => (
                             <TextInput
@@ -153,18 +153,18 @@ const SignUp = (props: SignUpProps): ReactElement<SignUpProps> => {
                                 onBlur={onBlur}
                                 onChangeText={onChange}
                                 value={value}
-                                placeholder={SIGN_UP_USERNAME_PLACEHOLDER}
+                                placeholder={SIGN_UP_NAME_PLACEHOLDER}
                             />
                         )}
                     />
                     <View className="mt-2">
-                        {errors.username?.type === "required" && (
+                        {errors.displayName?.type === "required" && (
                             <ErrorText>
                                 {COMMON_EMPTY_FIELD_NOT_ALLOWED}
                             </ErrorText>
                         )}
-                        {errors.username?.type === "minLength" && (
-                            <ErrorText>{AUTH_USERNAME_TOO_SHORT}</ErrorText>
+                        {errors.displayName?.type === "pattern" && (
+                            <ErrorText>{AUTH_NAME_INVALID}</ErrorText>
                         )}
                     </View>
 

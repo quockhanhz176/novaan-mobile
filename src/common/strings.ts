@@ -10,12 +10,12 @@ export const COMMON_SERVER_CONNECTION_FAIL_ERROR =
 // Authentication
 export const AUTH_EMAIL_INVALID = "*Email không hợp lệ";
 export const AUTH_PASSWORD_TOO_SHORT = "*Mật khẩu phải dài ít nhất 8 kí tự";
-export const AUTH_USERNAME_TOO_SHORT =
-    "*Tên đăng nhập phải dài ít nhất 6 kí tự";
+export const AUTH_NAME_INVALID =
+    "*Tên hiện thị chỉ bao gồm chữ hoa, chữ thường và dẫu cách giữa các từ";
 
 // Sign in screen
 export const SIGN_IN_GREETING = "Xin chào";
-export const SIGN_IN_EMAIL_TITLE = "Email";
+export const SIGN_IN_EMAIL_TITLE = "Tên đăng nhập/Email";
 export const SIGN_IN_EMAIL_PLACEHOLDER = "Nhập email";
 export const SIGN_IN_PASSWORD_TITLE = "Mật khẩu";
 export const SIGN_IN_PASSWORD_PLACEHOLDER = "Nhập mật khẩu";
@@ -37,8 +37,8 @@ export const SIGN_UP_SUCCESS_MESSAGE =
     "Bạn đã đăng ký tài khoản thành công. Xin hãy đăng nhập để bắt đầu sử dụng ứng dụng.";
 export const SIGN_UP_EMAIL_TITLE = "Tài khoản email";
 export const SIGN_UP_EMAIL_PLACEHOLDER = "Nhập tài khoản email của bạn";
-export const SIGN_UP_USERNAME_TITLE = "Tên đăng nhập";
-export const SIGN_UP_USERNAME_PLACEHOLDER = "Nhập tên đăng nhập";
+export const SIGN_UP_NAME_TITLE = "Tên hiển thị";
+export const SIGN_UP_NAME_PLACEHOLDER = "Nhập tên hiển thị";
 export const SIGN_UP_PASSWORD_TITLE = "Mật khẩu";
 export const SIGN_UP_PASSWORD_PLACEHOLDER = "Nhập mật khẩu của bạn";
 export const SIGN_UP_REENTER_PASSWORD_TITLE = "Nhập lại mật khẩu";

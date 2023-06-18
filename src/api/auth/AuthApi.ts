@@ -32,12 +32,12 @@ const signIn = async (
 };
 
 const signUp = async (
-    username: string,
+    displayName: string,
     email: string,
     password: string
 ): Promise<SignUpResponse> => {
     const response = await baseApi.post<SignUpRequest>(SIGN_UP_URL, {
-        username,
+        displayName,
         password,
         email,
     });

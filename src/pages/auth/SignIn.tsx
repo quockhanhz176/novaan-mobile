@@ -156,7 +156,7 @@ const SignIn = (props: SignInProps): ReactElement<SignInProps> => {
                         rules={{
                             required: true,
                             pattern:
-                                /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
+                                /^\w+([.-]?\w+)*(@\w+([.-]?\w+)*(\.\w{2,3})+)?$/,
                         }}
                         render={({ field: { onChange, onBlur, value } }) => (
                             <TextInput
