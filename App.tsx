@@ -1,12 +1,14 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import React from "react";
-import { View } from "react-native";
+import { Button, View } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-import SignIn from "./src/pages/auth/SignIn";
-import SignUp from "./src/pages/auth/SignUp";
-import MainScreens from "./src/pages/MainScreens";
+import SignIn from "@/pages/auth/SignIn";
+import SignUp from "@/pages/auth/SignUp";
+import MainScreens from "@/pages/MainScreens";
+
+import { customColors } from "@root/tailwind.config";
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 export type RootStackParamList = {

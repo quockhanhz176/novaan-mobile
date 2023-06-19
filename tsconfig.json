@@ -16,9 +16,9 @@
         "jsx": "preserve",
         "baseUrl": "./",
         "paths": {
-            "@/*": ["./src/*"]
+            "@/*": ["./src/*"],
+            "@root/*": ["./*"]
         },
-
         "typeRoots": ["./src/types"]
     },
     "extends": "expo/tsconfig.base",
