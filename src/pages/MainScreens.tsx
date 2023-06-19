@@ -1,4 +1,4 @@
-import React, { type FC } from "react";
+import React, { useState, type FC } from "react";
 import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
 import { View } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome5";
@@ -9,6 +9,8 @@ import Search from "./search/Search";
 import Reel from "./reel/Reel";
 import UserProfile from "./user-profile/UserProfile";
 import CreatePost from "./create-post/CreatePost";
+import { type NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { type RootStackParamList } from "App";
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 export type BottomTabParamList = {
@@ -20,9 +22,16 @@ export type BottomTabParamList = {
 };
 const BottomTab = createMaterialBottomTabNavigator<BottomTabParamList>();
 
-const MainScreens: FC = () => {
+interface MainScreensProps {
+    navigation: NativeStackNavigationProp<RootStackParamList, "MainScreens">;
+}
+
+const MainScreens: FC<MainScreensProps> = ({
+    navigation,
+}: MainScreensProps) => {
     const theme = useTheme();
     theme.colors.secondaryContainer = "transparent";
+    const [modalVisible, setModalVisible] = useState(false);
     return (
         <View className="flex-1">
             <BottomTab.Navigator
@@ -55,21 +64,27 @@ const MainScreens: FC = () => {
                     }}
                 />
                 <BottomTab.Screen
-                    name="Reel"
-                    component={Reel}
-                    options={{
-                        tabBarIcon: ({ color }) => (
-                            <Icon name="film" size={24} color={color} />
-                        ),
-                    }}
-                />
-                <BottomTab.Screen
                     name="CreatePost"
                     component={CreatePost}
                     options={{
                         tabBarLabel: "Đăng bài",
                         tabBarIcon: ({ color }) => (
                             <Icon name="plus" size={24} color={color} />
+                        ),
+                    }}
+                    listeners={({ navigation }) => ({
+                        tabPress: (e) => {
+                            e.preventDefault();
+                            setModalVisible(true);
+                        },
+                    })}
+                />
+                <BottomTab.Screen
+                    name="Reel"
+                    component={Reel}
+                    options={{
+                        tabBarIcon: ({ color }) => (
+                            <Icon name="film" size={24} color={color} />
                         ),
                     }}
                 />
@@ -84,6 +99,13 @@ const MainScreens: FC = () => {
                     }}
                 />
             </BottomTab.Navigator>
+            {true && (
+                <CreatePost
+                    navigation={navigation}
+                    visible={modalVisible}
+                    setVisible={setModalVisible}
+                />
+            )}
         </View>
     );
 };

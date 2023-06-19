@@ -36,7 +36,7 @@ import { useForm, Controller } from "react-hook-form";
 import ErrorText from "@/components/common/ErrorText";
 
 interface SignUpProps {
-    navigation: NativeStackNavigationProp<RootStackParamList, "SignIn">;
+    navigation: NativeStackNavigationProp<RootStackParamList, "SignUp">;
 }
 
 interface FormData {

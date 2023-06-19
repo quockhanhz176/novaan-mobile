@@ -1,0 +1,199 @@
+import React, { useState, type FC } from "react";
+import {
+    View,
+    Text,
+    TouchableOpacity,
+    TextInput,
+    Image,
+    ScrollView,
+} from "react-native";
+import IconEvill from "react-native-vector-icons/EvilIcons";
+import IconAnt from "react-native-vector-icons/AntDesign";
+import WarningAsterisk from "@/components/common/WarningAeterisk";
+import * as ImagePicker from "react-native-image-picker";
+import IconMaterial from "react-native-vector-icons/MaterialIcons";
+import {
+    CREATE_TIP_THANKS,
+    CREATE_TIP_TITLE_PLACEHOLDER,
+    CREATE_TIP_MEDIA_LABEL,
+    CREATE_TIP_TITLE_LABEL,
+    CREATE_TIP_MEDIA_BUTTON_TEXT,
+    CREATE_TIP_DESCRIPTION_LABEL,
+    CREATE_TIP_DESCRIPTION_PLACEHOLDER,
+    CREATE_TIP_TITLE,
+    CREATE_TIP_PREVIEW_BEFORE_SUBMIT,
+} from "@/common/strings";
+import { getThumbnailAsync } from "expo-video-thumbnails";
+import { customColors } from "@root/tailwind.config";
+import { type NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { type RootStackParamList } from "@root/App";
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const defaultThumbnail = require("@root/assets/default-video.png");
+
+interface CreateTipProps {
+    navigation: NativeStackNavigationProp<RootStackParamList, "CreateTip">;
+    visible?: boolean;
+    setVisible?: (boolean) => void;
+}
+
+const CreatePost: FC<CreateTipProps> = (props: CreateTipProps) => {
+    const labelClassName = "text-base font-medium uppercase";
+    const [titleCharacterCount, setTitleCharacterCount] = useState(0);
+    const [descriptionCharacterCount, setDescriptionCharacterCount] =
+        useState(0);
+    const [video, setVideo] = useState<ImagePicker.Asset | null>();
+    const [thumbnailUri, setThumbnailUri] = useState<string | null>();
+
+    const onTitleChange = (text: string): void => {
+        setTitleCharacterCount(text.length);
+    };
+    const onDescriptionChange = (text: string): void => {
+        setDescriptionCharacterCount(text.length);
+    };
+    const selectVideo = async (): Promise<void> => {
+        try {
+            // pick video
+            const videoResponse = await ImagePicker.launchImageLibrary({
+                mediaType: "video",
+                includeBase64: true,
+            });
+            if (videoResponse.didCancel === true) {
+                return;
+            }
+            const asset = videoResponse.assets?.[0];
+            if (asset == null) {
+                console.error("impossible!");
+                return;
+            }
+            setVideo(asset);
+
+            // pick thumbnail
+            if (asset.uri == null) {
+                console.error("uri not found");
+                return;
+            }
+            const timeStamp =
+                asset.duration != null && asset.duration > 3000 ? 3000 : 0;
+            const { uri } = await getThumbnailAsync(asset.uri, {
+                time: timeStamp,
+            });
+            setThumbnailUri(uri);
+        } catch (error) {
+            console.error(`fail: ${String(error)}`);
+        }
+    };
+
+    return (
+        <View className="flex-1">
+            <View className="h-[55] flex-row justify-between px-1">
+                <View className="flex-row space-x-2 items-center">
+                    <TouchableOpacity
+                        activeOpacity={0.2}
+                        className="h-10 w-10 items-center justify-center"
+                    >
+                        <IconEvill name="close" size={25} color="#000" />
+                    </TouchableOpacity>
+                    <Text className="text-xl font-medium">
+                        {CREATE_TIP_TITLE}
+                    </Text>
+                </View>
+            </View>
+            <ScrollView>
+                <Text className="text-base p-5 bg-ctertiary ">
+                    {CREATE_TIP_THANKS}
+                </Text>
+                <View className="px-3 py-7">
+                    <Text className={labelClassName}>
+                        {CREATE_TIP_TITLE_LABEL}
+                        <WarningAsterisk />
+                    </Text>
+                    <TextInput
+                        onChangeText={onTitleChange}
+                        maxLength={55}
+                        className="text-xl py-2 border-cgrey-platinum"
+                        // classname doesn't work
+                        style={{ borderBottomWidth: 1 }}
+                        placeholder={CREATE_TIP_TITLE_PLACEHOLDER}
+                    />
+                    <View className="items-end mt-2">
+                        <Text className="text-cgrey-dimGrey text-base">
+                            {titleCharacterCount.toString() + "/55"}
+                        </Text>
+                    </View>
+                    <Text className={labelClassName + " mt-4"}>
+                        {CREATE_TIP_MEDIA_LABEL}
+                        <WarningAsterisk />
+                    </Text>
+                    {video == null ? (
+                        <TouchableOpacity
+                            activeOpacity={0.5}
+                            onPress={selectVideo}
+                            className="h-[380] mt-2 rounded-md border-cprimary-500 bg-ctertiary"
+                            style={{ borderWidth: 1.3 }}
+                        >
+                            <View className="flex-row px-5 justify-center items-center space-x-2 h-full">
+                                <IconMaterial
+                                    size={60}
+                                    name="video-library"
+                                    color={customColors.cprimary[500]}
+                                />
+                                <Text className="w-[200] text-base text-cprimary-500">
+                                    {CREATE_TIP_MEDIA_BUTTON_TEXT}
+                                </Text>
+                            </View>
+                        </TouchableOpacity>
+                    ) : (
+                        <TouchableOpacity
+                            activeOpacity={0.5}
+                            onPress={selectVideo}
+                            className="h-[380] mt-2 rounded-md overflow-hidden"
+                        >
+                            <Image
+                                className="h-full w-full"
+                                source={
+                                    thumbnailUri !== null
+                                        ? { uri: thumbnailUri }
+                                        : defaultThumbnail
+                                }
+                            />
+                        </TouchableOpacity>
+                    )}
+                    <Text className={labelClassName + " mt-10"}>
+                        {CREATE_TIP_DESCRIPTION_LABEL}
+                    </Text>
+                    <TextInput
+                        onChangeText={onDescriptionChange}
+                        textAlignVertical="top"
+                        multiline
+                        numberOfLines={4}
+                        maxLength={500}
+                        className="text-base py-2"
+                        placeholder={CREATE_TIP_DESCRIPTION_PLACEHOLDER}
+                    />
+                    <View className="items-end">
+                        <Text className="text-cgrey-dimGrey text-base">
+                            {descriptionCharacterCount.toString() + "/500"}
+                        </Text>
+                    </View>
+                </View>
+            </ScrollView>
+            <View
+                className="flex-row justify-center items-center border-cgrey-seasalt"
+                style={{ borderTopWidth: 2 }}
+            >
+                <TouchableOpacity
+                    className="flex-row space-x-1 items-center
+                 rounded-full my-2 px-6 py-2 bg-cprimary-500"
+                >
+                    <Text className="text-sm text-white">
+                        {CREATE_TIP_PREVIEW_BEFORE_SUBMIT}
+                    </Text>
+                    <IconAnt name="eyeo" color="white" size={25} />
+                </TouchableOpacity>
+            </View>
+        </View>
+    );
+};
+
+export default CreatePost;

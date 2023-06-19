@@ -99,7 +99,7 @@ const SignIn = (props: SignInProps): ReactElement<SignInProps> => {
                 return;
             }
 
-            navigation.navigate("MainScreen");
+            navigation.navigate("MainScreens");
         } catch (error) {
             alert(COMMON_SERVER_CONNECTION_FAIL_ERROR);
             console.error(`fail: ${String(error)}`);
@@ -118,7 +118,7 @@ const SignIn = (props: SignInProps): ReactElement<SignInProps> => {
 
             // Save token to secure store
             await saveKeychain(KEYCHAIN_ID, response.token);
-            navigation.navigate("MainScreen");
+            navigation.navigate("MainScreens");
         } catch (error) {
             alert(SIGN_IN_GOOGLE_ERROR_OCCURED);
         } finally {
