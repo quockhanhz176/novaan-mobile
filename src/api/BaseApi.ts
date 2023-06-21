@@ -5,6 +5,7 @@ import { API_URL, API_TIMEOUT, KEYCHAIN_ID } from "@env";
 interface RequestConfig {
     timeout: number;
     authorizationRequired: boolean;
+    contentType?: string;
 }
 
 enum HttpMethod {
@@ -27,6 +28,7 @@ class BaseApi {
         }
 
         this.apiURL = API_URL;
+        this.keychainId = KEYCHAIN_ID;
     }
 
     getDefaultConfig(): RequestConfig {
@@ -40,9 +42,12 @@ class BaseApi {
         };
     }
 
-    async getHeaders(accessTokenRequired: boolean = false): Promise<Headers> {
+    async getHeaders(
+        accessTokenRequired: boolean = false,
+        contentType: string = "application/json"
+    ): Promise<Headers> {
         const headers = new Headers();
-        headers.append("Content-Type", "application/json");
+        headers.append("Content-Type", contentType);
         headers.append("Accept", "application/json");
         headers.append("Access-Control-Allow-Origin", "*");
 
@@ -109,7 +114,8 @@ class BaseApi {
         body?: any
     ): Promise<Response> {
         const headers = await this.getHeaders(
-            requestConfig.authorizationRequired
+            requestConfig.authorizationRequired,
+            requestConfig.contentType
         );
 
         // Use signal to avoid running the request for too long

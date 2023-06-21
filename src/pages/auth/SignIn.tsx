@@ -99,6 +99,8 @@ const SignIn = (props: SignInProps): ReactElement<SignInProps> => {
                 return;
             }
 
+            // Save token to secure store
+            await saveKeychain(KEYCHAIN_ID, response.token);
             navigation.navigate("MainScreens");
         } catch (error) {
             alert(COMMON_SERVER_CONNECTION_FAIL_ERROR);

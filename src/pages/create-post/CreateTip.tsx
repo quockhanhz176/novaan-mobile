@@ -6,6 +6,7 @@ import {
     TextInput,
     Image,
     ScrollView,
+    Alert,
 } from "react-native";
 import IconEvill from "react-native-vector-icons/EvilIcons";
 import IconAnt from "react-native-vector-icons/AntDesign";
@@ -21,35 +22,48 @@ import {
     CREATE_TIP_DESCRIPTION_LABEL,
     CREATE_TIP_DESCRIPTION_PLACEHOLDER,
     CREATE_TIP_TITLE,
-    CREATE_TIP_PREVIEW_BEFORE_SUBMIT,
+    CREATE_TIP_INVALID_ERROR_TITLE,
+    CREATE_TIP_TITLE_REQUIRED_ERROR,
+    CREATE_TIP_VIDEO_REQUIRED_ERROR,
+    COMMON_UNKNOWN_ERROR,
+    CREATE_TIP_VIDEO_WRONG_LENGTH_ERROR,
+    CREATE_TIP_SUBMIT,
 } from "@/common/strings";
 import { getThumbnailAsync } from "expo-video-thumbnails";
 import { customColors } from "@root/tailwind.config";
 import { type NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { type RootStackParamList } from "@root/App";
+import { Video } from "react-native-compressor";
+import { getInfoAsync } from "expo-file-system";
+import PostApi from "@/api/post/PostApi";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const defaultThumbnail = require("@root/assets/default-video.png");
+const VIDEO_LENGTH_UPPER_LIMIT = 120;
+// const VIDEO_SIZE_UPPER_LIMIT = 20 * 1024 * 1024;
 
 interface CreateTipProps {
     navigation: NativeStackNavigationProp<RootStackParamList, "CreateTip">;
-    visible?: boolean;
-    setVisible?: (boolean) => void;
 }
 
-const CreatePost: FC<CreateTipProps> = (props: CreateTipProps) => {
+type ValidateionResult = { valid: true } | { valid: false; message: string };
+
+const CreateTip: FC<CreateTipProps> = (props: CreateTipProps) => {
+    const { navigation } = props;
     const labelClassName = "text-base font-medium uppercase";
-    const [titleCharacterCount, setTitleCharacterCount] = useState(0);
-    const [descriptionCharacterCount, setDescriptionCharacterCount] =
-        useState(0);
+    const [title, setTitle] = useState("");
+    const [description, setDescription] = useState("");
     const [video, setVideo] = useState<ImagePicker.Asset | null>();
     const [thumbnailUri, setThumbnailUri] = useState<string | null>();
 
     const onTitleChange = (text: string): void => {
-        setTitleCharacterCount(text.length);
+        setTitle(text);
     };
     const onDescriptionChange = (text: string): void => {
-        setDescriptionCharacterCount(text.length);
+        setDescription(text);
+    };
+    const navigateBack = (): void => {
+        navigation.pop();
     };
     const selectVideo = async (): Promise<void> => {
         try {
@@ -83,12 +97,79 @@ const CreatePost: FC<CreateTipProps> = (props: CreateTipProps) => {
             console.error(`fail: ${String(error)}`);
         }
     };
+    const validateSubmission = (): ValidateionResult => {
+        let errorMessage: string | null = null;
+
+        if (title === "") {
+            errorMessage = CREATE_TIP_TITLE_REQUIRED_ERROR;
+        }
+        // check video
+        else if (video === null || video === undefined) {
+            errorMessage = CREATE_TIP_VIDEO_REQUIRED_ERROR;
+        } else if (video.duration == null) {
+            console.error("video duration null");
+            errorMessage = COMMON_UNKNOWN_ERROR;
+        } else if (video.fileSize == null) {
+            console.error("video size null");
+            errorMessage = COMMON_UNKNOWN_ERROR;
+        } else if (video.duration > VIDEO_LENGTH_UPPER_LIMIT) {
+            errorMessage = CREATE_TIP_VIDEO_WRONG_LENGTH_ERROR;
+            // } else if (video.fileSize > VIDEO_SIZE_UPPER_LIMIT) {
+            //     errorMessage = CREATE_TIP_VIDEO_WRONG_FILE_SIZE_ERROR;
+        }
+        // errorMessage is not null means a validation error occured
+        if (errorMessage !== null) {
+            return {
+                valid: false,
+                message: errorMessage,
+            };
+        }
+
+        return { valid: true };
+    };
+    const submit = async (): Promise<void> => {
+        const validationResult = validateSubmission();
+        if (!validationResult.valid) {
+            Alert.alert(
+                CREATE_TIP_INVALID_ERROR_TITLE,
+                validationResult.message
+            );
+            return;
+        }
+
+        if (video == null || video.uri == null) {
+            console.error(
+                "video or video.uri is null, which is impossible after validation"
+            );
+            return;
+        }
+
+        // compress video
+        const result = await Video.compress(
+            video.uri,
+            {
+                compressionMethod: "auto",
+            },
+            (progress: number): void => {
+                console.log("progress: " + progress.toString());
+            }
+        );
+
+        console.log(`result: ${result}`);
+        const fileInfo = await getInfoAsync(result, { size: true });
+        console.log(`initil file size: ${video.fileSize?.toString() ?? "no"}`);
+        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+        console.log(`compressed file size: ${fileInfo.size.toString()}`);
+
+        await PostApi.uploadTip(title, result);
+    };
 
     return (
         <View className="flex-1">
             <View className="h-[55] flex-row justify-between px-1">
                 <View className="flex-row space-x-2 items-center">
                     <TouchableOpacity
+                        onPress={navigateBack}
                         activeOpacity={0.2}
                         className="h-10 w-10 items-center justify-center"
                     >
@@ -118,7 +199,7 @@ const CreatePost: FC<CreateTipProps> = (props: CreateTipProps) => {
                     />
                     <View className="items-end mt-2">
                         <Text className="text-cgrey-dimGrey text-base">
-                            {titleCharacterCount.toString() + "/55"}
+                            {title.length.toString() + "/55"}
                         </Text>
                     </View>
                     <Text className={labelClassName + " mt-4"}>
@@ -173,7 +254,7 @@ const CreatePost: FC<CreateTipProps> = (props: CreateTipProps) => {
                     />
                     <View className="items-end">
                         <Text className="text-cgrey-dimGrey text-base">
-                            {descriptionCharacterCount.toString() + "/500"}
+                            {description.length.toString() + "/500"}
                         </Text>
                     </View>
                 </View>
@@ -183,17 +264,18 @@ const CreatePost: FC<CreateTipProps> = (props: CreateTipProps) => {
                 style={{ borderTopWidth: 2 }}
             >
                 <TouchableOpacity
-                    className="flex-row space-x-1 items-center
-                 rounded-full my-2 px-6 py-2 bg-cprimary-500"
+                    className="flex-row space-x-3 items-center rounded-full my-2 px-6 py-2 bg-cprimary-500"
+                    onPress={submit}
                 >
                     <Text className="text-sm text-white">
-                        {CREATE_TIP_PREVIEW_BEFORE_SUBMIT}
+                        {CREATE_TIP_SUBMIT}
                     </Text>
-                    <IconAnt name="eyeo" color="white" size={25} />
+                    {/* change to eyeo for previewing */}
+                    <IconAnt name="upload" color="white" size={18} />
                 </TouchableOpacity>
             </View>
         </View>
     );
 };
 
-export default CreatePost;
+export default CreateTip;

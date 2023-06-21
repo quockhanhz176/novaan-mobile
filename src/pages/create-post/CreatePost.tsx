@@ -1,6 +1,5 @@
 import React, { useRef, type FC, useEffect, Fragment } from "react";
 import {
-    StyleSheet,
     TouchableOpacity,
     Text,
     View,
