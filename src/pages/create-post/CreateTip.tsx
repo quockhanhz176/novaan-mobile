@@ -59,12 +59,15 @@ const CreateTip: FC<CreateTipProps> = (props: CreateTipProps) => {
     const onTitleChange = (text: string): void => {
         setTitle(text);
     };
+
     const onDescriptionChange = (text: string): void => {
         setDescription(text);
     };
+
     const navigateBack = (): void => {
         navigation.pop();
     };
+
     const selectVideo = async (): Promise<void> => {
         try {
             // pick video
@@ -97,36 +100,45 @@ const CreateTip: FC<CreateTipProps> = (props: CreateTipProps) => {
             console.error(`fail: ${String(error)}`);
         }
     };
+
     const validateSubmission = (): ValidateionResult => {
-        let errorMessage: string | null = null;
+        const response = {
+            valid: false,
+            message: "",
+        };
 
         if (title === "") {
-            errorMessage = CREATE_TIP_TITLE_REQUIRED_ERROR;
+            response.message = CREATE_TIP_TITLE_REQUIRED_ERROR;
+            return response;
         }
-        // check video
-        else if (video === null || video === undefined) {
-            errorMessage = CREATE_TIP_VIDEO_REQUIRED_ERROR;
-        } else if (video.duration == null) {
-            console.error("video duration null");
-            errorMessage = COMMON_UNKNOWN_ERROR;
-        } else if (video.fileSize == null) {
-            console.error("video size null");
-            errorMessage = COMMON_UNKNOWN_ERROR;
-        } else if (video.duration > VIDEO_LENGTH_UPPER_LIMIT) {
-            errorMessage = CREATE_TIP_VIDEO_WRONG_LENGTH_ERROR;
-            // } else if (video.fileSize > VIDEO_SIZE_UPPER_LIMIT) {
-            //     errorMessage = CREATE_TIP_VIDEO_WRONG_FILE_SIZE_ERROR;
+
+        if (video == null) {
+            response.message = CREATE_TIP_VIDEO_REQUIRED_ERROR;
+            return response;
         }
-        // errorMessage is not null means a validation error occured
-        if (errorMessage !== null) {
-            return {
-                valid: false,
-                message: errorMessage,
-            };
+
+        if (
+            video.duration === null ||
+            video.duration === undefined ||
+            video.duration === 0
+        ) {
+            response.message = COMMON_UNKNOWN_ERROR;
+            return response;
+        }
+
+        if ((video.fileSize ?? "") === "") {
+            response.message = COMMON_UNKNOWN_ERROR;
+            return response;
+        }
+
+        if (video.duration > VIDEO_LENGTH_UPPER_LIMIT) {
+            response.message = CREATE_TIP_VIDEO_WRONG_LENGTH_ERROR;
+            return response;
         }
 
         return { valid: true };
     };
+
     const submit = async (): Promise<void> => {
         const validationResult = validateSubmission();
         if (!validationResult.valid) {
