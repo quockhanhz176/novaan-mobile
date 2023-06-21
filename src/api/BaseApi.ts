@@ -6,6 +6,7 @@ interface RequestConfig {
     timeout: number;
     authorizationRequired: boolean;
     contentType?: string;
+    needJsonBody?: boolean;
 }
 
 enum HttpMethod {
@@ -48,7 +49,7 @@ class BaseApi {
     ): Promise<Headers> {
         const headers = new Headers();
         headers.append("Content-Type", contentType);
-        headers.append("Accept", "application/json");
+        headers.append("Accept", contentType);
         headers.append("Access-Control-Allow-Origin", "*");
 
         if (accessTokenRequired) {
@@ -133,10 +134,17 @@ class BaseApi {
             controller.abort();
         }, timeout);
 
+        if (
+            requestConfig === null ||
+            requestConfig.needJsonBody === undefined
+        ) {
+            requestConfig.needJsonBody = true;
+        }
+
         const response = await fetch(`${this.apiURL}${url}`, {
             method,
             headers,
-            body: JSON.stringify(body),
+            body: requestConfig.needJsonBody ? JSON.stringify(body) : body,
             signal: controller.signal,
         });
 

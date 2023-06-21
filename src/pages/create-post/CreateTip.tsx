@@ -169,10 +169,7 @@ const CreateTip: FC<CreateTipProps> = (props: CreateTipProps) => {
 
         console.log(`result: ${result}`);
         const fileInfo = await getInfoAsync(result, { size: true });
-        console.log(`initil file size: ${video.fileSize?.toString() ?? "no"}`);
-        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-        console.log(`compressed file size: ${fileInfo.size.toString()}`);
-
+        console.log(fileInfo);
         await PostApi.uploadTip(title, result);
     };
 
