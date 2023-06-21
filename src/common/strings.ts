@@ -76,6 +76,10 @@ export const CREATE_TIP_SUBMIT = "Đăng bài";
 export const CREATE_TIP_INVALID_ERROR_TITLE =
     "Thông tin về mẹo vặt sai yêu cầu";
 export const CREATE_TIP_TITLE_REQUIRED_ERROR = "Tiêu đề không được để trống";
+export const CREATE_TIP_DESCRIPTION_REQUIRED_ERROR =
+    "Mô tả không được để trống";
+export const CREATE_TIP_DESCRIPTION_TOO_SHORT_ERROR =
+    "Mô tả không được ngắn hơn 30 ký tự";
 export const CREATE_TIP_VIDEO_REQUIRED_ERROR =
     "Mẹo vặt phải được đăng kèm với video minh họa";
 export const CREATE_TIP_VIDEO_WRONG_LENGTH_ERROR =

@@ -8,7 +8,7 @@ import Home from "./home/Home";
 import Search from "./search/Search";
 import Reel from "./reel/Reel";
 import UserProfile from "./user-profile/UserProfile";
-import CreatePost from "./create-post/CreatePost";
+import CreatePostPopup from "./create-post/CreatePostPopup";
 import { type NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { type RootStackParamList } from "App";
 
@@ -18,7 +18,7 @@ export type BottomTabParamList = {
     Search: undefined;
     Reel: undefined;
     UserProfile: undefined;
-    CreatePost: undefined;
+    CreatePostPopup: undefined;
 };
 const BottomTab = createMaterialBottomTabNavigator<BottomTabParamList>();
 
@@ -64,8 +64,8 @@ const MainScreens: FC<MainScreensProps> = ({
                     }}
                 />
                 <BottomTab.Screen
-                    name="CreatePost"
-                    component={CreatePost}
+                    name="CreatePostPopup"
+                    component={CreatePostPopup}
                     options={{
                         tabBarLabel: "Đăng bài",
                         tabBarIcon: ({ color }) => (
@@ -100,7 +100,7 @@ const MainScreens: FC<MainScreensProps> = ({
                 />
             </BottomTab.Navigator>
             {true && (
-                <CreatePost
+                <CreatePostPopup
                     navigation={navigation}
                     visible={modalVisible}
                     setVisible={setModalVisible}

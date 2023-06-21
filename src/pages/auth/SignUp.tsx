@@ -3,8 +3,8 @@ import React, { useState, type ReactElement } from "react";
 import { Text, TextInput, View, TouchableOpacity, Alert } from "react-native";
 import { type NativeStackNavigationProp } from "@react-navigation/native-stack";
 
-import { authInputStyles } from "@/components/auth/AuthInput";
-import AuthButton from "@/components/auth/AuthButton";
+import { authInputStyles } from "@/pages/auth/components/AuthInput";
+import AuthButton from "@/pages/auth/components/AuthButton";
 import {
     AUTH_EMAIL_INVALID,
     AUTH_PASSWORD_TOO_SHORT,
@@ -31,9 +31,9 @@ import {
     AUTH_NAME_INVALID,
 } from "@/common/strings";
 import authApi from "@/api/auth/AuthApi";
-import OverlayLoading from "@/components/common/OverlayLoading";
+import OverlayLoading from "@/common/components/OverlayLoading";
 import { useForm, Controller } from "react-hook-form";
-import ErrorText from "@/components/common/ErrorText";
+import ErrorText from "@/common/components/ErrorText";
 
 interface SignUpProps {
     navigation: NativeStackNavigationProp<RootStackParamList, "SignUp">;
@@ -122,6 +122,7 @@ const SignUp = (props: SignUpProps): ReactElement<SignUpProps> => {
                         }}
                         render={({ field: { onChange, onBlur, value } }) => (
                             <TextInput
+                                autoCapitalize="none"
                                 className={authInputStyles.textInput}
                                 onBlur={onBlur}
                                 onChangeText={onChange}
@@ -151,6 +152,7 @@ const SignUp = (props: SignUpProps): ReactElement<SignUpProps> => {
                         }}
                         render={({ field: { onChange, onBlur, value } }) => (
                             <TextInput
+                                autoCapitalize="none"
                                 className={authInputStyles.textInput}
                                 onBlur={onBlur}
                                 onChangeText={onChange}
@@ -180,6 +182,7 @@ const SignUp = (props: SignUpProps): ReactElement<SignUpProps> => {
                         }}
                         render={({ field: { onChange, onBlur, value } }) => (
                             <TextInput
+                                autoCapitalize="none"
                                 className={authInputStyles.textInput}
                                 onBlur={onBlur}
                                 onChangeText={onChange}
@@ -214,6 +217,7 @@ const SignUp = (props: SignUpProps): ReactElement<SignUpProps> => {
                         }}
                         render={({ field: { onChange, onBlur, value } }) => (
                             <TextInput
+                                autoCapitalize="none"
                                 className={authInputStyles.textInput}
                                 onBlur={onBlur}
                                 onChangeText={onChange}

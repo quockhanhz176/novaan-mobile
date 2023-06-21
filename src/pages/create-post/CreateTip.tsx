@@ -6,12 +6,11 @@ import {
     TextInput,
     Image,
     ScrollView,
-    Alert,
 } from "react-native";
 import IconEvill from "react-native-vector-icons/EvilIcons";
 import IconAnt from "react-native-vector-icons/AntDesign";
-import WarningAsterisk from "@/components/common/WarningAeterisk";
-import * as ImagePicker from "react-native-image-picker";
+import WarningAsterisk from "@/common/components/WarningAeterisk";
+import type * as ImagePicker from "react-native-image-picker";
 import IconMaterial from "react-native-vector-icons/MaterialIcons";
 import {
     CREATE_TIP_THANKS,
@@ -22,31 +21,22 @@ import {
     CREATE_TIP_DESCRIPTION_LABEL,
     CREATE_TIP_DESCRIPTION_PLACEHOLDER,
     CREATE_TIP_TITLE,
-    CREATE_TIP_INVALID_ERROR_TITLE,
-    CREATE_TIP_TITLE_REQUIRED_ERROR,
-    CREATE_TIP_VIDEO_REQUIRED_ERROR,
-    COMMON_UNKNOWN_ERROR,
-    CREATE_TIP_VIDEO_WRONG_LENGTH_ERROR,
     CREATE_TIP_SUBMIT,
 } from "@/common/strings";
-import { getThumbnailAsync } from "expo-video-thumbnails";
 import { customColors } from "@root/tailwind.config";
 import { type NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { type RootStackParamList } from "@root/App";
-import { Video, getVideoMetaData } from "react-native-compressor";
-import { getInfoAsync } from "expo-file-system";
-import PostApi from "@/api/post/PostApi";
+import {
+    handleTipSubmission,
+    pickVideoAndThumbnail,
+} from "./services/createTipService";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const defaultThumbnail = require("@root/assets/default-video.png");
-const VIDEO_LENGTH_UPPER_LIMIT = 120;
-// const VIDEO_SIZE_UPPER_LIMIT = 20 * 1024 * 1024;
 
 interface CreateTipProps {
     navigation: NativeStackNavigationProp<RootStackParamList, "CreateTip">;
 }
-
-type ValidateionResult = { valid: true } | { valid: false; message: string };
 
 const CreateTip: FC<CreateTipProps> = (props: CreateTipProps) => {
     const { navigation } = props;
@@ -69,105 +59,11 @@ const CreateTip: FC<CreateTipProps> = (props: CreateTipProps) => {
     };
 
     const selectVideo = async (): Promise<void> => {
-        try {
-            // pick video
-            const videoResponse = await ImagePicker.launchImageLibrary({
-                mediaType: "video",
-                includeBase64: true,
-            });
-            if (videoResponse.didCancel === true) {
-                return;
-            }
-            const asset = videoResponse.assets?.[0];
-            if (asset == null) {
-                console.error("impossible!");
-                return;
-            }
-            setVideo(asset);
-
-            // pick thumbnail
-            if (asset.uri == null) {
-                console.error("uri not found");
-                return;
-            }
-            const timeStamp =
-                asset.duration != null && asset.duration > 3000 ? 3000 : 0;
-            const { uri } = await getThumbnailAsync(asset.uri, {
-                time: timeStamp,
-            });
-            setThumbnailUri(uri);
-        } catch (error) {
-            console.error(`fail: ${String(error)}`);
-        }
-    };
-
-    const validateSubmission = (): ValidateionResult => {
-        const response = {
-            valid: false,
-            message: "",
-        };
-
-        if (title === "") {
-            response.message = CREATE_TIP_TITLE_REQUIRED_ERROR;
-            return response;
-        }
-
-        if (video == null) {
-            response.message = CREATE_TIP_VIDEO_REQUIRED_ERROR;
-            return response;
-        }
-
-        if (
-            video.duration === null ||
-            video.duration === undefined ||
-            video.duration === 0
-        ) {
-            response.message = COMMON_UNKNOWN_ERROR;
-            return response;
-        }
-
-        if ((video.fileSize ?? "") === "") {
-            response.message = COMMON_UNKNOWN_ERROR;
-            return response;
-        }
-
-        if (video.duration > VIDEO_LENGTH_UPPER_LIMIT) {
-            response.message = CREATE_TIP_VIDEO_WRONG_LENGTH_ERROR;
-            return response;
-        }
-
-        return { valid: true };
+        await pickVideoAndThumbnail(setVideo, setThumbnailUri);
     };
 
     const submit = async (): Promise<void> => {
-        const validationResult = validateSubmission();
-        if (!validationResult.valid) {
-            Alert.alert(
-                CREATE_TIP_INVALID_ERROR_TITLE,
-                validationResult.message
-            );
-            return;
-        }
-
-        if (video == null || video.uri == null) {
-            console.error(
-                "video or video.uri is null, which is impossible after validation"
-            );
-            return;
-        }
-
-        // compress video
-        const videoUri = await Video.compress(
-            video.uri,
-            {
-                compressionMethod: "auto",
-            },
-            (progress: number): void => {
-                console.log("progress: " + progress.toString());
-            }
-        );
-
-        await PostApi.uploadTip(title, description, videoUri);
+        void handleTipSubmission({ title, description, video }, navigation.pop);
     };
 
     return (
@@ -208,7 +104,27 @@ const CreateTip: FC<CreateTipProps> = (props: CreateTipProps) => {
                             {title.length.toString() + "/55"}
                         </Text>
                     </View>
-                    <Text className={labelClassName + " mt-4"}>
+                    <Text className={labelClassName + " mt-10"}>
+                        {CREATE_TIP_DESCRIPTION_LABEL}
+                        <WarningAsterisk />
+                    </Text>
+                    <TextInput
+                        onChangeText={onDescriptionChange}
+                        textAlignVertical="top"
+                        multiline
+                        numberOfLines={4}
+                        maxLength={500}
+                        className="text-base py-2 first-line:border-cgrey-platinum"
+                        // classname doesn't work
+                        style={{ borderBottomWidth: 1 }}
+                        placeholder={CREATE_TIP_DESCRIPTION_PLACEHOLDER}
+                    />
+                    <View className="items-end">
+                        <Text className="text-cgrey-dimGrey text-base">
+                            {description.length.toString() + "/500"}
+                        </Text>
+                    </View>
+                    <Text className={labelClassName + " mt-10"}>
                         {CREATE_TIP_MEDIA_LABEL}
                         <WarningAsterisk />
                     </Text>
@@ -246,23 +162,6 @@ const CreateTip: FC<CreateTipProps> = (props: CreateTipProps) => {
                             />
                         </TouchableOpacity>
                     )}
-                    <Text className={labelClassName + " mt-10"}>
-                        {CREATE_TIP_DESCRIPTION_LABEL}
-                    </Text>
-                    <TextInput
-                        onChangeText={onDescriptionChange}
-                        textAlignVertical="top"
-                        multiline
-                        numberOfLines={4}
-                        maxLength={500}
-                        className="text-base py-2"
-                        placeholder={CREATE_TIP_DESCRIPTION_PLACEHOLDER}
-                    />
-                    <View className="items-end">
-                        <Text className="text-cgrey-dimGrey text-base">
-                            {description.length.toString() + "/500"}
-                        </Text>
-                    </View>
                 </View>
             </ScrollView>
             <View

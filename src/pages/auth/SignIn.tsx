@@ -6,8 +6,8 @@ import { useForm, Controller } from "react-hook-form";
 import * as WebBrowser from "expo-web-browser";
 import * as Google from "expo-auth-session/providers/google";
 
-import { authInputStyles } from "@/components/auth/AuthInput";
-import AuthButton from "@/components/auth/AuthButton";
+import { authInputStyles } from "@/pages/auth/components/AuthInput";
+import AuthButton from "@/pages/auth/components/AuthButton";
 import {
     SIGN_IN_WRONG_USERNAME_PASSWORD,
     COMMON_SERVER_CONNECTION_FAIL_ERROR,
@@ -26,12 +26,12 @@ import {
     SIGN_IN_GOOGLE_ERROR_OCCURED,
 } from "@/common/strings";
 import authApi from "@/api/auth/AuthApi";
-import OverlayLoading from "@/components/common/OverlayLoading";
-import ErrorText from "@/components/common/ErrorText";
-import Divider from "@/components/common/Divider";
-import GoogleSignInButton from "@/components/auth/GoogleSignInButton";
+import OverlayLoading from "@/common/components/OverlayLoading";
+import ErrorText from "@/common/components/ErrorText";
+import Divider from "@/common/components/Divider";
+import GoogleSignInButton from "@/pages/auth/components/GoogleSignInButton";
 import { GOOGLE_API_KEY, KEYCHAIN_ID } from "@env";
-import { saveKeychain } from "@/keychain/KeychainService";
+import { saveKeychain } from "@/common/keyChainService";
 
 interface SignInProps {
     navigation: NativeStackNavigationProp<RootStackParamList, "SignIn">;
@@ -162,6 +162,7 @@ const SignIn = (props: SignInProps): ReactElement<SignInProps> => {
                         }}
                         render={({ field: { onChange, onBlur, value } }) => (
                             <TextInput
+                                autoCapitalize="none"
                                 className={authInputStyles.textInput}
                                 onBlur={onBlur}
                                 onChangeText={onChange}
@@ -191,6 +192,7 @@ const SignIn = (props: SignInProps): ReactElement<SignInProps> => {
                         rules={{ required: true, minLength: 8 }}
                         render={({ field: { onChange, onBlur, value } }) => (
                             <TextInput
+                                autoCapitalize="none"
                                 textContentType="password"
                                 secureTextEntry={true}
                                 className={authInputStyles.textInput}

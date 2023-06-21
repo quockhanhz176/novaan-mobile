@@ -31,14 +31,14 @@ const uploadTip = async (
         needJsonBody: false,
     });
 
+    console.log("PostApi.uploadTip - response:" + JSON.stringify(response));
+
     if (!response.ok) {
-        console.log("not ok");
         return {
             success: false,
             reason: "no",
         };
     }
-    console.log("ok");
     return {
         success: true,
     };

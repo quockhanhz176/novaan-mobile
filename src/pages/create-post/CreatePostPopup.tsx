@@ -1,13 +1,8 @@
 import React, { useRef, type FC, useEffect, Fragment } from "react";
-import {
-    TouchableOpacity,
-    Text,
-    View,
-    Animated,
-} from "react-native";
+import { TouchableOpacity, Text, View, Animated } from "react-native";
 import IconEvill from "react-native-vector-icons/EvilIcons";
 import IconAnt from "react-native-vector-icons/AntDesign";
-import TouchableView from "@/components/common/TouchableView";
+import TouchableView from "@/common/components/TouchableView";
 import { type NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { type RootStackParamList } from "App";
 import {
@@ -16,20 +11,23 @@ import {
     CREATE_POST_UPLOAD_TIP_TITLE,
 } from "@/common/strings";
 
-interface CreatePostProps {
+interface CreatePostPopupProps {
     visible?: boolean;
     setVisible?: (boolean) => void;
     navigation: NativeStackNavigationProp<RootStackParamList, "MainScreens">;
 }
 
-// TODO: not render CreatePost when hidden without compromising animation
-const CreatePost: FC<CreatePostProps> = (props: CreatePostProps) => {
+// TODO: not render CreatePostPopup when hidden without compromising animation
+const CreatePostPopup: FC<CreatePostPopupProps> = (
+    props: CreatePostPopupProps
+) => {
     const { visible = true, setVisible = (_visible) => {}, navigation } = props;
     const dismissModal = (): void => {
         setVisible(false);
     };
     const openCreateTip = (): void => {
         navigation.navigate("CreateTip");
+        dismissModal();
     };
     const slideAnimation = useRef(new Animated.Value(0)).current;
     useEffect(() => {
@@ -111,4 +109,4 @@ const CreatePost: FC<CreatePostProps> = (props: CreatePostProps) => {
     );
 };
 
-export default CreatePost;
+export default CreatePostPopup;
