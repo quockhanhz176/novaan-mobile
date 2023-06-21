@@ -33,7 +33,7 @@ import { getThumbnailAsync } from "expo-video-thumbnails";
 import { customColors } from "@root/tailwind.config";
 import { type NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { type RootStackParamList } from "@root/App";
-import { Video } from "react-native-compressor";
+import { Video, getVideoMetaData } from "react-native-compressor";
 import { getInfoAsync } from "expo-file-system";
 import PostApi from "@/api/post/PostApi";
 
@@ -157,7 +157,7 @@ const CreateTip: FC<CreateTipProps> = (props: CreateTipProps) => {
         }
 
         // compress video
-        const result = await Video.compress(
+        const videoUri = await Video.compress(
             video.uri,
             {
                 compressionMethod: "auto",
@@ -167,10 +167,7 @@ const CreateTip: FC<CreateTipProps> = (props: CreateTipProps) => {
             }
         );
 
-        console.log(`result: ${result}`);
-        const fileInfo = await getInfoAsync(result, { size: true });
-        console.log(fileInfo);
-        await PostApi.uploadTip(title, result);
+        await PostApi.uploadTip(title, description, videoUri);
     };
 
     return (
