@@ -28,7 +28,22 @@ const signIn = async (
         usernameOrEmail,
         password,
     });
-    return await response.json();
+    console.log(`AuthApi.signIn - response: ${JSON.stringify(response)}`);
+    const body = await response.json();
+    console.log(`AuthApi.signIn - body: ${JSON.stringify(body)}`);
+
+    if (!response.ok) {
+        const code: number = body.code;
+        return {
+            success: false,
+            code,
+        };
+    }
+
+    return {
+        success: true,
+        token: body.token,
+    };
 };
 
 const signUp = async (
@@ -72,6 +87,10 @@ const signInWithGoogle = async (token: string): Promise<SignInResponse> => {
             SIGNIN_GOOGLE_URL,
             {
                 token,
+            },
+            {
+                timeout: 30000,
+                authorizationRequired: false,
             }
         );
         if (!response.ok) {

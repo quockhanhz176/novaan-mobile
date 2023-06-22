@@ -26,6 +26,7 @@
         "runtimeVersion": {
             "policy": "sdkVersion"
         },
-        "scheme": "novaanapp"
+        "scheme": "novaanapp",
+        "plugins": ["react-native-compressor"]
     }
 }

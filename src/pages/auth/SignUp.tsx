@@ -3,8 +3,8 @@ import React, { useState, type ReactElement } from "react";
 import { Text, TextInput, View, TouchableOpacity, Alert } from "react-native";
 import { type NativeStackNavigationProp } from "@react-navigation/native-stack";
 
-import { authInputStyles } from "@/components/auth/AuthInput";
-import AuthButton from "@/components/auth/AuthButton";
+import { authInputStyles } from "@/pages/auth/components/AuthInput";
+import AuthButton from "@/pages/auth/components/AuthButton";
 import {
     AUTH_EMAIL_INVALID,
     AUTH_PASSWORD_TOO_SHORT,
@@ -25,18 +25,18 @@ import {
     SIGN_UP_SUCCESS_MESSAGE,
     SIGN_UP_SUCCESS_TITLE,
     SIGN_UP_USERNAME_EXISTS_ERROR,
-    SIGN_UP_UNKNOWN_ERROR,
+    COMMON_UNKNOWN_ERROR,
     SIGN_UP_NAME_PLACEHOLDER,
     SIGN_UP_NAME_TITLE,
     AUTH_NAME_INVALID,
 } from "@/common/strings";
 import authApi from "@/api/auth/AuthApi";
-import OverlayLoading from "@/components/common/OverlayLoading";
+import OverlayLoading from "@/common/components/OverlayLoading";
 import { useForm, Controller } from "react-hook-form";
-import ErrorText from "@/components/common/ErrorText";
+import ErrorText from "@/common/components/ErrorText";
 
 interface SignUpProps {
-    navigation: NativeStackNavigationProp<RootStackParamList, "SignIn">;
+    navigation: NativeStackNavigationProp<RootStackParamList, "SignUp">;
 }
 
 interface FormData {
@@ -79,7 +79,7 @@ const SignUp = (props: SignUpProps): ReactElement<SignUpProps> => {
                         ? SIGN_UP_EMAIL_EXISTS_ERROR
                         : response.reason === "username exists"
                         ? SIGN_UP_USERNAME_EXISTS_ERROR
-                        : SIGN_UP_UNKNOWN_ERROR;
+                        : COMMON_UNKNOWN_ERROR;
                 Alert.alert(SIGN_UP_FAIL_TITLE, failureMessage);
                 return;
             }
@@ -87,6 +87,8 @@ const SignUp = (props: SignUpProps): ReactElement<SignUpProps> => {
             Alert.alert(SIGN_UP_SUCCESS_TITLE, SIGN_UP_SUCCESS_MESSAGE);
             navigation.navigate("SignIn");
         } catch (error) {
+            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+            console.log(`error: ${error.toString()}`);
             Alert.alert(
                 SIGN_UP_FAIL_TITLE,
                 COMMON_SERVER_CONNECTION_FAIL_ERROR
@@ -120,6 +122,7 @@ const SignUp = (props: SignUpProps): ReactElement<SignUpProps> => {
                         }}
                         render={({ field: { onChange, onBlur, value } }) => (
                             <TextInput
+                                autoCapitalize="none"
                                 className={authInputStyles.textInput}
                                 onBlur={onBlur}
                                 onChangeText={onChange}
@@ -149,6 +152,7 @@ const SignUp = (props: SignUpProps): ReactElement<SignUpProps> => {
                         }}
                         render={({ field: { onChange, onBlur, value } }) => (
                             <TextInput
+                                autoCapitalize="none"
                                 className={authInputStyles.textInput}
                                 onBlur={onBlur}
                                 onChangeText={onChange}
@@ -178,6 +182,7 @@ const SignUp = (props: SignUpProps): ReactElement<SignUpProps> => {
                         }}
                         render={({ field: { onChange, onBlur, value } }) => (
                             <TextInput
+                                autoCapitalize="none"
                                 className={authInputStyles.textInput}
                                 onBlur={onBlur}
                                 onChangeText={onChange}
@@ -212,6 +217,7 @@ const SignUp = (props: SignUpProps): ReactElement<SignUpProps> => {
                         }}
                         render={({ field: { onChange, onBlur, value } }) => (
                             <TextInput
+                                autoCapitalize="none"
                                 className={authInputStyles.textInput}
                                 onBlur={onBlur}
                                 onChangeText={onChange}

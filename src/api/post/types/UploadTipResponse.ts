@@ -1,9 +1,8 @@
-export type SignInResponse =
+export type UploadTipResponse =
     | {
           success: true;
-          token: string;
       }
     | {
           success: false;
-          code: number;
+          reason: string;
       };

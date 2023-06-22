@@ -1,10 +1,12 @@
-import { getKeychainValue } from "@/keychain/KeychainService";
+import { getKeychainValue } from "@/common/KeychainService";
 import { type Undefinable } from "@/common/types";
 import { API_URL, API_TIMEOUT, KEYCHAIN_ID } from "@env";
 
 interface RequestConfig {
     timeout: number;
     authorizationRequired: boolean;
+    contentType?: string;
+    needJsonBody?: boolean;
 }
 
 enum HttpMethod {
@@ -27,6 +29,7 @@ class BaseApi {
         }
 
         this.apiURL = API_URL;
+        this.keychainId = KEYCHAIN_ID;
     }
 
     getDefaultConfig(): RequestConfig {
@@ -40,10 +43,13 @@ class BaseApi {
         };
     }
 
-    async getHeaders(accessTokenRequired: boolean = false): Promise<Headers> {
+    async getHeaders(
+        accessTokenRequired: boolean = false,
+        contentType: string = "application/json"
+    ): Promise<Headers> {
         const headers = new Headers();
-        headers.append("Content-Type", "application/json");
-        headers.append("Accept", "application/json");
+        headers.append("Content-Type", contentType);
+        headers.append("Accept", contentType);
         headers.append("Access-Control-Allow-Origin", "*");
 
         if (accessTokenRequired) {
@@ -52,6 +58,8 @@ class BaseApi {
             if (accessToken == null) {
                 throw new Error("Access token not found");
             }
+            // TODO: figure out why this line is needed
+            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
             headers.append("Authorization", `Bearer ${accessToken}`);
         }
 
@@ -109,7 +117,8 @@ class BaseApi {
         body?: any
     ): Promise<Response> {
         const headers = await this.getHeaders(
-            requestConfig.authorizationRequired
+            requestConfig.authorizationRequired,
+            requestConfig.contentType
         );
 
         // Use signal to avoid running the request for too long
@@ -127,10 +136,17 @@ class BaseApi {
             controller.abort();
         }, timeout);
 
+        if (
+            requestConfig === null ||
+            requestConfig.needJsonBody === undefined
+        ) {
+            requestConfig.needJsonBody = true;
+        }
+
         const response = await fetch(`${this.apiURL}${url}`, {
             method,
             headers,
-            body: JSON.stringify(body),
+            body: requestConfig.needJsonBody ? JSON.stringify(body) : body,
             signal: controller.signal,
         });
 

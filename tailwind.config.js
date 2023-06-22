@@ -8,8 +8,15 @@ const colors = {
         400: "#0f875f",
         500: "#0b6144",
     },
+    csecondary: "#e94f37",
+    ctertiary: "#fff5ea",
     cinfo: "#1e96fc",
     cwarning: "#f32839",
+    cgrey: {
+        seasalt: "#f9f9f9",
+        platinum: "#dedede",
+        dimGrey: "#606060",
+    },
 };
 
 module.exports = {

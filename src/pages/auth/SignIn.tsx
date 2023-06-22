@@ -3,11 +3,9 @@ import React, { useState, type ReactElement, useEffect } from "react";
 import { Text, TextInput, View, TouchableOpacity } from "react-native";
 import { type NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useForm, Controller } from "react-hook-form";
-import * as WebBrowser from "expo-web-browser";
-import * as Google from "expo-auth-session/providers/google";
 
-import { authInputStyles } from "@/components/auth/AuthInput";
-import AuthButton from "@/components/auth/AuthButton";
+import { authInputStyles } from "@/pages/auth/components/AuthInput";
+import AuthButton from "@/pages/auth/components/AuthButton";
 import {
     SIGN_IN_WRONG_USERNAME_PASSWORD,
     COMMON_SERVER_CONNECTION_FAIL_ERROR,
@@ -26,12 +24,14 @@ import {
     SIGN_IN_GOOGLE_ERROR_OCCURED,
 } from "@/common/strings";
 import authApi from "@/api/auth/AuthApi";
-import OverlayLoading from "@/components/common/OverlayLoading";
-import ErrorText from "@/components/common/ErrorText";
-import Divider from "@/components/common/Divider";
-import GoogleSignInButton from "@/components/auth/GoogleSignInButton";
+import OverlayLoading from "@/common/components/OverlayLoading";
+import ErrorText from "@/common/components/ErrorText";
+import Divider from "@/common/components/Divider";
+import GoogleSignInButton from "@/pages/auth/components/GoogleSignInButton";
 import { GOOGLE_API_KEY, KEYCHAIN_ID } from "@env";
-import { saveKeychain } from "@/keychain/KeychainService";
+import { maybeCompleteAuthSession } from "expo-web-browser";
+import { useAuthRequest } from "expo-auth-session/providers/google";
+import { saveKeychain } from "@/common/KeychainService";
 
 interface SignInProps {
     navigation: NativeStackNavigationProp<RootStackParamList, "SignIn">;
@@ -46,7 +46,7 @@ const SignIn = (props: SignInProps): ReactElement<SignInProps> => {
     const { navigation } = props;
 
     const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [, response, promptAsync] = Google.useAuthRequest({
+    const [, response, promptAsync] = useAuthRequest({
         androidClientId: GOOGLE_API_KEY,
     });
     const [token, setToken] = useState<string>("");
@@ -64,7 +64,7 @@ const SignIn = (props: SignInProps): ReactElement<SignInProps> => {
     });
 
     useEffect(() => {
-        WebBrowser.maybeCompleteAuthSession();
+        maybeCompleteAuthSession();
     }, []);
 
     useEffect(() => {
@@ -94,12 +94,14 @@ const SignIn = (props: SignInProps): ReactElement<SignInProps> => {
         setIsLoading(true);
         try {
             const response = await authApi.signIn(data.email, data.password);
-            if (!response.success) {
+            if (!("token" in response)) {
                 alert(SIGN_IN_WRONG_USERNAME_PASSWORD);
                 return;
             }
 
-            navigation.navigate("MainScreen");
+            // Save token to secure store
+            await saveKeychain(KEYCHAIN_ID, response.token);
+            navigation.navigate("MainScreens");
         } catch (error) {
             alert(COMMON_SERVER_CONNECTION_FAIL_ERROR);
             console.error(`fail: ${String(error)}`);
@@ -112,15 +114,17 @@ const SignIn = (props: SignInProps): ReactElement<SignInProps> => {
         setIsLoading(true);
         try {
             const response = await authApi.signInWithGoogle(token);
-            if (!response.success) {
-                throw new Error();
+            if (!("token" in response)) {
+                alert(SIGN_IN_GOOGLE_ERROR_OCCURED);
+                return;
             }
 
             // Save token to secure store
             await saveKeychain(KEYCHAIN_ID, response.token);
-            navigation.navigate("MainScreen");
+            navigation.navigate("MainScreens");
         } catch (error) {
-            alert(SIGN_IN_GOOGLE_ERROR_OCCURED);
+            alert(COMMON_SERVER_CONNECTION_FAIL_ERROR);
+            console.error(`fail: ${String(error)}`);
         } finally {
             setIsLoading(false);
         }
@@ -160,6 +164,7 @@ const SignIn = (props: SignInProps): ReactElement<SignInProps> => {
                         }}
                         render={({ field: { onChange, onBlur, value } }) => (
                             <TextInput
+                                autoCapitalize="none"
                                 className={authInputStyles.textInput}
                                 onBlur={onBlur}
                                 onChangeText={onChange}
@@ -189,6 +194,7 @@ const SignIn = (props: SignInProps): ReactElement<SignInProps> => {
                         rules={{ required: true, minLength: 8 }}
                         render={({ field: { onChange, onBlur, value } }) => (
                             <TextInput
+                                autoCapitalize="none"
                                 textContentType="password"
                                 secureTextEntry={true}
                                 className={authInputStyles.textInput}
