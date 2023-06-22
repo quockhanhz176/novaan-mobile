@@ -1,4 +1,3 @@
-import { getRealPath, getVideoMetaData } from "react-native-compressor";
 import BaseApi from "../BaseApi";
 import { type UploadTipResponse } from "./types/UploadTipResponse";
 

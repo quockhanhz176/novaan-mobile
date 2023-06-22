@@ -30,7 +30,6 @@ import {
     handleTipSubmission,
     pickVideoAndThumbnail,
 } from "./services/createTipService";
-import { Toast } from "react-native-toast-message/lib/src/Toast";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const defaultThumbnail = require("@root/assets/default-video.png");
@@ -131,7 +130,7 @@ const CreateTip: FC<CreateTipProps> = (props: CreateTipProps) => {
                         {CREATE_TIP_MEDIA_LABEL}
                         <WarningAsterisk />
                     </Text>
-                    {video == null ? (
+                    {thumbnailUri == null ? (
                         <TouchableOpacity
                             activeOpacity={0.5}
                             onPress={selectVideo}

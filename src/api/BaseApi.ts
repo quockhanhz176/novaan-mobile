@@ -58,6 +58,8 @@ class BaseApi {
             if (accessToken == null) {
                 throw new Error("Access token not found");
             }
+            // TODO: figure out why this line is needed
+            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
             headers.append("Authorization", `Bearer ${accessToken}`);
         }
 

@@ -1,5 +1,4 @@
 import {
-    COMMON_UNKNOWN_ERROR,
     CREATE_TIP_DESCRIPTION_REQUIRED_ERROR,
     CREATE_TIP_DESCRIPTION_TOO_SHORT_ERROR,
     CREATE_TIP_FAILED,
@@ -11,7 +10,6 @@ import {
     CREATE_TIP_VIDEO_REQUIRED_ERROR,
     CREATE_TIP_VIDEO_WRONG_FILE_SIZE_ERROR,
     CREATE_TIP_VIDEO_WRONG_LENGTH_ERROR,
-    CREATE_TIP_VIDEO_WRONG_RESOLUTION,
 } from "@/common/strings";
 import type TipSubmission from "../types/TipSubmission";
 import { Alert } from "react-native";
