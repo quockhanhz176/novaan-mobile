@@ -9,19 +9,15 @@ const baseApi = new BaseApi();
 const uploadTip = async (
     title: string,
     description: string,
-    videoUri: string
+    videoUri: string,
+    extension: string
 ): Promise<UploadTipResponse> => {
-    const videoRealPath = await getRealPath(videoUri, "video");
-    const { extension } = (await getVideoMetaData(videoRealPath)) as {
-        extension: string;
-    };
-
     const formData = new FormData();
     formData.append("Title", title);
     formData.append("Description", description);
     formData.append("Video", {
         name: `upload.${extension}`,
-        uri: videoRealPath,
+        uri: videoUri,
         type: `video/${extension}`,
     } as any);
 

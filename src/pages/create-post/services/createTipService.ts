@@ -9,7 +9,9 @@ import {
     CREATE_TIP_SUCCESS,
     CREATE_TIP_TITLE_REQUIRED_ERROR,
     CREATE_TIP_VIDEO_REQUIRED_ERROR,
+    CREATE_TIP_VIDEO_WRONG_FILE_SIZE_ERROR,
     CREATE_TIP_VIDEO_WRONG_LENGTH_ERROR,
+    CREATE_TIP_VIDEO_WRONG_RESOLUTION,
 } from "@/common/strings";
 import type TipSubmission from "../types/TipSubmission";
 import { Alert } from "react-native";
@@ -24,22 +26,30 @@ interface ValidationResult {
     message?: string;
 }
 
+interface VideoInfo {
+    duration: number;
+    width: number;
+    height: number;
+    extension: string;
+    size: number;
+}
+
 const VIDEO_LENGTH_UPPER_LIMIT = 120;
 const DESCRIPTION_LENGTH_LOWER_LIMIT = 30;
-// const VIDEO_SIZE_UPPER_LIMIT = 20 * 1024 * 1024;
+const VIDEO_SIZE_UPPER_LIMIT = 20 * 1024; // 20MB
+
+const invalidResponse = (response: string): ValidationResult => {
+    return {
+        valid: false,
+        message: response,
+    };
+};
 
 const validateTipSubmission = ({
     title,
     description,
     video,
 }: TipSubmission): ValidationResult => {
-    const invalidResponse = (response: string): ValidationResult => {
-        return {
-            valid: false,
-            message: response,
-        };
-    };
-
     if (title === "") {
         return invalidResponse(CREATE_TIP_TITLE_REQUIRED_ERROR);
     }
@@ -56,17 +66,38 @@ const validateTipSubmission = ({
         return invalidResponse(CREATE_TIP_VIDEO_REQUIRED_ERROR);
     }
 
-    if (video.duration == null || video.duration === 0) {
-        return invalidResponse(COMMON_UNKNOWN_ERROR);
+    return { valid: true };
+};
+
+const validateCompressedVideo = (fileInfo: VideoInfo): ValidationResult => {
+    // Validate file size
+    if (fileInfo.size > VIDEO_SIZE_UPPER_LIMIT) {
+        return invalidResponse(CREATE_TIP_VIDEO_WRONG_FILE_SIZE_ERROR);
     }
 
-    if (video.fileSize == null) {
-        return invalidResponse(COMMON_UNKNOWN_ERROR);
-    }
-
-    if (video.duration > VIDEO_LENGTH_UPPER_LIMIT) {
+    // Validate duration
+    if (fileInfo.duration > VIDEO_LENGTH_UPPER_LIMIT) {
         return invalidResponse(CREATE_TIP_VIDEO_WRONG_LENGTH_ERROR);
     }
+
+    // TODO: Temporary commentted out to test the system more easily
+    // const getResolution(a: number, b: number): [number, number] => {
+    //     const getGCD = (a: number, b: number): number => {
+    //         if(b === 0) {
+    //             return a;
+    //         }
+    //         return getGCD(b, a % b)
+    //     }
+
+    //     const gcd = getGCD(a, b);
+    //     return [a / gcd, b / gcd];
+    // }
+
+    // // Validate resolution - Force 9:16 vertical video
+    // const videoResolution = getResolution(fileInfo.width, fileInfo.height)
+    // if(videoResolution[0] !== 9 || videoResolution[1] !== 16) {
+    //     return invalidResponse(CREATE_TIP_VIDEO_WRONG_RESOLUTION);
+    // }
 
     return { valid: true };
 };
@@ -104,12 +135,30 @@ export const handleTipSubmission = async (
             {
                 compressionMethod: "auto",
                 minimumFileSizeForCompress: 20,
-                maxSize: 1920,
+                maxSize: 1280, // HD width
             },
             console.log
         );
 
-        await PostApi.uploadTip(title, description, videoUri);
+        const realVideoPath = await getRealPath(videoUri, "video");
+        const videoInfo = (await getVideoMetaData(realVideoPath)) as VideoInfo;
+
+        const validationResult = validateCompressedVideo(videoInfo);
+        if (!validationResult.valid) {
+            Toast.show({
+                type: "error",
+                text1: CREATE_TIP_FAILED,
+                text2: validationResult.message,
+            });
+            return;
+        }
+
+        await PostApi.uploadTip(
+            title,
+            description,
+            realVideoPath,
+            videoInfo.extension
+        );
 
         // Notify the user when it is done
         Toast.show({
