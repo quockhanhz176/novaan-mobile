@@ -3,8 +3,6 @@ import React, { useState, type ReactElement, useEffect } from "react";
 import { Text, TextInput, View, TouchableOpacity } from "react-native";
 import { type NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useForm, Controller } from "react-hook-form";
-import * as WebBrowser from "expo-web-browser";
-import * as Google from "expo-auth-session/providers/google";
 
 import { authInputStyles } from "@/pages/auth/components/AuthInput";
 import AuthButton from "@/pages/auth/components/AuthButton";
@@ -31,6 +29,8 @@ import ErrorText from "@/common/components/ErrorText";
 import Divider from "@/common/components/Divider";
 import GoogleSignInButton from "@/pages/auth/components/GoogleSignInButton";
 import { GOOGLE_API_KEY, KEYCHAIN_ID } from "@env";
+import { maybeCompleteAuthSession } from "expo-web-browser";
+import { useAuthRequest } from "expo-auth-session/providers/google";
 import { saveKeychain } from "@/common/keyChainService";
 
 interface SignInProps {
@@ -46,7 +46,7 @@ const SignIn = (props: SignInProps): ReactElement<SignInProps> => {
     const { navigation } = props;
 
     const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [, response, promptAsync] = Google.useAuthRequest({
+    const [, response, promptAsync] = useAuthRequest({
         androidClientId: GOOGLE_API_KEY,
     });
     const [token, setToken] = useState<string>("");
@@ -64,7 +64,7 @@ const SignIn = (props: SignInProps): ReactElement<SignInProps> => {
     });
 
     useEffect(() => {
-        WebBrowser.maybeCompleteAuthSession();
+        maybeCompleteAuthSession();
     }, []);
 
     useEffect(() => {

@@ -11,10 +11,13 @@ import type TipSubmission from "../types/TipSubmission";
 import { Alert } from "react-native";
 import { Video } from "react-native-compressor";
 import PostApi from "@/api/post/PostApi";
-import * as ImagePicker from "react-native-image-picker";
 import { getThumbnailAsync } from "expo-video-thumbnails";
+import { type Asset, launchImageLibrary } from "react-native-image-picker";
 
-type ValidateionResult = { valid: true } | { valid: false; message: string };
+interface ValidationResult {
+    valid: boolean;
+    message?: string;
+}
 
 const VIDEO_LENGTH_UPPER_LIMIT = 120;
 const DESCRIPTION_LENGTH_LOWER_LIMIT = 30;
@@ -24,10 +27,8 @@ const validateTipSubmission = ({
     title,
     description,
     video,
-}: TipSubmission): ValidateionResult => {
-    const invalidResponse = (
-        response: string
-    ): { valid: false; message: string } => {
+}: TipSubmission): ValidationResult => {
+    const invalidResponse = (response: string): ValidationResult => {
         return {
             valid: false,
             message: response,
@@ -70,7 +71,6 @@ export const handleTipSubmission = async (
     onTipValid?: () => void
 ): Promise<void> => {
     const { title, video, description } = tipSubmission;
-
     const validationResult = validateTipSubmission(tipSubmission);
     if (!validationResult.valid) {
         Alert.alert(CREATE_TIP_INVALID_ERROR_TITLE, validationResult.message);
@@ -108,12 +108,12 @@ export const handleTipSubmission = async (
 };
 
 export const pickVideoAndThumbnail = async (
-    onVideoPicked: (asset: ImagePicker.Asset) => void,
+    onVideoPicked: (asset: Asset) => void,
     onThumbNailPicked: (uri: string) => void
 ): Promise<void> => {
     try {
         // pick video
-        const videoResponse = await ImagePicker.launchImageLibrary({
+        const videoResponse = await launchImageLibrary({
             mediaType: "video",
             includeBase64: true,
         });
