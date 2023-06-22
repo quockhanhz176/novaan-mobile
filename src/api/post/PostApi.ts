@@ -1,4 +1,4 @@
-import { getVideoMetaData } from "react-native-compressor";
+import { getRealPath, getVideoMetaData } from "react-native-compressor";
 import BaseApi from "../BaseApi";
 import { type UploadTipResponse } from "./types/UploadTipResponse";
 
@@ -11,17 +11,18 @@ const uploadTip = async (
     description: string,
     videoUri: string
 ): Promise<UploadTipResponse> => {
+    const videoRealPath = await getRealPath(videoUri, "video");
+    const { extension } = (await getVideoMetaData(videoRealPath)) as {
+        extension: string;
+    };
+
     const formData = new FormData();
     formData.append("Title", title);
     formData.append("Description", description);
-
-    const videoInfo = (await getVideoMetaData(videoUri)) as {
-        extension: string;
-    };
     formData.append("Video", {
-        name: `upload.${videoInfo.extension}`,
-        uri: videoUri,
-        type: `video/${videoInfo.extension}`,
+        name: `upload.${extension}`,
+        uri: videoRealPath,
+        type: `video/${extension}`,
     } as any);
 
     const response = await baseApi.post<FormData>(UPLOAD_TIP_URL, formData, {
@@ -31,7 +32,7 @@ const uploadTip = async (
         needJsonBody: false,
     });
 
-    console.log("PostApi.uploadTip - response:" + JSON.stringify(response));
+    console.log("PostApi.uploadTip - response: " + JSON.stringify(response));
 
     if (!response.ok) {
         return {

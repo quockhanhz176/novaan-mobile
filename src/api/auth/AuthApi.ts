@@ -87,6 +87,10 @@ const signInWithGoogle = async (token: string): Promise<SignInResponse> => {
             SIGNIN_GOOGLE_URL,
             {
                 token,
+            },
+            {
+                timeout: 30000,
+                authorizationRequired: false,
             }
         );
         if (!response.ok) {

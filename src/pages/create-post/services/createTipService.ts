@@ -2,17 +2,22 @@ import {
     COMMON_UNKNOWN_ERROR,
     CREATE_TIP_DESCRIPTION_REQUIRED_ERROR,
     CREATE_TIP_DESCRIPTION_TOO_SHORT_ERROR,
+    CREATE_TIP_FAILED,
+    CREATE_TIP_FAILED_SECONDARY,
     CREATE_TIP_INVALID_ERROR_TITLE,
+    CREATE_TIP_PENDING,
+    CREATE_TIP_SUCCESS,
     CREATE_TIP_TITLE_REQUIRED_ERROR,
     CREATE_TIP_VIDEO_REQUIRED_ERROR,
     CREATE_TIP_VIDEO_WRONG_LENGTH_ERROR,
 } from "@/common/strings";
 import type TipSubmission from "../types/TipSubmission";
 import { Alert } from "react-native";
-import { Video } from "react-native-compressor";
+import { Video, getRealPath, getVideoMetaData } from "react-native-compressor";
 import PostApi from "@/api/post/PostApi";
 import { getThumbnailAsync } from "expo-video-thumbnails";
 import { type Asset, launchImageLibrary } from "react-native-image-picker";
+import { Toast } from "react-native-toast-message/lib/src/Toast";
 
 interface ValidationResult {
     valid: boolean;
@@ -79,31 +84,46 @@ export const handleTipSubmission = async (
 
     onTipValid?.();
 
-    try {
-        if (video == null || video.uri == null) {
-            console.error(
-                "video or video.uri is null, which is impossible after validation"
-            );
-            return;
-        }
+    if (video == null || video.uri == null) {
+        console.error(
+            "video or video.uri is null, which is impossible after validation"
+        );
+        return;
+    }
 
-        // compress video
+    try {
+        // Notify the user that the video is being uploaded
+        Toast.show({
+            type: "info",
+            text1: CREATE_TIP_PENDING,
+        });
+
+        // Compress video
         const videoUri = await Video.compress(
             video.uri,
             {
                 compressionMethod: "auto",
+                minimumFileSizeForCompress: 20,
+                maxSize: 1920,
             },
-            (progress: number): void => {
-                console.log(
-                    "createTipService.handleTipSubmission - compression progress: " +
-                        progress.toString()
-                );
-            }
+            console.log
         );
 
         await PostApi.uploadTip(title, description, videoUri);
+
+        // Notify the user when it is done
+        Toast.show({
+            type: "success",
+            text1: CREATE_TIP_SUCCESS,
+        });
     } catch (e) {
-        console.trace(e);
+        // Notify the user when it fails
+        Toast.show({
+            type: "error",
+            text1: CREATE_TIP_FAILED,
+            text2: CREATE_TIP_FAILED_SECONDARY,
+        });
+        console.error(e.message);
     }
 };
 

@@ -31,7 +31,7 @@ import GoogleSignInButton from "@/pages/auth/components/GoogleSignInButton";
 import { GOOGLE_API_KEY, KEYCHAIN_ID } from "@env";
 import { maybeCompleteAuthSession } from "expo-web-browser";
 import { useAuthRequest } from "expo-auth-session/providers/google";
-import { saveKeychain } from "@/common/keyChainService";
+import { saveKeychain } from "@/common/KeychainService";
 
 interface SignInProps {
     navigation: NativeStackNavigationProp<RootStackParamList, "SignIn">;
@@ -94,7 +94,7 @@ const SignIn = (props: SignInProps): ReactElement<SignInProps> => {
         setIsLoading(true);
         try {
             const response = await authApi.signIn(data.email, data.password);
-            if (!response.success) {
+            if (!("token" in response)) {
                 alert(SIGN_IN_WRONG_USERNAME_PASSWORD);
                 return;
             }
@@ -114,15 +114,17 @@ const SignIn = (props: SignInProps): ReactElement<SignInProps> => {
         setIsLoading(true);
         try {
             const response = await authApi.signInWithGoogle(token);
-            if (!response.success) {
-                throw new Error();
+            if (!("token" in response)) {
+                alert(SIGN_IN_GOOGLE_ERROR_OCCURED);
+                return;
             }
 
             // Save token to secure store
             await saveKeychain(KEYCHAIN_ID, response.token);
             navigation.navigate("MainScreens");
         } catch (error) {
-            alert(SIGN_IN_GOOGLE_ERROR_OCCURED);
+            alert(COMMON_SERVER_CONNECTION_FAIL_ERROR);
+            console.error(`fail: ${String(error)}`);
         } finally {
             setIsLoading(false);
         }

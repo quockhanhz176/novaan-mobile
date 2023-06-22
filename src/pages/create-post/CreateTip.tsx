@@ -30,6 +30,7 @@ import {
     handleTipSubmission,
     pickVideoAndThumbnail,
 } from "./services/createTipService";
+import { Toast } from "react-native-toast-message/lib/src/Toast";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const defaultThumbnail = require("@root/assets/default-video.png");
@@ -63,7 +64,9 @@ const CreateTip: FC<CreateTipProps> = (props: CreateTipProps) => {
     };
 
     const submit = async (): Promise<void> => {
-        void handleTipSubmission({ title, description, video }, navigation.pop);
+        void handleTipSubmission({ title, description, video }, () => {
+            navigateBack();
+        });
     };
 
     return (

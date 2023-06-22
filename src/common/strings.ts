@@ -86,3 +86,8 @@ export const CREATE_TIP_VIDEO_WRONG_LENGTH_ERROR =
     "Độ dài video phải ngắn hơn hoặc bằng 2 phút";
 export const CREATE_TIP_VIDEO_WRONG_FILE_SIZE_ERROR =
     "File video phải nhỏ hơn hoặc bằng 20MB";
+
+export const CREATE_TIP_PENDING = "Mẹo vặt của bạn đang được tải lên~";
+export const CREATE_TIP_SUCCESS = "Mẹo vặt của bạn đã được đăng tải";
+export const CREATE_TIP_FAILED = "Đã có lỗi xảy ra khi đăng tải mẹo vặt";
+export const CREATE_TIP_FAILED_SECONDARY = "Xin vui lòng thử lại sau";
