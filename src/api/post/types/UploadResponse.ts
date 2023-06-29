@@ -1,4 +1,4 @@
-export type UploadTipResponse =
+export type UploadResponse =
     | {
           success: true;
       }

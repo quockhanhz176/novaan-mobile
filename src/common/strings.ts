@@ -88,8 +88,103 @@ export const CREATE_TIP_VIDEO_WRONG_FILE_SIZE_ERROR =
     "File video phải nhỏ hơn hoặc bằng 20MB";
 export const CREATE_TIP_VIDEO_WRONG_RESOLUTION =
     "File video phải là video dọc với tỉ lệ 9:16";
-
 export const CREATE_TIP_PENDING = "Mẹo vặt của bạn đang được tải lên~";
 export const CREATE_TIP_SUCCESS = "Mẹo vặt của bạn đã được đăng tải";
 export const CREATE_TIP_FAILED = "Đã có lỗi xảy ra khi đăng tải mẹo vặt";
 export const CREATE_TIP_FAILED_SECONDARY = "Xin vui lòng thử lại sau";
+
+// Create recipe screen
+export const CREATE_RECIPE_TITLE = "Tạo công thức";
+export const CREATE_RECIPE_THANKS =
+    "Chúng tôi rất vui khi bạn quyết định chia sẻ công thức nấu ăn của mình với cộng đồng!";
+export const CREATE_RECIPE_TITLE_LABEL = "Tiêu đề";
+export const CREATE_RECIPE_TITLE_PLACEHOLDER = "E.g. Đậu lướt ván";
+export const CREATE_RECIPE_MEDIA_LABEL = "Thêm video";
+export const CREATE_RECIPE_MEDIA_BUTTON_TEXT =
+    "Thêm video công thức nấu ăn của bạn";
+export const CREATE_RECIPE_DESCRIPTION_LABEL = "Thêm mô tả";
+export const CREATE_RECIPE_DESCRIPTION_PLACEHOLDER =
+    "E.g. Đậu lướt ván ăn kèm với rau kinh giới";
+export const CREATE_RECIPE_PREVIEW_BEFORE_SUBMIT = "Xem trước khi đăng";
+export const CREATE_RECIPE_SUBMIT = "Đăng bài";
+export const CREATE_RECIPE_NEXT_STEP_BUTTON_TITLE = "Tiếp theo";
+export const CREATE_RECIPE_PREVIOUS_STEP_BUTTON_TITLE = "Quay lại";
+export const CREATE_RECIPE_PDT_SUBTITLE = "Hãy thêm một vài chi tiết...";
+export const CREATE_RECIPE_PORTION_TITLE = "Khẩu phần";
+export const CREATE_RECIPE_PORTION_TYPE_PLACEHOLDER = "khẩu phần";
+export const CREATE_RECIPE_PORTION_DIFFICULTY_TITLE = "Độ khó";
+export const CREATE_RECIPE_PORTION_DIFFICULTY_PLACEHOLDER = "chọn độ khó";
+export const CREATE_RECIPE_PREPARE_TIME_TITLE = "Thời gian chuẩn bị";
+export const CREATE_RECIPE_COOK_TIME_TITLE = "Thời gian nấu";
+export const CREATE_RECIPE_INGREDIENTS_SUBTITLE =
+    "Bạn sử dụng những nguyên liệu nào cho công thức của mình?";
+export const CREATE_RECIPE_INGREDIENTS_TITLE = "Thêm nguyên liệu";
+export const CREATE_RECIPE_INGREDIENTS_ADD_INGREDIENT_BUTTON_TITLE =
+    "Thêm một nguyên liệu";
+export const CREATE_RECIPE_INSTRUCTIONS_SUBTITLE =
+    "Đã đến lúc thêm các hướng dẫn cụ thể...";
+export const CREATE_RECIPE_INSTRUCTIONS_TITLE = "Các bước";
+export const CREATE_RECIPE_INSTRUCTIONS_ADD_INGREDIENT_BUTTON_TITLE =
+    "Thêm một bước";
+export const CREATE_RECIPE_INSTRUCTIONS_INSTRUCTION_TEXT = "Bước: ";
+export const CREATE_RECIPE_HOUR = "giờ";
+export const CREATE_RECIPE_MINUTE = "phút";
+// Create recipe message
+export const CREATE_RECIPE_INVALID_ERROR_TITLE =
+    "Thông tin về công thức sai yêu cầu";
+export const CREATE_RECIPE_TITLE_REQUIRED_ERROR = "Tiêu đề không được để trống";
+export const CREATE_RECIPE_DESCRIPTION_REQUIRED_ERROR =
+    "Mô tả không được để trống";
+export const CREATE_RECIPE_DESCRIPTION_TOO_SHORT_ERROR =
+    "Mô tả không được ngắn hơn 30 ký tự";
+export const CREATE_RECIPE_VIDEO_REQUIRED_ERROR =
+    "Công thức nấu ăn phải được đăng kèm với video minh họa";
+export const CREATE_RECIPE_VIDEO_WRONG_LENGTH_ERROR =
+    "Độ dài video phải ngắn hơn hoặc bằng 2 phút";
+export const CREATE_RECIPE_VIDEO_WRONG_FILE_SIZE_ERROR =
+    "File video phải nhỏ hơn hoặc bằng 20MB";
+export const CREATE_RECIPE_VIDEO_WRONG_RESOLUTION =
+    "File video phải là video dọc với tỉ lệ 9:16";
+export const CREATE_RECIPE_PORTION_QUALITY_OUT_OF_RANGE_ERROR =
+    "Số lượng khẩu phần phải lớn hơn 0";
+export const CREATE_RECIPE_PORTION_TYPE_MISSING =
+    "Bạn chưa chọn loại khẩu phần";
+export const CREATE_RECIPE_DIFFICULTY_MISSING = "Bạn chưa chọn độ khó";
+export const CREATE_RECIPE_NO_INGREDIENT_ERROR =
+    "Công thức của bạn phải có ít nhất 1 nguyên liệu";
+export const CREATE_RECIPE_NO_INSTRUCTION_ERROR =
+    "Công thức của bạn phải có ít nhất 1 bước";
+export const CREATE_RECIPE_PENDING =
+    "Công thức nấu ăn của bạn đang được tải lên~";
+export const CREATE_RECIPE_SUCCESS =
+    "Công thức nấu ăn của bạn đã được đăng tải";
+export const CREATE_RECIPE_FAILED =
+    "Đã có lỗi xảy ra khi đăng tải công thức nấu ăn";
+export const CREATE_RECIPE_FAILED_SECONDARY = "Xin vui lòng thử lại sau";
+
+// Add ingredient screen
+export const ADD_INGREDIENT_TITLE = "Thêm nguyên liệu";
+export const ADD_INGREDIENT_INGREDIENT_TITLE = "Tên nguyên liệu";
+export const ADD_INGREDIENT_AMOUNT_TITLE = "Số lượng";
+export const ADD_INGREDIENT_UNIT_TITLE = "Đơn vị đo";
+export const ADD_INGREDIENT_SUBMIT_BUTTON_TITLE = "Hoàn tất";
+// Add ingredient message
+export const ADD_INGREDIENT_MESSAGE_TITLE = "Nhập thiếu trường bắt buộc";
+export const ADD_INGREDIENT_NO_NAME_ERROR =
+    "Trường tên nguyên liệu là bắt buộc";
+export const ADD_INGREDIENT_ZERO_AMOUNT_ERROR =
+    "Số lượng nguyên liệu phải lớn hơn 0";
+export const ADD_INGREDIENT_NO_UNIT_ERROR = "Trường đơn vị đo là bắt buộc";
+
+// Add instruction screen
+export const ADD_INSTRUCTION_TITLE = "Thêm hướng dẫn";
+export const ADD_INSTRUCTION_DESCRIPTION_TITLE = "Mô tả những việc cần làm";
+export const ADD_INSTRUCTION_DESCRIPTION_PLACEHOLDER =
+    "E.g. Gọt vỏ, rửa sạch và cắt hạt lựu một củ cà rốt";
+export const ADD_INSTRUCTION_IMAGE_TITLE = "Thêm ảnh";
+export const ADD_INSTRUCTION_IMAGE_BUTTON_TEXT = "Thêm ảnh minh họa";
+export const ADD_INSTRUCTION_SUBMIT_BUTTON_TITLE = "Hoàn tất";
+// Add instruction message
+export const ADD_INSTRUCTION_MESSAGE_TITLE = "Thông tin sai yêu cầu";
+export const ADD_INSTRUCTION_NO_DESCRIPTION_ERROR = "Trường mô tả là bắt buộc";
+export const ADD_INSTRUCTION_WRONG_IMAGE_SIZE = "Ảnh phải nhỏ hơn 5MB";

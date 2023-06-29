@@ -26,10 +26,8 @@ import {
 import { customColors } from "@root/tailwind.config";
 import { type NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { type RootStackParamList } from "@root/App";
-import {
-    handleTipSubmission,
-    pickVideoAndThumbnail,
-} from "./services/createTipService";
+import { handleTipSubmission } from "./services/createTipService";
+import { pickVideoAndThumbnail } from "../common/commonServices";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const defaultThumbnail = require("@root/assets/default-video.png");
@@ -102,7 +100,7 @@ const CreateTip: FC<CreateTipProps> = (props: CreateTipProps) => {
                         placeholder={CREATE_TIP_TITLE_PLACEHOLDER}
                     />
                     <View className="items-end mt-2">
-                        <Text className="text-cgrey-dimGrey text-base">
+                        <Text className="text-cgrey-dim text-base">
                             {title.length.toString() + "/55"}
                         </Text>
                     </View>
@@ -122,7 +120,7 @@ const CreateTip: FC<CreateTipProps> = (props: CreateTipProps) => {
                         placeholder={CREATE_TIP_DESCRIPTION_PLACEHOLDER}
                     />
                     <View className="items-end">
-                        <Text className="text-cgrey-dimGrey text-base">
+                        <Text className="text-cgrey-dim text-base">
                             {description.length.toString() + "/500"}
                         </Text>
                     </View>

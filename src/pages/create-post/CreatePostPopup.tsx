@@ -29,6 +29,10 @@ const CreatePostPopup: FC<CreatePostPopupProps> = (
         navigation.navigate("CreateTip");
         dismissModal();
     };
+    const openCreateRecipe = (): void => {
+        navigation.navigate("CreateRecipe");
+        dismissModal();
+    };
     const slideAnimation = useRef(new Animated.Value(0)).current;
     useEffect(() => {
         if (visible) {
@@ -84,7 +88,10 @@ const CreatePostPopup: FC<CreatePostPopupProps> = (
                     </TouchableOpacity>
                 </View>
                 <View className="mt-7 space-y-5 pb-6">
-                    <TouchableOpacity className={createButtonCn}>
+                    <TouchableOpacity
+                        className={createButtonCn}
+                        onPress={openCreateRecipe}
+                    >
                         <View className={iconWrapperCn}>
                             <IconAnt name="upload" size={20} />
                         </View>
