@@ -1,4 +1,5 @@
 import { type Context } from "react";
+import { Dimensions } from "react-native";
 
 export const validateText = (
     text: string,
@@ -25,3 +26,6 @@ export type Setter<Type> = {
 export const getUrlExtension = (url: string): string => {
     return url.split(/[#?]/)[0]?.split(".")?.pop()?.trim() ?? "";
 };
+
+export const { width: windowWidth, height: windowHeight } =
+    Dimensions.get("window");

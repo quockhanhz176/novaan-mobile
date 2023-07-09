@@ -21,11 +21,11 @@ const SIGN_UP_USERNAME_EXIST_ERROR =
 const baseApi = new BaseApi();
 
 const signIn = async (
-    usernameOrEmail: string,
+    email: string,
     password: string
 ): Promise<SignInResponse> => {
     const response = await baseApi.post<SignInRequest>(SIGN_IN_URL, {
-        usernameOrEmail,
+        email,
         password,
     });
     console.log(`AuthApi.signIn - response: ${JSON.stringify(response)}`);

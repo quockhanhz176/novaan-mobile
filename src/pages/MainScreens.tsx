@@ -11,6 +11,7 @@ import UserProfile from "./user-profile/UserProfile";
 import CreatePostPopup from "./create-post/CreatePostPopup";
 import { type NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { type RootStackParamList } from "App";
+import { BOTTOM_NAV_HEIGHT } from "@/common/constants";
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 export type BottomTabParamList = {
@@ -37,11 +38,12 @@ const MainScreens: FC<MainScreensProps> = ({
             <BottomTab.Navigator
                 activeColor="#E94F37"
                 barStyle={{
+                    height: BOTTOM_NAV_HEIGHT,
                     backgroundColor: "#fcfcfc",
                     borderTopWidth: 1,
                     borderColor: "#f0f0f0",
-                    borderRadius: 20,
                 }}
+                initialRouteName="Reel"
             >
                 <BottomTab.Screen
                     name="Home"
@@ -99,13 +101,11 @@ const MainScreens: FC<MainScreensProps> = ({
                     }}
                 />
             </BottomTab.Navigator>
-            {true && (
-                <CreatePostPopup
-                    navigation={navigation}
-                    visible={modalVisible}
-                    setVisible={setModalVisible}
-                />
-            )}
+            <CreatePostPopup
+                navigation={navigation}
+                visible={modalVisible}
+                setVisible={setModalVisible}
+            />
         </View>
     );
 };

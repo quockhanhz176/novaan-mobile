@@ -69,7 +69,7 @@ const CreatePostPopup: FC<CreatePostPopupProps> = (
                         {
                             translateY: slideAnimation.interpolate({
                                 inputRange: [0, 1],
-                                outputRange: [200, 0],
+                                outputRange: [300, 0],
                             }),
                         },
                     ],

@@ -2,6 +2,9 @@
 export const COMMON_ALERT_TITLE = "Cảnh báo";
 export const COMMON_FIELD_WRONG_FORMAT = "Trường thông tin sai định dạng!";
 export const COMMON_EMPTY_FIELD_NOT_ALLOWED = "*Trường này không được để trống";
+export const DIFFICULTY_EASY = "Dễ"
+export const DIFFICULTY_MEDIUM = "Trung bình"
+export const DIFFICULTY_HARD = "Khó"
 // Common messages
 export const COMMON_SERVER_CONNECTION_FAIL_ERROR =
     "Hiện đang không thể kết nối được với server, xin vui lòng thử lại sau";
@@ -188,3 +191,6 @@ export const ADD_INSTRUCTION_SUBMIT_BUTTON_TITLE = "Hoàn tất";
 export const ADD_INSTRUCTION_MESSAGE_TITLE = "Thông tin sai yêu cầu";
 export const ADD_INSTRUCTION_NO_DESCRIPTION_ERROR = "Trường mô tả là bắt buộc";
 export const ADD_INSTRUCTION_WRONG_IMAGE_SIZE = "Ảnh phải nhỏ hơn 5MB";
+
+// Reel screen
+export const REEL_DIFFICULTY_TITLE = "Độ khó: "
