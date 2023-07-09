@@ -150,6 +150,8 @@ class BaseApi {
             signal: controller.signal,
         });
 
+        console.log(JSON.stringify(response));
+
         clearTimeout(timeoutId);
 
         return response;

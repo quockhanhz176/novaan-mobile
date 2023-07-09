@@ -4,6 +4,7 @@
     "@react-navigation/material-top-tabs": "^6.6.2",
     "@react-navigation/native": "^6.1.6",
     "@react-navigation/native-stack": "^6.9.12",
+    "base-64": "^1.0.0",
     "dotenv": "^16.1.4",
     "expo": "~48.0.18",
     "expo-application": "~5.1.1",
@@ -45,6 +46,7 @@
   "devDependencies": {
     "@babel/core": "^7.19.3",
     "@tsconfig/react-native": "^3.0.2",
+    "@types/base-64": "^1.0.0",
     "@types/jest": "^29.5.2",
     "@types/react": "~18.0.24",
     "@types/react-native": "~0.70.6",
