@@ -1,28 +1,110 @@
-import React, { type FC } from "react";
+import React, {
+    useRef,
+    type FC,
+    useState,
+    useCallback,
+    useEffect,
+} from "react";
+import { type GestureResponderEvent, View } from "react-native";
 import Video from "react-native-video";
+import PlayPause from "./PlayPause";
+import Seeker from "./Seeker";
+import reelServices from "../services/reelServices";
 
 interface VideoViewrProps {
-    videoUri: string;
+    videoId: string;
+    isPaused?: boolean;
 }
 
-const VideoViewer: FC<VideoViewrProps> = ({ videoUri }: VideoViewrProps) => {
+const VideoViewer: FC<VideoViewrProps> = ({
+    videoId,
+    isPaused: pausedFromHigherUp = true,
+}: VideoViewrProps) => {
+    const videoRef = useRef<Video>(null);
+    const [paused, setPaused] = useState(pausedFromHigherUp);
+    const [currentTimeStamp, setCurrentTimeStamp] = useState(0);
+    const [playToggle, setPlayToggle] = useState<boolean>();
+    const [pauseToggle, setPauseToggle] = useState<boolean>();
+    const videoDuration = useRef(1);
+
+    const [videoUri, setVideoUri] = useState("");
+
+    const loadVideo = async (): Promise<void> => {
+        const result = await reelServices.getResourceUrl(videoId);
+        if (result == null) {
+            return;
+        }
+
+        setVideoUri(result);
+    };
+
+    useEffect(() => {
+        void loadVideo();
+    }, []);
+
+    useEffect(() => {
+        setPaused(pausedFromHigherUp);
+    }, [pausedFromHigherUp]);
+
+    const onVideoPress = (e: GestureResponderEvent): void => {
+        const pauseState = !paused;
+        setPaused(pauseState);
+        if (pauseState) {
+            setPauseToggle(pauseToggle !== undefined ? !pauseToggle : true);
+        } else {
+            setPlayToggle(playToggle !== undefined ? !playToggle : true);
+        }
+    };
+
+    const onSeek = useCallback(
+        (progress: number): void => {
+            videoRef.current?.seek(progress * videoDuration.current);
+        },
+        [videoDuration.current]
+    );
+
+    const onVideoError = async (): Promise<void> => {
+        void loadVideo();
+    };
+
     return (
-        <Video
-            source={{
-                uri: videoUri,
-            }}
-            style={{
-                backgroundColor: "black",
-                position: "absolute",
-                top: 0,
-                left: 0,
-                bottom: 0,
-                right: 0,
-            }}
-            // controls
-            resizeMode="cover"
-            repeat
-        />
+        <View
+            className="absolute top-0 left-0 bottom-0 right-0"
+            onTouchEnd={onVideoPress}
+        >
+            {videoUri !== "" && (
+                <Video
+                    paused={paused}
+                    ref={videoRef}
+                    source={{
+                        uri: videoUri,
+                    }}
+                    style={{
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        bottom: 0,
+                        right: 0,
+                    }}
+                    resizeMode="contain"
+                    repeat
+                    onLoad={({ duration }) => {
+                        videoRef.current?.seek(1);
+                        videoDuration.current = duration;
+                    }}
+                    onProgress={({ currentTime }) => {
+                        setCurrentTimeStamp(currentTime);
+                    }}
+                    onError={onVideoError}
+                />
+            )}
+            <PlayPause showToggle={pauseToggle} icon="pause" />
+            <PlayPause showToggle={playToggle} icon="play" />
+            <Seeker
+                progress={currentTimeStamp / videoDuration.current}
+                onSeek={onSeek}
+            />
+        </View>
     );
 };
 

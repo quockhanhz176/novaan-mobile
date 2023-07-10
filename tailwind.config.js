@@ -21,6 +21,10 @@ const colors = {
     xanthous: "#f7b01c",
     star: "#ffcb01",
     heart: "#ff6531",
+    seeker: {
+        background: "#898b8B",
+        foreground: "#a40605",
+    },
 };
 
 module.exports = {

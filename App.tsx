@@ -36,12 +36,12 @@ export type RootStackParamList = {
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 const rootNavigationRef = createNavigationContainerRef<RootStackParamList>();
 
-export function rootNavigate(
-    name: keyof RootStackParamList,
-    params?: any
+export function rootNavigate<T extends unknown & keyof RootStackParamList>(
+    name: T,
+    params?: RootStackParamList[T]
 ): void {
     if (rootNavigationRef.isReady()) {
-        rootNavigationRef.navigate(name, params);
+        rootNavigationRef.navigate(name as any, params);
     }
 }
 

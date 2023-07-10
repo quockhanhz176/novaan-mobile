@@ -1,8 +1,13 @@
 import React, { type ReactNode, type FC } from "react";
-import { TouchableWithoutFeedback, View, type ViewProps } from "react-native";
+import {
+    type GestureResponderEvent,
+    TouchableWithoutFeedback,
+    View,
+    type ViewProps,
+} from "react-native";
 
 interface TouchableViewProps extends ViewProps {
-    onPress?: () => void;
+    onPress?: (event: GestureResponderEvent) => void;
     children?: ReactNode;
 }
 

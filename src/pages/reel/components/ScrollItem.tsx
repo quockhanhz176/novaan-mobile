@@ -1,30 +1,30 @@
-import React, { memo, useMemo, type ReactElement } from "react";
+import React, { type FC, memo } from "react";
 import {
     View,
     Text,
     type NativeScrollEvent,
     type NativeSyntheticEvent,
-    useWindowDimensions,
 } from "react-native";
 import Swiper, { type SwiperInternals } from "react-native-swiper";
-import reelServices from "../services/reelServices";
-import PostDetails from "./PostDetails";
+import Details from "./Details";
 import VideoViewer from "./VideoViewer";
+import { SCROLL_ITEM_HEIGHT } from "../commons/constants";
 import { windowWidth } from "@/common/utils";
+import { type InternalPost } from "./InfiniteScroll";
 
-interface ScrollItemProps {
+interface MainScrollItemProps {
+    post: InternalPost;
     onPageChange?: (page: Page) => void;
+    isVideoPaused?: boolean;
 }
 
-export type Page = "Profile" | "Video" | "Details";
+export type Page = "Profile" | "Video" | "Details" | "Changing";
 
-const ScrollItem = ({
+const ScrollItem: FC<MainScrollItemProps> = ({
+    post,
     onPageChange,
-}: ScrollItemProps): ReactElement<ScrollItemProps> => {
-    const post = useMemo(() => reelServices.getNextPost(), []);
-
-    const dimension = useWindowDimensions();
-
+    isVideoPaused,
+}: MainScrollItemProps) => {
     const onIndexChanged = (index: number): void => {
         let page: Page = "Profile";
         switch (index) {
@@ -41,7 +41,15 @@ const ScrollItem = ({
         onPageChange?.(page);
     };
 
-    const handleScrollEndDrag = (
+    const onScrollBeginDrag = (
+        _e: NativeSyntheticEvent<NativeScrollEvent>,
+        state: SwiperInternals,
+        _swiper: Swiper
+    ): void => {
+        onPageChange?.("Changing");
+    };
+
+    const onScrollEndDrag = (
         _e: NativeSyntheticEvent<NativeScrollEvent>,
         state: SwiperInternals,
         _swiper: Swiper
@@ -52,20 +60,21 @@ const ScrollItem = ({
 
     return (
         <Swiper
-            style={{ height: dimension.height }}
+            style={{ height: SCROLL_ITEM_HEIGHT }}
             loop={false}
             showsPagination={false}
             index={1}
-            onMomentumScrollEnd={handleScrollEndDrag}
+            onScrollBeginDrag={onScrollBeginDrag}
+            onMomentumScrollEnd={onScrollEndDrag}
         >
             <View className="flex-1 justify-center items-center bg-white">
-                <Text>profile</Text>
+                <Text>prrofile - {post.creator.username}</Text>
             </View>
             <View className="flex-1 justify-center items-center bg-white">
-                <VideoViewer videoUri={post.video} />
+                <VideoViewer videoId={post.video} isPaused={isVideoPaused} />
             </View>
             <View className="flex-1">
-                <PostDetails post={post} />
+                <Details post={post} />
             </View>
         </Swiper>
     );

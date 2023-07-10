@@ -1,5 +1,4 @@
 import React, { useState, type FC } from "react";
-import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
 import { View } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome5";
 import { useTheme } from "react-native-paper";
@@ -12,6 +11,7 @@ import CreatePostPopup from "./create-post/CreatePostPopup";
 import { type NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { type RootStackParamList } from "App";
 import { BOTTOM_NAV_HEIGHT } from "@/common/constants";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 export type BottomTabParamList = {
@@ -21,7 +21,7 @@ export type BottomTabParamList = {
     UserProfile: undefined;
     CreatePostPopup: undefined;
 };
-const BottomTab = createMaterialBottomTabNavigator<BottomTabParamList>();
+const BottomTab = createBottomTabNavigator<BottomTabParamList>();
 
 interface MainScreensProps {
     navigation: NativeStackNavigationProp<RootStackParamList, "MainScreens">;
@@ -36,12 +36,16 @@ const MainScreens: FC<MainScreensProps> = ({
     return (
         <View className="flex-1">
             <BottomTab.Navigator
-                activeColor="#E94F37"
-                barStyle={{
-                    height: BOTTOM_NAV_HEIGHT,
-                    backgroundColor: "#fcfcfc",
-                    borderTopWidth: 1,
-                    borderColor: "#f0f0f0",
+                screenOptions={{
+                    tabBarActiveTintColor: "#E94F37",
+                    tabBarItemStyle: {
+                        marginVertical: 13,
+                    },
+                    tabBarStyle: {
+                        height: BOTTOM_NAV_HEIGHT,
+                    },
+                    unmountOnBlur: true,
+                    headerShown: false,
                 }}
                 initialRouteName="Reel"
             >

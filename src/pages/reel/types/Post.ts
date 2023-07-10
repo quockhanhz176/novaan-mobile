@@ -2,7 +2,7 @@ import type PostResponse from "@/api/post/types/PostResponse";
 import type User from "./User";
 import type RecipeTime from "@/pages/create-post/create-recipe/types/RecipeTime";
 
-type Post = PostResponse & {
+type Post = Omit<PostResponse, "preptime" | "cookTime"> & {
     creator: User;
     prepTime: RecipeTime;
     cookTime: RecipeTime;

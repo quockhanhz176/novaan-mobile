@@ -1,11 +1,42 @@
-import React, { type FC } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { getData, storeData } from "@/common/AsyncStorageService";
+import React, { useState, type FC } from "react";
+import { StyleSheet, TouchableOpacity, View, Text } from "react-native";
 
 const Home: FC = () => {
+    const [outer, setOuter] = useState(true);
+    // console.log("rerender - outer");
     return (
         <View style={styles.container}>
-            <Text>Home</Text>
+            <TouchableOpacity
+                className="w-[100] h-[100] bg-black mb-10"
+                onPress={async () => {
+                    setOuter(!outer);
+                    const data = await getData("reelListData");
+                    console.log(JSON.stringify(data));
+                }}
+            />
+            <Component1 />
         </View>
+    );
+};
+
+const Component1: FC = () => {
+    const [state1, setState1] = useState(0);
+    // console.log("rerender - inner");
+
+    return (
+        <TouchableOpacity
+            onPress={() => {
+                setState1(state1 + 1);
+                void storeData("reelListData", {
+                    list: [{ postId: "aaaaaaaa", postType: "CulinaryTip" }],
+                    lastItem: 3,
+                    lastUpdate: new Date(),
+                });
+            }}
+        >
+            <Text>{state1}</Text>
+        </TouchableOpacity>
     );
 };
 

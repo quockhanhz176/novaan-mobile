@@ -1,4 +1,10 @@
+import {
+    type StorageKey,
+    getData,
+    storeData,
+} from "@/common/AsyncStorageService";
 import type Post from "../types/Post";
+import PostApi from "@/api/post/PostApi";
 
 const getNextPost = (): Post =>
     ({
@@ -43,8 +49,97 @@ const getNextPost = (): Post =>
         },
     } as any);
 
+let postListData: StorageKey["reelListData"] | undefined;
+
+const serverError = (): void => {
+    // Toast.show({
+    //     type: "error",
+    //     text1: COMMON_SERVER_CONNECTION_FAIL_ERROR,
+    // });
+};
+
+const getListData = async (): Promise<boolean> => {
+    if (postListData != null) {
+        return true;
+    }
+
+    // get from storage
+    const newListData = await getData("reelListData");
+    if (newListData != null) {
+        postListData = newListData;
+        return true;
+    }
+
+    // get from api
+    const response = await PostApi.getPostList();
+    if (response.success) {
+        postListData = {
+            list: response.value,
+            lastItem: -1,
+            lastUpdate: new Date(),
+        };
+        return true;
+    }
+
+    serverError();
+    return false;
+};
+
+// TODO: implement busninesses when recommendation is clearer
+const getPost = async (index: number): Promise<Post | null> => {
+    try {
+        // remove data in store
+        await storeData("reelListData", null);
+        await getListData();
+        if (
+            postListData == null ||
+            index < 0 ||
+            index >= postListData.list.length
+        ) {
+            return null;
+        }
+
+        const minimalItem = postListData.list[index];
+        console.log("minimalItem: " + JSON.stringify(minimalItem));
+        const postResponse = await PostApi.getPost(
+            minimalItem.postId,
+            minimalItem.postType === "Recipe" ? "recipe" : "tip"
+        );
+        if (!postResponse.success) {
+            serverError();
+            return null;
+        }
+
+        return {
+            ...postResponse.value,
+            // decoy data
+            creator: {
+                username: "Điện máy XANH",
+                userId: "123332",
+            },
+            prepTime: { hour: 0, minute: 30 },
+            cookTime: { hour: 0, minute: 30 },
+        };
+    } catch (e) {
+        console.error(e);
+        serverError();
+        return null;
+    }
+};
+
+const getResourceUrl = async (id: string): Promise<string | null> => {
+    const response = await PostApi.getResource(id);
+    if (!response.success) {
+        return null;
+    }
+
+    return response.value.url;
+};
+
 const reelServices = {
     getNextPost,
+    getPost,
+    getResourceUrl,
 };
 
 export default reelServices;

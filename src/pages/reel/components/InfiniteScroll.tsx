@@ -1,36 +1,85 @@
-import React, { useState, type FC, useCallback, useEffect } from "react";
+import React, {
+    useState,
+    type FC,
+    useCallback,
+    useRef,
+    type ReactElement,
+    useEffect,
+} from "react";
 import ScrollItem, { type Page } from "./ScrollItem";
-import { FlatList, SafeAreaView, useWindowDimensions } from "react-native";
+import {
+    FlatList,
+    type LayoutChangeEvent,
+    type NativeScrollEvent,
+    type NativeSyntheticEvent,
+    SafeAreaView,
+} from "react-native";
+import { SCROLL_ITEM_HEIGHT } from "../commons/constants";
+import type Post from "../types/Post";
+import reelServices from "../services/reelServices";
 
-const PRELOAD_AMOUNT = 5;
-const END_REACH_THRESHOLD = 1;
+interface InfiniteScrollProps {
+    postGetter?: (index: number) => Promise<Post | null>;
+}
 
-const InfiniteScroll: FC = () => {
-    const [pages, setPages] = useState<number[]>([]);
+export type InternalPost = Post & {
+    index: number;
+};
+
+const PRELOAD_AMOUNT = 2;
+const END_REACH_THRESHOLD = 2;
+
+const InfiniteScroll: FC<InfiniteScrollProps> = ({ postGetter }) => {
+    const [loading, setLoading] = useState(false);
+
+    const [internalPosts, setInternalPosts] = useState<InternalPost[]>([]);
     const [scrollEnabled, setScrollEnabled] = useState(true);
-
-    const dimension = useWindowDimensions();
+    const [currentPage, setCurrentPage] = useState(0);
+    const scrollHeight = useRef(1);
 
     useEffect(() => {
-        if (pages.length === 0) {
-            fetchMoreData();
-        }
+        void fetchPost(0, PRELOAD_AMOUNT);
     }, []);
 
-    const fetchMoreData = (): void => {
-        // When we need to init pages
-        if (pages.length === 0) {
-            setPages([...Array(5).keys()]);
+    const fetchPostDefault = async (index: number): Promise<Post | null> => {
+        return await reelServices.getPost(index);
+    };
+
+    const fetchPost = async (
+        index: number,
+        count: number = 1
+    ): Promise<void> => {
+        setLoading(true);
+        try {
+            if (postGetter == null) {
+                postGetter = fetchPostDefault;
+            }
+            for (let i = 0; i < count; i++) {
+                const post = await postGetter(index + i);
+                if (post == null) {
+                    continue;
+                }
+                internalPosts.push({ ...post, index: index + i });
+            }
+
+            setInternalPosts([...internalPosts]);
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const fetchMoreData = async (): Promise<void> => {
+        if (internalPosts.length === 0) {
             return;
         }
 
-        // Fetch the next 5 post's id
-        const lastId = pages[pages.length - 1];
+        const lastIndex = internalPosts.length - 1;
         for (let i = 1; i <= PRELOAD_AMOUNT; i++) {
-            pages.push(lastId + i);
+            const index = lastIndex + i;
+            await fetchPost(index);
         }
-
-        setPages([...pages]);
     };
 
     const onScrollItemPageChange = useCallback((page: Page): void => {
@@ -41,30 +90,44 @@ const InfiniteScroll: FC = () => {
         }
     }, []);
 
-    if (pages.length === 0) {
-        return null;
-    }
+    const onMomentumScrollEnd = (
+        e: NativeSyntheticEvent<NativeScrollEvent>
+    ): void => {
+        const page = Math.round(
+            e.nativeEvent.contentOffset.y / scrollHeight.current
+        );
+        setCurrentPage(page);
+    };
+
+    const onLayout = (e: LayoutChangeEvent): void => {
+        scrollHeight.current = e.nativeEvent.layout.height;
+    };
+
+    const renderItem = ({ item }: { item: InternalPost }): ReactElement => {
+        return (
+            <ScrollItem
+                post={item}
+                onPageChange={onScrollItemPageChange}
+                isVideoPaused={item.index !== currentPage}
+            />
+        );
+    };
 
     return (
-        <SafeAreaView className="h-screen">
+        <SafeAreaView style={{ height: SCROLL_ITEM_HEIGHT }}>
             <FlatList
-                data={pages}
-                keyExtractor={(item) => String(item)}
+                showsVerticalScrollIndicator={false}
+                data={internalPosts}
+                onMomentumScrollEnd={onMomentumScrollEnd}
                 scrollEnabled={scrollEnabled}
                 pagingEnabled={true}
-                renderItem={({ item }) => {
-                    console.log(item);
-                    return <ScrollItem onPageChange={onScrollItemPageChange} />;
-                }}
-                windowSize={dimension.height}
+                renderItem={renderItem}
                 onEndReachedThreshold={END_REACH_THRESHOLD}
                 onEndReached={fetchMoreData}
-                removeClippedSubviews={true}
-                // We only view one item at a time, so we keep these number low to avoid blocking
-                // https://reactnative.dev/docs/optimizing-flatlist-configuration
-                maxToRenderPerBatch={2}
-                initialNumToRender={2}
+                onLayout={onLayout}
             />
+            {/* TODO: Add loading overlay for video here */}
+            {loading && null}
         </SafeAreaView>
     );
 };
