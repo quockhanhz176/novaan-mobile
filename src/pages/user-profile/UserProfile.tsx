@@ -8,28 +8,24 @@ import { type ColorValue, Text, View } from "react-native";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import CreatedPosts from "./CreatedPosts";
 import SavedPosts from "./SavedPosts";
+import {
+    type BottomTabParamList,
+    type UserProfileTabParamList,
+} from "@/types/navigation";
 import { useProfileInfo } from "@/api/profile/ProfileApi";
 import OverlayLoading from "@/common/components/OverlayLoading";
-import { type MaterialBottomTabNavigationProp } from "@react-navigation/material-bottom-tabs";
-import { type BottomTabParamList } from "../MainScreens";
-import { Toast } from "react-native-toast-message/lib/src/Toast";
-import { Avatar } from "react-native-paper";
-import { customColors } from "@root/tailwind.config";
 import {
     PROFILE_CONTENT_COUNT_TITLE,
-    PROFILE_EMPTY_BIO,
     PROFILE_FOLLOWER_COUNT_TITLE,
     PROFILE_FOLLOWING_COUNT_TITLE,
+    PROFILE_EMPTY_BIO,
 } from "@/common/strings";
+import { type MaterialBottomTabNavigationProp } from "@react-navigation/material-bottom-tabs";
+import { customColors } from "@root/tailwind.config";
+import { Avatar } from "react-native-paper";
+import Toast from "react-native-toast-message";
 import IconFeather from "react-native-vector-icons/Feather";
 import IconMaterial from "react-native-vector-icons/MaterialIcons";
-
-// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
-export type UserProfileTabParamList = {
-    CreatedPosts: undefined;
-    SavedPosts: undefined;
-    Following: undefined;
-};
 
 const Tab = createMaterialTopTabNavigator<UserProfileTabParamList>();
 

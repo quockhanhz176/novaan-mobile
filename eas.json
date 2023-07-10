@@ -1,6 +1,6 @@
 {
     "cli": {
-        "version": ">= 3.13.2"
+        "version": "3.15.0"
     },
     "build": {
         "development": {
@@ -18,7 +18,13 @@
             "channel": "preview"
         },
         "production": {
-            "channel": "production"
+            "channel": "production",
+            "env": {
+                "API_URL": "http://192.168.1.133:8000/api/",
+                "API_TIMEOUT": "3000",
+                "KEYCHAIN_ID": "NOVAAN_API_KEY",
+                "GOOGLE_API_KEY": "674305079034-k2svaaclifbmiglbo18imf9bpml4flnd.apps.googleusercontent.com"
+            }
         }
     },
     "submit": {

@@ -2,9 +2,9 @@
 export const COMMON_ALERT_TITLE = "Cảnh báo";
 export const COMMON_FIELD_WRONG_FORMAT = "Trường thông tin sai định dạng!";
 export const COMMON_EMPTY_FIELD_NOT_ALLOWED = "*Trường này không được để trống";
-export const DIFFICULTY_EASY = "Dễ"
-export const DIFFICULTY_MEDIUM = "Trung bình"
-export const DIFFICULTY_HARD = "Khó"
+export const DIFFICULTY_EASY = "Dễ";
+export const DIFFICULTY_MEDIUM = "Trung bình";
+export const DIFFICULTY_HARD = "Khó";
 // Common messages
 export const COMMON_SERVER_CONNECTION_FAIL_ERROR =
     "Hiện đang không thể kết nối được với server, xin vui lòng thử lại sau";
@@ -200,4 +200,4 @@ export const PROFILE_EMPTY_BIO =
     "Oops! Người dùng này chưa viết gì nhiều về bản thân họ.";
 
 // Reel screen
-export const REEL_DIFFICULTY_TITLE = "Độ khó: "
+export const REEL_DIFFICULTY_TITLE = "Độ khó: ";

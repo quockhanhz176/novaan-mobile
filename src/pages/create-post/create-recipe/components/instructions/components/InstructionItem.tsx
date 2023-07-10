@@ -1,5 +1,5 @@
 import { type FC } from "react";
-import type Instruction from "../types/Instruction";
+import type Instruction from "../../../types/Instruction";
 import React, { Image, Text, TouchableOpacity, View } from "react-native";
 import IconFA from "react-native-vector-icons/FontAwesome5";
 import IconMaterial from "react-native-vector-icons/MaterialCommunityIcons";

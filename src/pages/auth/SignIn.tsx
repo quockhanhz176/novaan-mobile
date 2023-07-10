@@ -31,7 +31,7 @@ import GoogleSignInButton from "@/pages/auth/components/GoogleSignInButton";
 import { GOOGLE_API_KEY, KEYCHAIN_ID } from "@env";
 import { maybeCompleteAuthSession } from "expo-web-browser";
 import { useAuthRequest } from "expo-auth-session/providers/google";
-import { saveKeychain } from "@/common/KeychainServices";
+import { saveKeychain } from "@/common/keychainService";
 
 interface SignInProps {
     navigation: NativeStackNavigationProp<RootStackParamList, "SignIn">;

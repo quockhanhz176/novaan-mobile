@@ -1,7 +1,5 @@
-import React, { type FC, useContext, useRef, useState } from "react";
+import React, { useRef, useState, type ReactElement, useContext } from "react";
 import { View, Text, TouchableOpacity, FlatList } from "react-native";
-import { recipeInformationContext } from "../types/RecipeParams";
-import { rootNavigate } from "@root/App";
 import {
     CREATE_RECIPE_INSTRUCTIONS_SUBTITLE,
     CREATE_RECIPE_INSTRUCTIONS_ADD_INGREDIENT_BUTTON_TITLE,
@@ -10,51 +8,42 @@ import {
 import WarningAsterisk from "@/common/components/WarningAeterisk";
 import IconAnt from "react-native-vector-icons/AntDesign";
 import { customColors } from "@root/tailwind.config";
-import type Instruction from "../types/Instruction";
-import InstructionItem from "./InstructionItem";
+import type Instruction from "../../../types/Instruction";
+import InstructionItem from "../components/InstructionItem";
+import { type NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { type InstructionStackParamList } from "@/types/navigation";
+import { recipeInformationContext } from "../../../types/RecipeParams";
 
-const Instructions: FC = () => {
+interface ViewInstructionsProp {
+    navigation: NativeStackNavigationProp<
+        InstructionStackParamList,
+        "ViewInstruction"
+    >;
+}
+
+const ViewInstruction = ({
+    navigation,
+}: ViewInstructionsProp): ReactElement<ViewInstructionsProp> => {
     const { instructions, setInstructions } = useContext(
         recipeInformationContext
     );
     const [refresh, setRefresh] = useState(true);
     const labelClassName = "text-base font-medium uppercase";
-    const id = useRef(0);
     const lastInstruction = useRef(0);
 
     const resetList = (): void => {
         setRefresh(!refresh);
     };
 
-    const addInstruction = (instruction: Instruction): void => {
-        instruction.id = id.current++;
-        instruction.step = ++lastInstruction.current;
-        setInstructions([...instructions, instruction]);
-        resetList();
-    };
-
-    const editInstruction = (instruction: Instruction): void => {
-        const index = instructions.findIndex((s) => s.id === instruction.id);
-        if (index === -1) {
-            return;
-        }
-
-        instructions.splice(index, 1, instruction);
-        setInstructions(instructions);
-        resetList();
-    };
-
     const openAddInstruction = (): void => {
-        rootNavigate("AddInstruction", {
+        navigation.navigate("AddInstruction", {
             information: { type: "add" },
-            submitInstruction: addInstruction,
         });
     };
 
     const openEditInstruction = (instruction: Instruction): void => {
-        rootNavigate("AddInstruction", {
+        navigation.navigate("AddInstruction", {
             information: { type: "edit", instruction },
-            submitInstruction: editInstruction,
         });
     };
 
@@ -130,4 +119,4 @@ const Instructions: FC = () => {
     );
 };
 
-export default Instructions;
+export default ViewInstruction;

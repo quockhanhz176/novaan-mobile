@@ -1,5 +1,5 @@
 import { type FC } from "react";
-import type Ingredient from "../types/Ingredient";
+import type Ingredient from "../../../types/Ingredient";
 import React, { Text, TouchableOpacity, View } from "react-native";
 import IconFA from "react-native-vector-icons/FontAwesome5";
 import IconMaterial from "react-native-vector-icons/MaterialCommunityIcons";

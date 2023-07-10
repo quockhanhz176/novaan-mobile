@@ -1,5 +1,11 @@
 import { type FC } from "react";
-import React, { ScrollView, View, Text, Image, TouchableOpacity } from "react-native";
+import React, {
+    ScrollView,
+    View,
+    Text,
+    Image,
+    TouchableOpacity,
+} from "react-native";
 import type Post from "../types/Post";
 import { Divider } from "react-native-paper";
 import IconFeather from "react-native-vector-icons/Feather";

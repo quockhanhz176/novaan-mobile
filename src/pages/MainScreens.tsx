@@ -9,19 +9,14 @@ import Reel from "./reel/Reel";
 import UserProfile from "./user-profile/UserProfile";
 import CreatePostPopup from "./create-post/CreatePostPopup";
 import { type NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { type RootStackParamList } from "App";
+import {
+    type BottomTabParamList,
+    type RootStackParamList,
+} from "@/types/navigation";
 import { BOTTOM_NAV_HEIGHT } from "@/common/constants";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
 
-// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
-export type BottomTabParamList = {
-    Home: undefined;
-    Search: undefined;
-    Reel: undefined;
-    UserProfile: undefined;
-    CreatePostPopup: undefined;
-};
-const BottomTab = createBottomTabNavigator<BottomTabParamList>();
+const BottomTab = createMaterialBottomTabNavigator<BottomTabParamList>();
 
 interface MainScreensProps {
     navigation: NativeStackNavigationProp<RootStackParamList, "MainScreens">;

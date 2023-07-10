@@ -1,9 +1,9 @@
-import { getKeychainValue } from "@/common/KeychainServices";
 import { API_URL, API_TIMEOUT, KEYCHAIN_ID } from "@env";
 import { useNavigation } from "@react-navigation/core";
-import { type RootStackParamList } from "@root/App";
 import UnauthorizedError from "./errors/Unauthorized";
 import { type NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { getKeychainValue } from "@/common/keychainService";
+import { type RootStackParamList } from "@/types/navigation";
 
 interface RequestConfig {
     timeout?: number;

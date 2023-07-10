@@ -111,14 +111,11 @@ export const compressVideo = async (
     });
 
     // Compress video
-    const videoUri = await Video.compress(
-        uri,
-        {
-            compressionMethod: "auto",
-            minimumFileSizeForCompress: 20,
-            maxSize: 1280, // HD width
-        }
-    );
+    const videoUri = await Video.compress(uri, {
+        compressionMethod: "auto",
+        minimumFileSizeForCompress: 20,
+        maxSize: 1280, // HD width
+    });
 
     const realVideoPath = await getRealPath(videoUri, "video");
     const videoInfo = (await getVideoMetaData(realVideoPath)) as VideoInfo;

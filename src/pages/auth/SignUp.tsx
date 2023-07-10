@@ -87,8 +87,6 @@ const SignUp = (props: SignUpProps): ReactElement<SignUpProps> => {
             Alert.alert(SIGN_UP_SUCCESS_TITLE, SIGN_UP_SUCCESS_MESSAGE);
             navigation.navigate("SignIn");
         } catch (error) {
-            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-            console.log(`error: ${error.toString()}`);
             Alert.alert(
                 SIGN_UP_FAIL_TITLE,
                 COMMON_SERVER_CONNECTION_FAIL_ERROR

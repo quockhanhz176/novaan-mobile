@@ -50,7 +50,7 @@ jobs:
       run: sdkmanager "platform-tools" "platforms;android-${{ matrix.android-version }}"
 
     - name: Create APK with EAS
-      run: eas build -p android --profile preview --local --output builds/preview.apk --non-interactive
+      run: eas build -p android --profile production --local --output builds/preview.apk --non-interactive
 
     - name: Upload APK to Firebase App Distribution
       uses: wzieba/Firebase-Distribution-Github-Action@v1
