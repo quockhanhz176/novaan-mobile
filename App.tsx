@@ -17,7 +17,7 @@ import { enableScreens } from "react-native-screens";
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 
-enableScreens(true);
+enableScreens();
 
 const App = () => {
     return (

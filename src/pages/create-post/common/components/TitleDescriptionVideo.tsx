@@ -11,9 +11,9 @@ import WarningAsterisk from "@/common/components/WarningAeterisk";
 import IconMaterial from "react-native-vector-icons/MaterialIcons";
 import { customColors } from "@root/tailwind.config";
 import { type NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { type RootStackParamList } from "@root/App";
 import TDVParamTypes from "../types/TDVParams";
 import { pickVideoAndThumbnail } from "../commonServices";
+import { type RootStackParamList } from "@/types/navigation";
 
 export interface TDVRouteProps {
     labelType: keyof typeof TDVParamTypes;

@@ -1,7 +1,5 @@
-import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import { type NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { type ReactElement, useState, useEffect } from "react";
-import { type RootStackParamList } from "@root/App";
+import { type ReactElement, useState, useMemo } from "react";
 import { Bar } from "react-native-progress";
 import React, { Text, TouchableOpacity, View } from "react-native";
 import IconEvill from "react-native-vector-icons/EvilIcons";
@@ -27,13 +25,18 @@ import PortionDificultyTime from "./components/PortionDifficultyTime";
 import { handleRecipeSubmission } from "./services/createRecipeService";
 import Ingredient from "./components/ingredients/Ingredient";
 import Instruction from "./components/instructions/Instruction";
-import { type RecipeTabParamList } from "@/types/navigation";
+import {
+    type RootStackParamList,
+    type RecipeTabParamList,
+} from "@/types/navigation";
+import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 
 interface CreateRecipeProps {
     navigation: NativeStackNavigationProp<RootStackParamList, "CreateTip">;
 }
 
 const RecipeTab = createMaterialTopTabNavigator<RecipeTabParamList>();
+// const RecipeTab = createBottomTabNavigator<RecipeTabParamList>();
 
 const recipeTabRef = createNavigationContainerRef<RecipeTabParamList>();
 
@@ -68,10 +71,10 @@ const CreateRecipe = ({
     const bottomNavButtonClassName =
         "flex-1 flex-row space-x-3 items-center justify-center rounded-full my-2 px-6 py-2";
 
-    const [progress, setProgress] = useState(progressStep);
-    useEffect(() => {
-        setProgress((currentScreen + 1) * progressStep);
-    }, [currentScreen]);
+    const progress = useMemo(
+        () => (currentScreen + 1) * progressStep,
+        [currentScreen]
+    );
 
     const submitRecipe = async (): Promise<void> => {
         await handleRecipeSubmission(
@@ -149,6 +152,7 @@ const CreateRecipe = ({
                 borderWidth={0}
                 unfilledColor={customColors.cgrey.platinum}
                 borderRadius={0}
+                animated={true}
             />
             <recipeInformationContext.Provider
                 value={{
@@ -181,7 +185,6 @@ const CreateRecipe = ({
                             tabBarStyle: {
                                 height: 0,
                             },
-                            swipeEnabled: false,
                         }}
                     >
                         <RecipeTab.Screen

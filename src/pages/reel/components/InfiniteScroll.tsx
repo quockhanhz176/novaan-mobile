@@ -117,6 +117,7 @@ const InfiniteScroll: FC<InfiniteScrollProps> = ({ postGetter }) => {
         <SafeAreaView style={{ height: SCROLL_ITEM_HEIGHT }}>
             <FlatList
                 showsVerticalScrollIndicator={false}
+                keyExtractor={(item) => item.id}
                 data={internalPosts}
                 onMomentumScrollEnd={onMomentumScrollEnd}
                 scrollEnabled={scrollEnabled}

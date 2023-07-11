@@ -13,16 +13,14 @@ const Ingredient = (): ReactElement => {
                 name="ViewIngredient"
                 options={{
                     headerShown: false,
+                    animation: "slide_from_right",
+                    animationDuration: 100,
                 }}
                 component={ViewIngredients}
             />
             <IngredientStack.Screen
                 name="AddIngredient"
                 component={AddIngredient}
-                options={{
-                    animation: "slide_from_bottom",
-                    animationDuration: 200,
-                }}
             />
         </IngredientStack.Navigator>
     );

@@ -2,7 +2,6 @@ import React, { type FC, useContext } from "react";
 import { View, Text, TextInput, ScrollView } from "react-native";
 import WarningAsterisk from "@/common/components/WarningAeterisk";
 import { type NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { type RootStackParamList } from "@root/App";
 import { recipeInformationContext } from "../types/RecipeParams";
 import {
     CREATE_RECIPE_COOK_TIME_TITLE,
@@ -18,6 +17,7 @@ import { customColors } from "@root/tailwind.config";
 import RecipeTimeInput from "./RecipeTimeInput";
 import protionTypeItems from "../types/PortionTypeItems";
 import difficultyItems from "../types/DifficultyItems";
+import { type RootStackParamList } from "@/types/navigation";
 
 export interface TitleDescriptionVideoProps {
     navigation?: NativeStackNavigationProp<RootStackParamList, "CreateTip">;

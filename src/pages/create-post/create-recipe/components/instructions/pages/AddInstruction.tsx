@@ -151,7 +151,7 @@ const AddInstruction = ({
     };
 
     return (
-        <Modal>
+        <Modal animationType="slide">
             <ScrollView>
                 <View className="h-[55] flex-row items-center justify-between px-1 border-b-2 border-cgrey-platinum">
                     <View className="flex-row space-x-2 items-center">

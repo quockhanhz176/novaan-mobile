@@ -25,9 +25,9 @@ import {
 } from "@/common/strings";
 import { customColors } from "@root/tailwind.config";
 import { type NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { type RootStackParamList } from "@root/App";
 import { handleTipSubmission } from "./services/createTipService";
 import { pickVideoAndThumbnail } from "../common/commonServices";
+import { type RootStackParamList } from "@/types/navigation";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const defaultThumbnail = require("@root/assets/default-video.png");

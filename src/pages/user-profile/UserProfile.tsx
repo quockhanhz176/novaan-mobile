@@ -78,7 +78,7 @@ const UserProfile = (
                 size: 24,
                 color: focused
                     ? customColors.cprimary["400"]
-                    : customColors.cprimary["100"],
+                    : customColors.cgrey.platinum,
             };
         },
         []

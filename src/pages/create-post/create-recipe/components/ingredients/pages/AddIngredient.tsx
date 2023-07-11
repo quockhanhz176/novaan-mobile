@@ -69,7 +69,7 @@ const AddIngredient = ({
     const labelClassName = "text-base font-medium uppercase";
 
     const navigateBack = (): void => {
-        navigation.pop();
+        navigation.goBack();
     };
 
     const addIngredient = (ingredient: Ingredient): void => {
@@ -128,8 +128,7 @@ const AddIngredient = ({
             inputIngredient.id = information.ingredient.id;
             editIngredient(inputIngredient);
         }
-
-        navigation.pop();
+        navigateBack();
     };
 
     return (

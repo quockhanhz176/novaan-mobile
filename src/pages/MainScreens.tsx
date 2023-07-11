@@ -14,9 +14,10 @@ import {
     type RootStackParamList,
 } from "@/types/navigation";
 import { BOTTOM_NAV_HEIGHT } from "@/common/constants";
-import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { customColors } from "@root/tailwind.config";
 
-const BottomTab = createMaterialBottomTabNavigator<BottomTabParamList>();
+const BottomTab = createBottomTabNavigator<BottomTabParamList>();
 
 interface MainScreensProps {
     navigation: NativeStackNavigationProp<RootStackParamList, "MainScreens">;
@@ -27,19 +28,21 @@ const MainScreens: FC<MainScreensProps> = ({
 }: MainScreensProps) => {
     const theme = useTheme();
     theme.colors.secondaryContainer = "transparent";
+
     const [modalVisible, setModalVisible] = useState(false);
     return (
         <View className="flex-1">
             <BottomTab.Navigator
                 screenOptions={{
-                    tabBarActiveTintColor: "#E94F37",
+                    tabBarActiveTintColor: customColors.cprimary["300"],
                     tabBarItemStyle: {
-                        marginVertical: 13,
+                        marginVertical: 12,
+                        justifyContent: "center",
+                        alignItems: "center",
                     },
                     tabBarStyle: {
                         height: BOTTOM_NAV_HEIGHT,
                     },
-                    unmountOnBlur: true,
                     headerShown: false,
                 }}
                 initialRouteName="Reel"
@@ -55,12 +58,12 @@ const MainScreens: FC<MainScreensProps> = ({
                     }}
                 />
                 <BottomTab.Screen
-                    name="Search"
-                    component={Search}
+                    name="Reel"
+                    component={Reel}
                     options={{
-                        tabBarLabel: "Tìm kiếm",
+                        unmountOnBlur: true,
                         tabBarIcon: ({ color }) => (
-                            <Icon name="search" size={24} color={color} />
+                            <Icon name="film" size={24} color={color} />
                         ),
                     }}
                 />
@@ -68,12 +71,12 @@ const MainScreens: FC<MainScreensProps> = ({
                     name="CreatePostPopup"
                     component={CreatePostPopup}
                     options={{
-                        tabBarLabel: "Đăng bài",
+                        tabBarLabel: "",
                         tabBarIcon: ({ color }) => (
                             <Icon name="plus" size={24} color={color} />
                         ),
                     }}
-                    listeners={({ navigation }) => ({
+                    listeners={() => ({
                         tabPress: (e) => {
                             e.preventDefault();
                             setModalVisible(true);
@@ -81,11 +84,12 @@ const MainScreens: FC<MainScreensProps> = ({
                     })}
                 />
                 <BottomTab.Screen
-                    name="Reel"
-                    component={Reel}
+                    name="Search"
+                    component={Search}
                     options={{
+                        tabBarLabel: "Tìm kiếm",
                         tabBarIcon: ({ color }) => (
-                            <Icon name="film" size={24} color={color} />
+                            <Icon name="search" size={24} color={color} />
                         ),
                     }}
                 />
