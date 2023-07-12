@@ -29,3 +29,9 @@ export const getUrlExtension = (url: string): string => {
 
 export const { width: windowWidth, height: windowHeight } =
     Dimensions.get("window");
+
+export type DistributiveOmit<T, K extends PropertyKey> = T extends any
+    ? Omit<T, K>
+    : never;
+
+export type IntersectUnion<T, U, V> = T extends U ? T & V : T;

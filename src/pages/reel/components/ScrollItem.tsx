@@ -6,8 +6,8 @@ import {
     type NativeSyntheticEvent,
 } from "react-native";
 import Swiper, { type SwiperInternals } from "react-native-swiper";
-import Details from "./Details";
-import VideoViewer from "./VideoViewer";
+import Details from "./details/Details";
+import VideoViewer from "./video/VideoViewer";
 import { SCROLL_ITEM_HEIGHT } from "../commons/constants";
 import { windowWidth } from "@/common/utils";
 import { type InternalPost } from "./InfiniteScroll";

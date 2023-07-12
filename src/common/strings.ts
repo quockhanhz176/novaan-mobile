@@ -5,6 +5,8 @@ export const COMMON_EMPTY_FIELD_NOT_ALLOWED = "*Trường này không được �
 export const DIFFICULTY_EASY = "Dễ";
 export const DIFFICULTY_MEDIUM = "Trung bình";
 export const DIFFICULTY_HARD = "Khó";
+export const PORTION_PIECE = "miếng";
+export const PORTION_SERVING = "phần ăn";
 // Common messages
 export const COMMON_SERVER_CONNECTION_FAIL_ERROR =
     "Hiện đang không thể kết nối được với server, xin vui lòng thử lại sau";
@@ -200,4 +202,11 @@ export const PROFILE_EMPTY_BIO =
     "Oops! Người dùng này chưa viết gì nhiều về bản thân họ.";
 
 // Reel screen
-export const REEL_DIFFICULTY_TITLE = "Độ khó: ";
+export const REEL_DETAILS_DIFFICULTY_TITLE = "Độ khó: "
+export const REEL_DETAILS_INGREDIENTS_TITLE = "Nguyên liệu"
+export const REEL_DETAILS_INSTRUCTIONS_TITLE = "Hướng dẫn chi tiết"
+export const REEL_DETAILS_INSTRUCTION_TITLE = "Bước"
+export const REEL_DETAILS_PREPARE_TIME_TITLE = "Thời gian chuẩn bị"
+export const REEL_DETAILS_PREPARE_COOK_TIME = "Thời gian nấu"
+export const REEL_DETAILS_HOUR = "giờ"
+export const REEL_DETAILS_MINUTE = "phút"

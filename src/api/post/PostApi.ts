@@ -11,6 +11,7 @@ import { type FailableResponse } from "../common/types/FailableResponse";
 import type PostListResponse from "./types/PostListResponse";
 import type PostResponse from "./types/PostResponse";
 import type ResourceResponse from "./types/ResourceResponse";
+import { type ProfileInfo } from "../profile/types";
 
 // upload
 const UPLOAD_RECIPE_URL = "content/upload/recipe";
@@ -20,6 +21,7 @@ const POST_LIST_URL = "content/posts";
 const GET_RECIPE_URL = "content/post/recipe";
 const GET_TIP_URL = "content/post/tip";
 const GET_RESOURCE_URL = "content/download";
+const GET_USER_URL = "profile";
 
 const baseApi = new BaseApi();
 
@@ -150,26 +152,7 @@ const uploadRecipe = async (
 };
 
 const getPostList = async (): Promise<FailableResponse<PostListResponse>> => {
-    const response = await baseApi.get(POST_LIST_URL, {
-        timeout: 3000,
-        authorizationRequired: true,
-    });
-    console.log(`PostApi.getPostList - response: ${JSON.stringify(response)}`);
-    const body = await response.json();
-    console.log(`PostApi.getPostList - body: ${JSON.stringify(body)}`);
-
-    if (!response.ok) {
-        const code: number = body.code ?? -1;
-        return {
-            success: false,
-            code,
-        };
-    }
-
-    return {
-        success: true,
-        value: body,
-    };
+    return await getBase<PostListResponse>(POST_LIST_URL, "getPostList");
 };
 
 const getPost = async (
@@ -196,20 +179,45 @@ const getPost = async (
 
     return {
         success: true,
-        value: body,
+        value: {
+            ...body,
+            type,
+            ...(type === "recipe"
+                ? {
+                      difficulty: 1,
+                      portionType: 0,
+                  }
+                : {}),
+        },
     };
 };
 
 const getResource = async (
     id: string
 ): Promise<FailableResponse<ResourceResponse>> => {
-    const response = await baseApi.get(`${GET_RESOURCE_URL}/${id}`, {
+    return await getBase<ResourceResponse>(
+        `${GET_RESOURCE_URL}/${id}`,
+        "getResource"
+    );
+};
+
+const getProfile = async (
+    id: string
+): Promise<FailableResponse<ProfileInfo>> => {
+    return await getBase<ProfileInfo>(`${GET_USER_URL}/${id}`, "getProfile");
+};
+
+const getBase = async <T>(
+    url: string,
+    caller: string
+): Promise<FailableResponse<T>> => {
+    const response = await baseApi.get(url, {
         timeout: 3000,
         authorizationRequired: true,
     });
-    console.log(`PostApi.getResource - response: ${JSON.stringify(response)}`);
+    console.log(`PostApi.${caller} - response: ${JSON.stringify(response)}`);
     const body = await response.json();
-    console.log(`PostApi.getResource - body: ${JSON.stringify(body)}`);
+    console.log(`PostApi.${caller} - body: ${JSON.stringify(body)}`);
 
     if (!response.ok) {
         const code: number = body.code ?? -1;
@@ -231,6 +239,7 @@ const postApi = {
     getPostList,
     getPost,
     getResource,
+    getProfile,
 };
 
 export default postApi;

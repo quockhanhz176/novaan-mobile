@@ -10,7 +10,7 @@ export interface ProfileInfo {
     id: string;
     username: string;
     userId: string;
-    isFollowing: string;
+    isFollowing: boolean;
     followersCount: number;
     followingCount: number;
     avatar: string;

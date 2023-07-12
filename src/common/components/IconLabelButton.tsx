@@ -6,6 +6,8 @@ import {
     type TextProps,
     type TouchableOpacityProps,
     View,
+    type ViewStyle,
+    type StyleProp,
 } from "react-native";
 import { type IconProps } from "react-native-vector-icons/Icon";
 import IconIonicons from "react-native-vector-icons/Ionicons";
@@ -18,6 +20,7 @@ interface IconLabelButtonProps {
     text?: string;
     textClassName?: string;
     textProps?: TextProps;
+    style?: StyleProp<ViewStyle>;
 }
 
 const IconLabelButton: FC<IconLabelButtonProps> = ({
@@ -28,6 +31,7 @@ const IconLabelButton: FC<IconLabelButtonProps> = ({
     text,
     textClassName = "",
     textProps,
+    style,
 }: IconLabelButtonProps) => {
     const iProps: IconProps = {
         name: "heart",
@@ -48,7 +52,7 @@ const IconLabelButton: FC<IconLabelButtonProps> = ({
     };
 
     return (
-        <TouchableOpacity {...buttonProps}>
+        <TouchableOpacity {...buttonProps} style={style}>
             <View
                 className={`flex-row space-x-1 items-center ${buttonClassName}`}
             >

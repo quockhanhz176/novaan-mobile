@@ -9,7 +9,7 @@ import { type GestureResponderEvent, View } from "react-native";
 import Video from "react-native-video";
 import PlayPause from "./PlayPause";
 import Seeker from "./Seeker";
-import reelServices from "../services/reelServices";
+import { useFetchResourceUrl } from "@/api/utils/resourceHooks";
 
 interface VideoViewrProps {
     videoId: string;
@@ -27,19 +27,16 @@ const VideoViewer: FC<VideoViewrProps> = ({
     const [pauseToggle, setPauseToggle] = useState<boolean>();
     const videoDuration = useRef(1);
 
-    const [videoUri, setVideoUri] = useState("");
-
-    const loadVideo = async (): Promise<void> => {
-        const result = await reelServices.getResourceUrl(videoId);
-        if (result == null) {
-            return;
-        }
-
-        setVideoUri(result);
-    };
+    const { resourceUrl, fetchUrl } = useFetchResourceUrl();
 
     useEffect(() => {
-        void loadVideo();
+        void fetchUrl(videoId)
+            .then((success) => {
+                if (!success) {
+                    // Do something to alert user or retry
+                }
+            })
+            .catch(console.log);
     }, []);
 
     useEffect(() => {
@@ -64,7 +61,7 @@ const VideoViewer: FC<VideoViewrProps> = ({
     );
 
     const onVideoError = async (): Promise<void> => {
-        void loadVideo();
+        // Show error
     };
 
     return (
@@ -72,12 +69,12 @@ const VideoViewer: FC<VideoViewrProps> = ({
             className="absolute top-0 left-0 bottom-0 right-0"
             onTouchEnd={onVideoPress}
         >
-            {videoUri !== "" && (
+            {resourceUrl !== "" && (
                 <Video
                     paused={paused}
                     ref={videoRef}
                     source={{
-                        uri: videoUri,
+                        uri: resourceUrl,
                     }}
                     style={{
                         position: "absolute",
