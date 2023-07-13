@@ -22,7 +22,11 @@ enableScreens();
 const App = () => {
     return (
         <>
-            <PaperProvider>
+            <PaperProvider
+                settings={{
+                    rippleEffectEnabled: false,
+                }}
+            >
                 <Portal>
                     <View className="flex-1">
                         <NavigationContainer>

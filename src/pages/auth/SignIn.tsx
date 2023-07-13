@@ -1,4 +1,3 @@
-import { type RootStackParamList } from "App";
 import React, { useState, type ReactElement, useEffect } from "react";
 import { Text, TextInput, View, TouchableOpacity } from "react-native";
 import { type NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -32,6 +31,7 @@ import { GOOGLE_API_KEY, KEYCHAIN_ID } from "@env";
 import { maybeCompleteAuthSession } from "expo-web-browser";
 import { useAuthRequest } from "expo-auth-session/providers/google";
 import { saveKeychain } from "@/common/keychainService";
+import { type RootStackParamList } from "@/types/navigation";
 
 interface SignInProps {
     navigation: NativeStackNavigationProp<RootStackParamList, "SignIn">;

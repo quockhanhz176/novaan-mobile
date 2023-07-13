@@ -1,2 +1,2 @@
 export * from "./profile.type";
-export * from "./posts.type";
+export * from "./post.type";

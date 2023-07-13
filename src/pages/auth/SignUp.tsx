@@ -1,4 +1,3 @@
-import { type RootStackParamList } from "App";
 import React, { useState, type ReactElement } from "react";
 import { Text, TextInput, View, TouchableOpacity, Alert } from "react-native";
 import { type NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -34,6 +33,7 @@ import authApi from "@/api/auth/AuthApi";
 import OverlayLoading from "@/common/components/OverlayLoading";
 import { useForm, Controller } from "react-hook-form";
 import ErrorText from "@/common/components/ErrorText";
+import { type RootStackParamList } from "@/types/navigation";
 
 interface SignUpProps {
     navigation: NativeStackNavigationProp<RootStackParamList, "SignUp">;

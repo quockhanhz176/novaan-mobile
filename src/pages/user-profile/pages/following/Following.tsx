@@ -1,15 +1,15 @@
 import React, { type FC } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
-const CreatedPosts: FC = () => {
+const Following: FC = () => {
     return (
         <View style={styles.container}>
-            <Text>CreatedPosts</Text>
+            <Text>Following List</Text>
         </View>
     );
 };
 
-export default CreatedPosts;
+export default Following;
 
 const styles = StyleSheet.create({
     container: {

@@ -2,12 +2,12 @@ import React, {
     type ReactElement,
     useEffect,
     useState,
-    useCallback,
+    createContext,
 } from "react";
-import { type ColorValue, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
-import CreatedPosts from "./CreatedPosts";
-import SavedPosts from "./SavedPosts";
+import CreatedPosts from "./pages/created-post/CreatedPosts";
+import SavedPosts from "./pages/saved-post/SavedPosts";
 import {
     type BottomTabParamList,
     type UserProfileTabParamList,
@@ -24,14 +24,24 @@ import { type MaterialBottomTabNavigationProp } from "@react-navigation/material
 import { customColors } from "@root/tailwind.config";
 import { Avatar } from "react-native-paper";
 import Toast from "react-native-toast-message";
-import IconFeather from "react-native-vector-icons/Feather";
-import IconMaterial from "react-native-vector-icons/MaterialIcons";
+import ProfileStatItem from "./components/ProfileStatItem";
+import { type ProfileInfo } from "@/api/profile/types";
+import Following from "./pages/following/Following";
+import ProfileTabIcon from "./components/ProfileTabIcon";
 
 const Tab = createMaterialTopTabNavigator<UserProfileTabParamList>();
 
 interface UserProfileProps {
     navigation: MaterialBottomTabNavigationProp<BottomTabParamList>;
 }
+
+interface UserProfileContextProps {
+    userInfo?: ProfileInfo;
+}
+
+export const UserProfileContext = createContext<UserProfileContextProps>({
+    userInfo: undefined,
+});
 
 const UserProfile = (
     props: UserProfileProps
@@ -72,23 +82,11 @@ const UserProfile = (
         }
     };
 
-    const getTabIndicatorProp = useCallback(
-        (focused: boolean): { size: number; color: ColorValue } => {
-            return {
-                size: 24,
-                color: focused
-                    ? customColors.cprimary["400"]
-                    : customColors.cgrey.platinum,
-            };
-        },
-        []
-    );
-
     if (profileInfo == null) {
-        return <View></View>;
+        return <OverlayLoading />;
     }
 
-    const { username, postCount, followersCount, followingCount } = profileInfo;
+    const { username, followersCount, followingCount } = profileInfo;
 
     return (
         <View className="flex-1 bg-white">
@@ -97,7 +95,7 @@ const UserProfile = (
                     {username}
                 </Text>
             </View>
-            <View className="mx-6 mt-6 flex-row items-center justify-center">
+            <View className="mx-6 mt-4 flex-row items-center justify-center">
                 <Avatar.Text
                     size={96}
                     style={{
@@ -108,10 +106,10 @@ const UserProfile = (
                 />
             </View>
             <View className="mx-6 mt-4 flex-row">
-                {/* TODO: Add approved content count here */}
+                {/* TODO: Add approved content count here (postCount) */}
                 <ProfileStatItem
                     label={PROFILE_CONTENT_COUNT_TITLE}
-                    value={postCount ?? 0}
+                    value={0}
                 />
                 <ProfileStatItem
                     label={PROFILE_FOLLOWER_COUNT_TITLE}
@@ -129,77 +127,58 @@ const UserProfile = (
                     {PROFILE_EMPTY_BIO}
                 </Text>
             </View>
-            <Tab.Navigator
-                className="flex-1"
-                screenOptions={{
-                    tabBarItemStyle: {
-                        flex: 1,
-                        justifyContent: "center",
-                        alignItems: "center",
-                    },
-                    tabBarIndicatorStyle: {
-                        backgroundColor: customColors.cprimary["300"],
-                    },
-                }}
-            >
-                <Tab.Screen
-                    name="CreatedPosts"
-                    component={CreatedPosts}
-                    options={{
-                        tabBarLabel: ({ focused }) => (
-                            <IconMaterial
-                                name="grid-on"
-                                {...getTabIndicatorProp(focused)}
-                            />
-                        ),
+            <UserProfileContext.Provider value={{ userInfo: profileInfo }}>
+                <Tab.Navigator
+                    className="flex-1"
+                    screenOptions={{
+                        tabBarItemStyle: {
+                            flex: 1,
+                            justifyContent: "center",
+                            alignItems: "center",
+                        },
+                        tabBarIndicatorStyle: {
+                            backgroundColor: customColors.cprimary["300"],
+                        },
                     }}
-                />
-                <Tab.Screen
-                    name="SavedPosts"
-                    component={SavedPosts}
-                    options={{
-                        tabBarLabel: ({ focused }) => (
-                            <IconMaterial
-                                name="bookmark-outline"
-                                {...getTabIndicatorProp(focused)}
-                            />
-                        ),
-                    }}
-                />
-                <Tab.Screen
-                    name="Following"
-                    component={CreatedPosts}
-                    options={{
-                        tabBarLabel: ({ focused }) => (
-                            <IconFeather
-                                name="users"
-                                {...getTabIndicatorProp(focused)}
-                            />
-                        ),
-                    }}
-                />
-            </Tab.Navigator>
+                >
+                    <Tab.Screen
+                        name="CreatedPosts"
+                        component={CreatedPosts}
+                        options={{
+                            tabBarLabel: (props) => (
+                                <ProfileTabIcon {...props} icon="grid" />
+                            ),
+                        }}
+                    />
+                    <Tab.Screen
+                        name="SavedPosts"
+                        component={SavedPosts}
+                        options={{
+                            tabBarLabel: (props) => (
+                                <ProfileTabIcon
+                                    {...props}
+                                    icon="bookmark-outline"
+                                />
+                            ),
+                        }}
+                    />
+                    <Tab.Screen
+                        name="Following"
+                        component={Following}
+                        options={{
+                            tabBarLabel: (props) => (
+                                <ProfileTabIcon
+                                    {...props}
+                                    icon="account-group-outline"
+                                />
+                            ),
+                        }}
+                    />
+                </Tab.Navigator>
+            </UserProfileContext.Provider>
             {loading && <OverlayLoading />}
         </View>
     );
 };
 
 export default UserProfile;
-
-interface ProfileStatItemProps {
-    label: string;
-    value: string | number;
-}
-
-const ProfileStatItem = (
-    props: ProfileStatItemProps
-): ReactElement<ProfileStatItemProps> => {
-    return (
-        <View className="flex-1 items-center">
-            <Text numberOfLines={1}>{props.label}</Text>
-            <Text className="text-xl font-semibold text-cprimary-300">
-                {props.value}
-            </Text>
-        </View>
-    );
-};

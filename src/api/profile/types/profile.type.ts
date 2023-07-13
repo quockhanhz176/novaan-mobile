@@ -1,4 +1,4 @@
-import { type Undefinable } from "@/common/types";
+import { type Undefinable } from "@/types/app";
 
 export interface Followership {
     id: string;
