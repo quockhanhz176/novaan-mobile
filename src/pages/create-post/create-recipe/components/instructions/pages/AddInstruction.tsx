@@ -10,8 +10,13 @@ import {
     ADD_INSTRUCTION_NO_DESCRIPTION_ERROR,
     ADD_INSTRUCTION_WRONG_IMAGE_SIZE,
 } from "@/common/strings";
-import { type NativeStackNavigationProp } from "@react-navigation/native-stack";
-import React, { useState, useRef, type ReactElement, useContext } from "react";
+import React, {
+    useState,
+    useRef,
+    type ReactElement,
+    useContext,
+    useEffect,
+} from "react";
 import {
     Image,
     Alert,
@@ -28,49 +33,43 @@ import IconIon from "react-native-vector-icons/Ionicons";
 import { type Asset, launchImageLibrary } from "react-native-image-picker";
 import { customColors } from "@root/tailwind.config";
 import type Instruction from "../../../types/Instruction";
-import { type InstructionStackParamList } from "@/types/navigation";
 import { recipeInformationContext } from "../../../types/RecipeParams";
-
-export interface AddInstructionParams {
-    information:
-        | {
-              type: "add";
-          }
-        | {
-              type: "edit";
-              instruction: Instruction;
-          };
-}
+import { type Undefinable } from "@/types/app";
 
 interface AddInstructionProps {
-    route: {
-        params: AddInstructionParams;
-    };
-    navigation: NativeStackNavigationProp<
-        InstructionStackParamList,
-        "AddInstruction"
-    >;
+    instruction: Undefinable<Instruction>;
+    isShown: boolean;
+    onClose: () => void;
 }
 
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
 
 const AddInstruction = ({
-    route: {
-        params: { information },
-    },
-    navigation,
+    instruction,
+    isShown,
+    onClose,
 }: AddInstructionProps): ReactElement<AddInstructionProps> => {
     const { instructions, setInstructions } = useContext(
         recipeInformationContext
     );
-    const [description, setDescription] = useState(
-        information.type === "edit" ? information.instruction.description : ""
-    );
-    const [imageUri, setImageUri] = useState<string | undefined>(
-        information.type === "edit"
-            ? information.instruction.imageUri
-            : undefined
-    );
+
+    const [description, setDescription] = useState("");
+    const [imageUri, setImageUri] = useState<Undefinable<string>>(undefined);
+
+    useEffect(() => {
+        if (instruction === undefined) {
+            return;
+        }
+
+        setDescription(instruction.description);
+        setImageUri(instruction.imageUri);
+    }, [instruction]);
+
+    const resetState = (): void => {
+        setDescription("");
+        setImageUri(undefined);
+    };
+
     const imageAsset = useRef<Asset | undefined>(undefined);
     const labelClassName = "text-base font-medium uppercase";
 
@@ -88,8 +87,9 @@ const AddInstruction = ({
         setInstructions(instructions);
     };
 
-    const navigateBack = (): void => {
-        navigation.pop();
+    const handleCloseModal = (): void => {
+        resetState();
+        onClose();
     };
 
     const submit = (): void => {
@@ -111,21 +111,24 @@ const AddInstruction = ({
             return;
         }
 
+        let currentId = 0;
+        if (instructions.length > 0) {
+            currentId = instructions[instructions.length - 1].id + 1;
+        }
         const inputInstruction: Instruction = {
-            id: instructions.length,
+            id: currentId,
             step: instructions.length + 1,
             description,
             imageUri,
         };
-        if (information.type === "add") {
+        if (instruction === undefined) {
             addInstruction(inputInstruction);
         } else {
-            inputInstruction.id = information.instruction.id;
-            inputInstruction.step = information.instruction.step;
+            inputInstruction.id = instruction.id;
+            inputInstruction.step = instruction.step;
             editInstruction(inputInstruction);
         }
-
-        navigation.pop();
+        handleCloseModal();
     };
 
     const selectImage = async (): Promise<void> => {
@@ -151,12 +154,12 @@ const AddInstruction = ({
     };
 
     return (
-        <Modal animationType="slide">
+        <Modal animationType="slide" visible={isShown}>
             <ScrollView>
                 <View className="h-[55] flex-row items-center justify-between px-1 border-b-2 border-cgrey-platinum">
                     <View className="flex-row space-x-2 items-center">
                         <TouchableOpacity
-                            onPress={navigateBack}
+                            onPress={handleCloseModal}
                             activeOpacity={0.2}
                             className="h-10 w-10 items-center justify-center"
                         >

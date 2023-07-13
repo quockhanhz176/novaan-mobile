@@ -10,8 +10,12 @@ import {
     ADD_INGREDIENT_UNIT_TITLE,
     ADD_INGREDIENT_ZERO_AMOUNT_ERROR,
 } from "@/common/strings";
-import { type NativeStackNavigationProp } from "@react-navigation/native-stack";
-import React, { useState, type ReactElement, useContext } from "react";
+import React, {
+    useState,
+    type ReactElement,
+    useContext,
+    useEffect,
+} from "react";
 import {
     Alert,
     Modal,
@@ -23,57 +27,47 @@ import {
 } from "react-native";
 import IconEvill from "react-native-vector-icons/EvilIcons";
 import type Ingredient from "../../../types/Ingredient";
-import { type IngredientStackParamList } from "@/types/navigation";
 import { recipeInformationContext } from "../../../types/RecipeParams";
-
-export interface AddIngredientParams {
-    information:
-        | {
-              type: "add";
-          }
-        | {
-              type: "edit";
-              ingredient: Ingredient;
-          };
-}
+import { type Undefinable } from "@/types/app";
 
 interface AddIngredentProps {
-    route: {
-        params: AddIngredientParams;
-    };
-    navigation: NativeStackNavigationProp<
-        IngredientStackParamList,
-        "AddIngredient"
-    >;
+    ingredient: Undefinable<Ingredient>;
+    isShown: boolean;
+    onClose: () => void;
 }
 
 const AddIngredient = ({
-    route: {
-        params: { information },
-    },
-    navigation,
+    ingredient,
+    isShown,
+    onClose,
 }: AddIngredentProps): ReactElement<AddIngredentProps> => {
     const { ingredients, setIngredients } = useContext(
         recipeInformationContext
     );
-    const [name, setName] = useState(
-        information.type === "edit" ? information.ingredient.name : ""
-    );
-    const [amount, setAmount] = useState<number>(
-        information.type === "edit" ? information.ingredient.amount : 1
-    );
-    const [unit, setUnit] = useState<string>(
-        information.type === "edit" ? information.ingredient.unit : ""
-    );
+
+    const [name, setName] = useState("");
+    const [amount, setAmount] = useState<number>(1);
+    const [unit, setUnit] = useState<string>("");
+
+    useEffect(() => {
+        if (ingredient === undefined) {
+            return;
+        }
+
+        setName(ingredient.name);
+        setAmount(ingredient.amount);
+        setUnit(ingredient.unit);
+    }, [ingredient]);
+
+    const resetState = (): void => {
+        setName("");
+        setAmount(1);
+        setUnit("");
+    };
 
     const labelClassName = "text-base font-medium uppercase";
 
-    const navigateBack = (): void => {
-        navigation.goBack();
-    };
-
     const addIngredient = (ingredient: Ingredient): void => {
-        ingredient.id = ingredients.length;
         setIngredients([...ingredients, ingredient]);
     };
 
@@ -96,6 +90,11 @@ const AddIngredient = ({
         setAmount(numberAmount);
     };
 
+    const handleCloseModal = (): void => {
+        resetState();
+        onClose();
+    };
+
     const submit = (): void => {
         const error = (message: string): void => {
             Alert.alert(ADD_INGREDIENT_MESSAGE_TITLE, message);
@@ -116,28 +115,33 @@ const AddIngredient = ({
             return;
         }
 
+        let currentId = 0;
+        if (ingredients.length > 0) {
+            currentId = ingredients[ingredients.length - 1].id + 1;
+        }
         const inputIngredient: Ingredient = {
-            id: ingredients.length,
+            id: currentId,
             amount,
             name,
             unit,
         };
-        if (information.type === "add") {
+
+        if (ingredient === undefined) {
             addIngredient(inputIngredient);
         } else {
-            inputIngredient.id = information.ingredient.id;
+            inputIngredient.id = ingredient.id;
             editIngredient(inputIngredient);
         }
-        navigateBack();
+        handleCloseModal();
     };
 
     return (
-        <Modal animationType="slide">
+        <Modal animationType="slide" visible={isShown}>
             <ScrollView>
                 <View className="h-[55] flex-row items-center justify-between px-1 border-b-2 border-cgrey-platinum">
                     <View className="flex-row space-x-2 items-center">
                         <TouchableOpacity
-                            onPress={navigateBack}
+                            onPress={handleCloseModal}
                             activeOpacity={0.2}
                             className="h-10 w-10 items-center justify-center"
                         >

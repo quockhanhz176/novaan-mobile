@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
-import React from "react";
+import React, { useEffect } from "react";
 import { View } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -14,12 +14,23 @@ import { toastConfig } from "@/common/configs/toast.config";
 import Toast from "react-native-toast-message";
 import { type RootStackParamList } from "@/types/navigation";
 import { enableScreens } from "react-native-screens";
+import { OrientationLock, lockAsync } from "expo-screen-orientation";
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 
 enableScreens();
 
+const DEFAULT_ORIENTATION = OrientationLock.PORTRAIT_UP;
+
 const App = () => {
+    const handleLockOrientation = async (): Promise<void> => {
+        await lockAsync(DEFAULT_ORIENTATION);
+    };
+
+    useEffect(() => {
+        void handleLockOrientation();
+    }, []);
+
     return (
         <>
             <PaperProvider

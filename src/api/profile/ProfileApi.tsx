@@ -7,6 +7,7 @@ import {
     type ProfileInfo,
     type GetUserRecipeReturn,
     type GetUserTipReturn,
+    type GetUserContentHookReturn,
 } from "./types";
 import { getKeychainValue } from "@/common/keychainService";
 import {
@@ -67,112 +68,110 @@ export const useProfileInfo = (): UseProfileInfoReturn => {
     return { profileInfo, fetchUserProfile, fetchPersonalProfile };
 };
 
-export const useUserRecipes = (userId?: string): GetUserRecipeReturn => {
+const useGetContent = (
+    contentType: "recipes" | "tips",
+    userId?: string
+): GetUserContentHookReturn => {
     const { getReq } = useFetch({ authorizationRequired: true });
 
     const [ended, setEnded] = useState(false);
-    const [recipes, setRecipes] = useState<RecipeResponse[]>([]);
-    const [currentPage, setCurrentPage] = useState<number>(0);
+    const [currentPage, setCurrentPage] = useState(0);
 
-    const getRecipes = async (
+    const getContent = async <T,>(
         start: number,
         limit: number
-    ): Promise<boolean> => {
+    ): Promise<T[]> => {
         if (userId == null) {
             userId = await getUserIdFromToken();
         }
 
         const content = (await getReq(
-            `profile/${userId}/recipes?Start=${start}&Limit=${limit}`
-        )) as RecipeResponse[];
-
-        if (content == null) {
-            return false;
-        }
+            `profile/${userId}/${contentType}?Start=${start}&Limit=${limit}`
+        )) as T[];
 
         if (content.length === 0 || content.length < PAGE_SIZE) {
             setEnded(true);
         }
 
-        // TODO: Need to have a mechanism to auto remove viewed content above and re-query as needed
-        // Spread operator to mutate array become more expensive as the array become bigger
-        setRecipes((recipes) => [...recipes, ...content]);
-        return true;
+        return content;
     };
 
-    const getNext = async (): Promise<boolean> => {
+    const getNext = async <T,>(): Promise<T[]> => {
         // Avoid re-fetching data
         if (ended) {
-            return true;
+            return [];
         }
 
         const start = currentPage * PAGE_SIZE;
-        if (start < recipes.length) {
-            return true;
-        }
-
         setCurrentPage((page) => page + 1);
-        return await getRecipes(start, PAGE_SIZE);
+        return await getContent<T>(start, PAGE_SIZE);
     };
 
     const refresh = (): void => {
         setEnded(false);
-        setRecipes([]);
         setCurrentPage(0);
+    };
+
+    return { getContent, getNext, refresh, ended };
+};
+
+export const useUserRecipes = (userId?: string): GetUserRecipeReturn => {
+    const {
+        ended,
+        getNext: getNextRecipes,
+        refresh: refreshContent,
+    } = useGetContent("recipes", userId);
+
+    const [recipes, setRecipes] = useState<RecipeResponse[]>([]);
+
+    const getNext = async (): Promise<boolean> => {
+        if (ended) {
+            return true;
+        }
+
+        const content = await getNextRecipes<RecipeResponse>();
+        if (content == null) {
+            return false;
+        }
+
+        setRecipes([...recipes, ...content]);
+        return true;
+    };
+
+    const refresh = (): void => {
+        refreshContent();
+        setRecipes([]);
     };
 
     return { getNext, refresh, recipes, ended };
 };
 
 export const useUserTips = (userId?: string): GetUserTipReturn => {
-    const { getReq } = useFetch({ authorizationRequired: true });
+    const {
+        ended,
+        getNext: getNextTips,
+        refresh: refreshContent,
+    } = useGetContent("tips", userId);
 
-    const [ended, setEnded] = useState(false);
     const [tips, setTips] = useState<TipResponse[]>([]);
-    const [currentPage, setCurrentPage] = useState<number>(0);
-
-    const getTips = async (start: number, limit: number): Promise<boolean> => {
-        if (userId == null) {
-            userId = await getUserIdFromToken();
-        }
-
-        const content = (await getReq(
-            `profile/${userId}/tips?Start=${start}&Limit=${limit}`
-        )) as TipResponse[];
-
-        if (content == null) {
-            return false;
-        }
-
-        if (content.length === 0 || content.length < PAGE_SIZE) {
-            setEnded(true);
-        }
-
-        // TODO: Need to have a mechanism to auto remove viewed content above and re-query as needed
-        // Spread operator to mutate array become more expensive as the array become bigger
-        setTips((tips) => [...tips, ...content]);
-        return true;
-    };
 
     const getNext = async (): Promise<boolean> => {
-        // Avoid re-fetching data
         if (ended) {
             return true;
         }
 
-        const start = currentPage * PAGE_SIZE;
-        if (start < tips.length) {
-            return true;
+        const content = await getNextTips<TipResponse>();
+        if (content == null) {
+            return false;
         }
 
-        setCurrentPage((page) => page + 1);
-        return await getTips(start, PAGE_SIZE);
+        setTips([...tips, ...content]);
+        return true;
     };
 
     const refresh = (): void => {
-        setEnded(false);
+        refreshContent();
         setTips([]);
-        setCurrentPage(0);
     };
 
     return { getNext, refresh, tips, ended };

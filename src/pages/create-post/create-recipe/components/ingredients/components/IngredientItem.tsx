@@ -25,8 +25,8 @@ const IngredientItem: FC<IngredientItemProps> = ({
     return (
         <View className="flex-row justify-between items-center p-3 space-x-10">
             <View className="flex-row space-x-3 items-center">
-                <IconMaterial name="equal" size={25} />
-                <Text className="w-[200]" numberOfLines={1}>
+                <IconMaterial name="equal" size={20} />
+                <Text numberOfLines={1} className="text-lg">
                     {`${ingredient.amount.toString()} ${ingredient.unit} ${
                         ingredient.name
                     }`}

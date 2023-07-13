@@ -49,13 +49,15 @@ const CreatedPosts = (): ReactElement => {
     const recipesEmpty = useMemo(() => recipes.length === 0, [recipes]);
     const tipsEmpty = useMemo(() => tips.length === 0, [tips]);
 
+    // Fetch data if it is currently empty
     useEffect(() => {
-        if (viewCategory === "recipe") {
+        if (viewCategory === "recipe" && recipesEmpty) {
             void getNextRecipes();
-        } else {
+        }
+        if (viewCategory === "tips" && tipsEmpty) {
             void getNextTips();
         }
-    }, []);
+    }, [viewCategory]);
 
     const fetchMorePost = async (): Promise<void> => {
         if (
@@ -190,35 +192,33 @@ const CreatedPosts = (): ReactElement => {
                     handleOnEndReached={fetchMorePost}
                 />
             )}
-            {viewingItem && (
-                <Modal animationType="slide">
-                    <View style={{ height: 50 }} className="flex-row">
-                        <View className="flex-1 justify-center items-start">
-                            <Pressable
-                                onPress={handleCloseItemView}
-                                className="px-4 py-2 rounded-lg"
-                            >
-                                <MaterialIcon name="arrow-back" size={24} />
-                            </Pressable>
-                        </View>
-                        <View className="flex-1 justify-center items-center">
-                            <Text className="text-base">
-                                {PROFILE_POSTED_TITLE}
-                            </Text>
-                        </View>
-                        <View className="flex-1 justify-center items-end">
-                            {/* TODO: Add delete + edit post options here */}
-                            <Pressable className="px-4 py-2 rounded-lg">
-                                <IonIcon
-                                    name="ios-ellipsis-vertical-sharp"
-                                    size={18}
-                                />
-                            </Pressable>
-                        </View>
+            <Modal animationType="slide" visible={viewingItem}>
+                <View style={{ height: 50 }} className="flex-row">
+                    <View className="flex-1 justify-center items-start">
+                        <Pressable
+                            onPress={handleCloseItemView}
+                            className="px-4 py-2 rounded-lg"
+                        >
+                            <MaterialIcon name="arrow-back" size={24} />
+                        </Pressable>
                     </View>
-                    <InfiniteScroll postGetter={postGetterProfile} />
-                </Modal>
-            )}
+                    <View className="flex-1 justify-center items-center">
+                        <Text className="text-base">
+                            {PROFILE_POSTED_TITLE}
+                        </Text>
+                    </View>
+                    <View className="flex-1 justify-center items-end">
+                        {/* TODO: Add delete + edit post options here */}
+                        <Pressable className="px-4 py-2 rounded-lg">
+                            <IonIcon
+                                name="ios-ellipsis-vertical-sharp"
+                                size={18}
+                            />
+                        </Pressable>
+                    </View>
+                </View>
+                <InfiniteScroll postGetter={postGetterProfile} />
+            </Modal>
         </View>
     );
 };

@@ -28,7 +28,7 @@ const InstructionItem: FC<InstructionItemProps> = ({
         <View className="flex-row justify-between items-center p-3 space-x-4">
             <View className="flex-row space-x-3 items-center">
                 <IconMaterial name="equal" size={25} />
-                <View className="h-[70] w-[70] justify-center items-center overflow-hidden rounded">
+                <View className="justify-center items-center overflow-hidden rounded">
                     {instruction.imageUri != null ? (
                         <Image
                             source={{ uri: instruction.imageUri }}
@@ -38,17 +38,15 @@ const InstructionItem: FC<InstructionItemProps> = ({
                         <IconEntypo name="image" size={30} />
                     )}
                 </View>
-                <View className="align-center">
+                <View>
                     <Text className="font-medium">
                         {CREATE_RECIPE_INSTRUCTIONS_INSTRUCTION_TEXT +
                             instruction.step.toString()}
                     </Text>
-                    <Text className="w-[200]" numberOfLines={1}>
-                        {instruction.description}
-                    </Text>
+                    <Text numberOfLines={1}>{instruction.description}</Text>
                 </View>
             </View>
-            <View className="flex-row space-x-3 items-start h-full">
+            <View className="flex-row space-x-3 items-center h-full">
                 <TouchableOpacity onPress={onEdit}>
                     <IconFA name="edit" size={20} />
                 </TouchableOpacity>

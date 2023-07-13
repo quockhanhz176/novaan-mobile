@@ -23,13 +23,13 @@ import {
 } from "./types/RecipeParams";
 import PortionDificultyTime from "./components/PortionDifficultyTime";
 import { handleRecipeSubmission } from "./services/createRecipeService";
-import Ingredient from "./components/ingredients/Ingredient";
-import Instruction from "./components/instructions/Instruction";
 import {
     type RootStackParamList,
     type RecipeTabParamList,
 } from "@/types/navigation";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
+import ViewIngredients from "./components/ingredients/pages/ViewIngredient";
+import ViewInstruction from "./components/instructions/pages/ViewInstruction";
 
 interface CreateRecipeProps {
     navigation: NativeStackNavigationProp<RootStackParamList, "CreateTip">;
@@ -181,6 +181,7 @@ const CreateRecipe = ({
                 <NavigationContainer independent={true} ref={recipeTabRef}>
                     <RecipeTab.Navigator
                         screenOptions={{
+                            swipeEnabled: false,
                             tabBarShowLabel: false,
                             tabBarStyle: {
                                 height: 0,
@@ -198,11 +199,11 @@ const CreateRecipe = ({
                         />
                         <RecipeTab.Screen
                             name="Ingredients"
-                            component={Ingredient}
+                            component={ViewIngredients}
                         />
                         <RecipeTab.Screen
                             name="Instructions"
-                            component={Instruction}
+                            component={ViewInstruction}
                         />
                     </RecipeTab.Navigator>
                 </NavigationContainer>
