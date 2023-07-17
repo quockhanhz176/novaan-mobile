@@ -21,7 +21,8 @@ const CustomToggleButton = ({
                 backgroundColor: isChecked
                     ? customColors.cprimary["300"]
                     : "#FFF",
-                width: 96,
+                width: 64,
+                height: 32,
             }}
             icon={() => (
                 <ToggleButtonLabel label={label} isChecked={isChecked} />

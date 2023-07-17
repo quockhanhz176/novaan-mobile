@@ -105,7 +105,6 @@ const getPost = async (index: number): Promise<Post | null> => {
         }
 
         const minimalItem = postListData.list[index];
-        console.log("minimalItem: " + JSON.stringify(minimalItem));
         const postResponse = await PostApi.getPost(
             minimalItem.postId,
             minimalItem.postType === "Recipe" ? "recipe" : "tip"

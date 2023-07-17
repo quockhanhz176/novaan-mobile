@@ -200,9 +200,11 @@ export const PROFILE_FOLLOWER_COUNT_TITLE = "Người theo dõi";
 export const PROFILE_FOLLOWING_COUNT_TITLE = "Đang theo dõi";
 export const PROFILE_EMPTY_BIO =
     "Oops! Người dùng này chưa viết gì nhiều về bản thân họ.";
-export const PROFILE_POSTED_TITLE = "Bài đăng của bạn";
+export const PROFILE_POSTED_TITLE = "Chi tiết bài đăng";
 export const PROFILE_EMPTY_RECIPE = "Oops, phần này chưa có công thức nào cả";
 export const PROFILE_EMPTY_TIPS = "Oops, phần này chưa có mẹo vặt nào cả";
+export const PROFILE_EMPTY_FOLLOWING = "Oops, bạn chưa theo dõi ai cả";
+export const PROFILE_PAGE_LABEL = "Trang cá nhân";
 
 // Reel screen
 export const REEL_DETAILS_DIFFICULTY_TITLE = "Độ khó: ";

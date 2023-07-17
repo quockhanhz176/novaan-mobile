@@ -3,13 +3,14 @@ import React, {
     useEffect,
     useState,
     createContext,
+    useMemo,
 } from "react";
-import { Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import CreatedPosts from "./pages/created-post/CreatedPosts";
 import SavedPosts from "./pages/saved-post/SavedPosts";
 import {
-    type BottomTabParamList,
+    type BottomTabNavProp,
     type UserProfileTabParamList,
 } from "@/types/navigation";
 import { useProfileInfo } from "@/api/profile/ProfileApi";
@@ -19,8 +20,8 @@ import {
     PROFILE_FOLLOWER_COUNT_TITLE,
     PROFILE_FOLLOWING_COUNT_TITLE,
     PROFILE_EMPTY_BIO,
+    PROFILE_PAGE_LABEL,
 } from "@/common/strings";
-import { type MaterialBottomTabNavigationProp } from "@react-navigation/material-bottom-tabs";
 import { customColors } from "@root/tailwind.config";
 import { Avatar } from "react-native-paper";
 import Toast from "react-native-toast-message";
@@ -28,11 +29,15 @@ import ProfileStatItem from "./components/ProfileStatItem";
 import { type ProfileInfo } from "@/api/profile/types";
 import Following from "./pages/following/Following";
 import ProfileTabIcon from "./components/ProfileTabIcon";
+import MaterialIcon from "react-native-vector-icons/MaterialIcons";
 
 const Tab = createMaterialTopTabNavigator<UserProfileTabParamList>();
 
 interface UserProfileProps {
-    navigation: MaterialBottomTabNavigationProp<BottomTabParamList>;
+    navigation?: BottomTabNavProp;
+    userId?: string;
+    showBackButton?: boolean;
+    onClose?: () => void;
 }
 
 interface UserProfileContextProps {
@@ -46,33 +51,37 @@ export const UserProfileContext = createContext<UserProfileContextProps>({
 const UserProfile = (
     props: UserProfileProps
 ): ReactElement<UserProfileProps> => {
-    const { navigation } = props;
+    const { navigation, userId, showBackButton = true, onClose } = props;
+
+    const isUserProfile = useMemo(() => userId == null, [userId]);
 
     const [loading, setLoading] = useState(true);
 
-    const { profileInfo, fetchPersonalProfile } = useProfileInfo();
+    const { profileInfo, fetchPersonalProfile, fetchUserProfile } =
+        useProfileInfo();
 
     useEffect(() => {
         void handleFetchProfile();
-    }, []);
-
-    useEffect(() => {
-        if (profileInfo == null) {
-            return;
-        }
-
-        console.log(profileInfo);
-    }, [profileInfo]);
+    }, [userId]);
 
     const handleFetchProfile = async (): Promise<void> => {
         setLoading(true);
         try {
-            const fetched = await fetchPersonalProfile();
+            let fetched = false;
+            if (userId == null) {
+                fetched = await fetchPersonalProfile();
+            } else {
+                fetched = await fetchUserProfile(userId);
+            }
             if (!fetched) {
                 throw new Error();
             }
         } catch {
-            navigation.navigate("Home");
+            if (navigation == null) {
+                onClose?.();
+            } else {
+                navigation.navigate("Home");
+            }
             Toast.show({
                 type: "error",
                 text1: "Failed to fetch user profile",
@@ -90,22 +99,41 @@ const UserProfile = (
 
     return (
         <View className="flex-1 bg-white">
-            <View className="items-center justify-center mt-4">
-                <Text className="text-cprimary-300 text-xl font-semibold">
-                    {username}
-                </Text>
+            <View className="items-center mx-6 mt-4 flex-row">
+                <View className="items-start">
+                    {!isUserProfile && showBackButton && (
+                        <Pressable
+                            onPress={onClose}
+                            className="pr-2 py-2 rounded-lg"
+                        >
+                            <MaterialIcon name="arrow-back" size={24} />
+                        </Pressable>
+                    )}
+                </View>
+                <View className="items-center">
+                    <Text className="text-cprimary-300 text-lg font-semibold">
+                        {isUserProfile ? PROFILE_PAGE_LABEL : username}
+                    </Text>
+                </View>
             </View>
-            <View className="mx-6 mt-4 flex-row items-center justify-center">
+            <View className="mx-6 mt-6 flex-row items-center justify-between">
                 <Avatar.Text
-                    size={96}
+                    size={64}
                     style={{
                         backgroundColor: customColors.cprimary["300"],
                     }}
                     label="XD"
-                    className="mr-2"
                 />
+                <View className="flex-1 mx-3">
+                    <Text className="text-lg font-semibold text-cprimary-300">
+                        {username}
+                    </Text>
+                    <Text className="text-gray-400 italic">
+                        {PROFILE_EMPTY_BIO}
+                    </Text>
+                </View>
             </View>
-            <View className="mx-6 mt-4 flex-row">
+            <View className="mx-6 mt-4 flex-row justify-between">
                 {/* TODO: Add approved content count here (postCount) */}
                 <ProfileStatItem
                     label={PROFILE_CONTENT_COUNT_TITLE}
@@ -120,16 +148,9 @@ const UserProfile = (
                     value={followingCount ?? 0}
                 />
             </View>
-            <View className="mx-6 my-4">
-                <Text className="text-xl text-cprimary-300">{username}</Text>
-                {/* TODO: Add user brief description here when it is ready */}
-                <Text className="text-gray-600 italic mt-2">
-                    {PROFILE_EMPTY_BIO}
-                </Text>
-            </View>
             <UserProfileContext.Provider value={{ userInfo: profileInfo }}>
                 <Tab.Navigator
-                    className="flex-1"
+                    className="flex-1 mt-4"
                     screenOptions={{
                         tabBarItemStyle: {
                             flex: 1,
@@ -150,30 +171,34 @@ const UserProfile = (
                             ),
                         }}
                     />
-                    <Tab.Screen
-                        name="SavedPosts"
-                        component={SavedPosts}
-                        options={{
-                            tabBarLabel: (props) => (
-                                <ProfileTabIcon
-                                    {...props}
-                                    icon="bookmark-outline"
-                                />
-                            ),
-                        }}
-                    />
-                    <Tab.Screen
-                        name="Following"
-                        component={Following}
-                        options={{
-                            tabBarLabel: (props) => (
-                                <ProfileTabIcon
-                                    {...props}
-                                    icon="account-group-outline"
-                                />
-                            ),
-                        }}
-                    />
+                    {isUserProfile && (
+                        <Tab.Screen
+                            name="SavedPosts"
+                            component={SavedPosts}
+                            options={{
+                                tabBarLabel: (props) => (
+                                    <ProfileTabIcon
+                                        {...props}
+                                        icon="bookmark-outline"
+                                    />
+                                ),
+                            }}
+                        />
+                    )}
+                    {isUserProfile && (
+                        <Tab.Screen
+                            name="Following"
+                            component={Following}
+                            options={{
+                                tabBarLabel: (props) => (
+                                    <ProfileTabIcon
+                                        {...props}
+                                        icon="account-group-outline"
+                                    />
+                                ),
+                            }}
+                        />
+                    )}
                 </Tab.Navigator>
             </UserProfileContext.Provider>
             {loading && <OverlayLoading />}

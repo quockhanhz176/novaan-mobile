@@ -10,7 +10,7 @@ const ProfileStatItem = (
     props: ProfileStatItemProps
 ): ReactElement<ProfileStatItemProps> => {
     return (
-        <View className="flex-1 items-center">
+        <View className="items-center">
             <Text numberOfLines={1}>{props.label}</Text>
             <Text className="text-xl font-semibold text-cprimary-300">
                 {props.value}

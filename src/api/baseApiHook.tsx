@@ -49,7 +49,6 @@ export const useFetch = (config?: RequestConfig): UseFetchReturn => {
         const headers = new Headers();
         headers.append("Content-Type", "application/json");
         headers.append("Accept", "application/json");
-        headers.append("Access-Control-Allow-Origin", "http://localhost:3000");
         headers.append(
             "Access-Control-Allow-Headers",
             "Origin, X-Requested-With, Content-Type, Accept, Authorization"
@@ -124,6 +123,7 @@ export const useFetch = (config?: RequestConfig): UseFetchReturn => {
             // Avoid empty response body from server
             try {
                 const body = await response.json();
+                console.log(body);
                 return body;
             } catch {
                 return true;

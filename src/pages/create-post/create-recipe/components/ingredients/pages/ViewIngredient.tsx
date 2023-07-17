@@ -38,8 +38,6 @@ const ViewIngredients = (): ReactElement => {
 
     const deleteIngredient = (id: number): void => {
         const index = ingredients.findIndex((i) => i.id === id);
-        console.log(index);
-
         if (index === -1) {
             return;
         }

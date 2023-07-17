@@ -120,6 +120,8 @@ const SignIn = (props: SignInProps): ReactElement<SignInProps> => {
             }
 
             // Save token to secure store
+            console.log(response.token);
+
             await saveKeychain(KEYCHAIN_ID, response.token);
             navigation.navigate("MainScreens");
         } catch (error) {

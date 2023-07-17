@@ -22,3 +22,9 @@ export interface UseProfileInfoReturn {
     fetchPersonalProfile: () => Promise<boolean>;
     fetchUserProfile: (userId: string) => Promise<boolean>;
 }
+
+export interface MinimalUserInfo {
+    username: string;
+    userId: string;
+    avatar: string;
+}

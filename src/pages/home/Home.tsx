@@ -4,7 +4,6 @@ import { StyleSheet, TouchableOpacity, View, Text } from "react-native";
 
 const Home: FC = () => {
     const [outer, setOuter] = useState(true);
-    // console.log("rerender - outer");
     return (
         <View style={styles.container}>
             <TouchableOpacity
@@ -22,8 +21,6 @@ const Home: FC = () => {
 
 const Component1: FC = () => {
     const [state1, setState1] = useState(0);
-    // console.log("rerender - inner");
-
     return (
         <TouchableOpacity
             onPress={() => {

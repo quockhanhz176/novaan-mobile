@@ -1,3 +1,5 @@
+import { type UserProfileRouteProps } from "@/pages/user-profile/UserProfile";
+
 /* eslint-disable @typescript-eslint/consistent-type-definitions */
 export type RootStackParamList = {
     SignIn: undefined;
@@ -11,9 +13,12 @@ export type BottomTabParamList = {
     Home: undefined;
     Search: undefined;
     Reel: undefined;
-    UserProfile: undefined;
+    UserProfile: UserProfileRouteProps;
     CreatePostPopup: undefined;
 };
+
+export type BottomTabNavProp =
+    MaterialBottomTabNavigationProp<BottomTabParamList>;
 
 export type RecipeTabParamList = {
     TitleDescriptionVideo: TDVRouteProps;

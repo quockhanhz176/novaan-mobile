@@ -30,14 +30,17 @@ import { type RecipeResponse } from "@/api/post/types/PostResponse";
 type ViewCategory = "recipe" | "tips";
 
 const CreatedPosts = (): ReactElement => {
+    const userProfileContext = useContext(UserProfileContext);
     const {
         getNext: getNextRecipes,
-        recipes,
+        content: recipes,
         ended: recipesEnded,
-    } = useUserRecipes();
-    const { getNext: getNextTips, tips, ended: tipsEnded } = useUserTips();
-
-    const userProfileContext = useContext(UserProfileContext);
+    } = useUserRecipes(userProfileContext.userInfo?.userId);
+    const {
+        getNext: getNextTips,
+        content: tips,
+        ended: tipsEnded,
+    } = useUserTips(userProfileContext.userInfo?.userId);
 
     const [viewingItem, setViewingItem] = useState(false);
     const [viewItem, setViewItem] =
@@ -68,20 +71,12 @@ const CreatedPosts = (): ReactElement => {
         }
 
         setFetching(true);
-        try {
-            let success: boolean = false;
-            if (viewCategory === "recipe") {
-                success = await getNextRecipes();
-            } else {
-                success = await getNextTips();
-            }
-
-            if (!success) {
-                // Alert user
-            }
-        } finally {
-            setFetching(false);
+        if (viewCategory === "recipe") {
+            await getNextRecipes();
+        } else {
+            await getNextTips();
         }
+        setFetching(false);
     };
 
     const postGetterProfile = async (index: number): Promise<Post | null> => {
@@ -217,7 +212,10 @@ const CreatedPosts = (): ReactElement => {
                         </Pressable>
                     </View>
                 </View>
-                <InfiniteScroll postGetter={postGetterProfile} />
+                <InfiniteScroll
+                    postGetter={postGetterProfile}
+                    isInsideUserProfile={true}
+                />
             </Modal>
         </View>
     );
