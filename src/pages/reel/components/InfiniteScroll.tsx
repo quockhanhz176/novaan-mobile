@@ -20,7 +20,7 @@ import reelServices from "../services/reelServices";
 
 interface InfiniteScrollProps {
     postGetter?: (index: number) => Promise<Post | null>;
-    isInsideUserProfile?: boolean;
+    showUserProfile?: boolean;
 }
 
 export type InternalPost = Post & {
@@ -32,7 +32,7 @@ const END_REACH_THRESHOLD = 2;
 
 const InfiniteScroll: FC<InfiniteScrollProps> = ({
     postGetter,
-    isInsideUserProfile = false,
+    showUserProfile = true,
 }) => {
     const [loading, setLoading] = useState(false);
 
@@ -111,7 +111,7 @@ const InfiniteScroll: FC<InfiniteScrollProps> = ({
         return (
             <ScrollItem
                 post={item}
-                isInsideUserProfile={isInsideUserProfile}
+                showUserProfile={showUserProfile}
                 onPageChange={onScrollItemPageChange}
                 isVideoPaused={item.index !== currentPage}
             />

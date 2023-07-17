@@ -1,7 +1,7 @@
-import React, { type FC } from "react";
+import React, { type ReactElement } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
-const SavedPosts: FC = () => {
+const SavedPosts = (): ReactElement => {
     return (
         <View style={styles.container}>
             <Text>SavedPosts</Text>

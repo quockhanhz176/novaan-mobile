@@ -6,13 +6,9 @@ import React, {
     useMemo,
 } from "react";
 import { Pressable, Text, View } from "react-native";
-import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import CreatedPosts from "./pages/created-post/CreatedPosts";
 import SavedPosts from "./pages/saved-post/SavedPosts";
-import {
-    type BottomTabNavProp,
-    type UserProfileTabParamList,
-} from "@/types/navigation";
+import { type BottomTabNavProp } from "@/types/navigation";
 import { useProfileInfo } from "@/api/profile/ProfileApi";
 import OverlayLoading from "@/common/components/OverlayLoading";
 import {
@@ -30,8 +26,7 @@ import { type ProfileInfo } from "@/api/profile/types";
 import Following from "./pages/following/Following";
 import ProfileTabIcon from "./components/ProfileTabIcon";
 import MaterialIcon from "react-native-vector-icons/MaterialIcons";
-
-const Tab = createMaterialTopTabNavigator<UserProfileTabParamList>();
+import { SceneMap, TabBar, TabView } from "react-native-tab-view";
 
 interface UserProfileProps {
     navigation?: BottomTabNavProp;
@@ -48,6 +43,14 @@ export const UserProfileContext = createContext<UserProfileContextProps>({
     userInfo: undefined,
 });
 
+const userProfileRoute = [
+    { key: "created" },
+    { key: "saved" },
+    { key: "following" },
+];
+
+const peopleProfileRoute = [{ key: "created" }];
+
 const UserProfile = (
     props: UserProfileProps
 ): ReactElement<UserProfileProps> => {
@@ -56,6 +59,16 @@ const UserProfile = (
     const isUserProfile = useMemo(() => userId == null, [userId]);
 
     const [loading, setLoading] = useState(true);
+    const [index, setIndex] = useState(0);
+    const [routes, setRoutes] = useState<Array<{ key: string }>>([]);
+
+    useEffect(() => {
+        if (isUserProfile) {
+            setRoutes(userProfileRoute);
+        } else {
+            setRoutes(peopleProfileRoute);
+        }
+    }, [isUserProfile]);
 
     const { profileInfo, fetchPersonalProfile, fetchUserProfile } =
         useProfileInfo();
@@ -63,6 +76,20 @@ const UserProfile = (
     useEffect(() => {
         void handleFetchProfile();
     }, [userId]);
+
+    const renderScene = useMemo(() => {
+        if (isUserProfile) {
+            return SceneMap({
+                created: CreatedPosts,
+                saved: SavedPosts,
+                following: Following,
+            });
+        }
+
+        return SceneMap({
+            created: CreatedPosts,
+        });
+    }, [isUserProfile]);
 
     const handleFetchProfile = async (): Promise<void> => {
         setLoading(true);
@@ -88,6 +115,19 @@ const UserProfile = (
             });
         } finally {
             setLoading(false);
+        }
+    };
+
+    const getTabBarIcon = (route: { key: string }): string => {
+        switch (route.key) {
+            case "created":
+                return "grid";
+            case "saved":
+                return "bookmark-outline";
+            case "following":
+                return "account-group-outline";
+            default:
+                return "grid";
         }
     };
 
@@ -149,57 +189,30 @@ const UserProfile = (
                 />
             </View>
             <UserProfileContext.Provider value={{ userInfo: profileInfo }}>
-                <Tab.Navigator
+                <TabView
                     className="flex-1 mt-4"
-                    screenOptions={{
-                        tabBarItemStyle: {
-                            flex: 1,
-                            justifyContent: "center",
-                            alignItems: "center",
-                        },
-                        tabBarIndicatorStyle: {
-                            backgroundColor: customColors.cprimary["300"],
-                        },
-                    }}
-                >
-                    <Tab.Screen
-                        name="CreatedPosts"
-                        component={CreatedPosts}
-                        options={{
-                            tabBarLabel: (props) => (
-                                <ProfileTabIcon {...props} icon="grid" />
-                            ),
-                        }}
-                    />
-                    {isUserProfile && (
-                        <Tab.Screen
-                            name="SavedPosts"
-                            component={SavedPosts}
-                            options={{
-                                tabBarLabel: (props) => (
-                                    <ProfileTabIcon
-                                        {...props}
-                                        icon="bookmark-outline"
-                                    />
-                                ),
+                    navigationState={{ index, routes }}
+                    renderScene={renderScene}
+                    onIndexChange={setIndex}
+                    renderTabBar={(tabBarProp) => (
+                        <TabBar
+                            {...tabBarProp}
+                            style={{ elevation: 0 }}
+                            indicatorContainerStyle={{
+                                backgroundColor: customColors.white,
                             }}
+                            indicatorStyle={{
+                                backgroundColor: customColors.cprimary["300"],
+                            }}
+                            renderLabel={(iconProp) => (
+                                <ProfileTabIcon
+                                    {...iconProp}
+                                    icon={getTabBarIcon(iconProp.route)}
+                                />
+                            )}
                         />
                     )}
-                    {isUserProfile && (
-                        <Tab.Screen
-                            name="Following"
-                            component={Following}
-                            options={{
-                                tabBarLabel: (props) => (
-                                    <ProfileTabIcon
-                                        {...props}
-                                        icon="account-group-outline"
-                                    />
-                                ),
-                            }}
-                        />
-                    )}
-                </Tab.Navigator>
+                />
             </UserProfileContext.Provider>
             {loading && <OverlayLoading />}
         </View>

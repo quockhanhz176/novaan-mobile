@@ -214,7 +214,7 @@ const CreatedPosts = (): ReactElement => {
                 </View>
                 <InfiniteScroll
                     postGetter={postGetterProfile}
-                    isInsideUserProfile={true}
+                    showUserProfile={false}
                 />
             </Modal>
         </View>
