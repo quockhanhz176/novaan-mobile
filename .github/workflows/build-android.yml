@@ -20,6 +20,18 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+
+    - name: Install Node dependencies
+      run: npm ci
+
+    - name: App Prebuild
+      run: npx expo prebuild
+
     - name: Use Java JDK 11
       uses: actions/setup-java@v3
       with:
@@ -30,21 +42,12 @@ jobs:
     - name: Use Android Manager (for SDK and Build Tools)
       uses: android-actions/setup-android@v2
 
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-
     - name: 🏗 Setup EAS
       uses: expo/expo-github-action@v8
       with:
         eas-version: latest
         token: ${{ secrets.EXPO_TOKEN }}
         expo-cache: true
-
-    - name: Install Node dependencies
-      run: npm ci
 
     - name: Install Android SDK and platform tools
       run: sdkmanager "platform-tools" "platforms;android-${{ matrix.android-version }}"
