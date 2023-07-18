@@ -61,4 +61,4 @@ jobs:
         appId: ${{secrets.FIREBASE_APP_ID}}
         serviceCredentialsFileContent: ${{ secrets.CREDENTIAL_FILE_CONTENT }}
         groups: testers
-        file: builds/preview.apk
+        file: builds/novaan-mobile.apk
