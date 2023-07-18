@@ -6,11 +6,9 @@ name: Expo Build APK CI
 on:
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
 
 jobs:
-  install-dependencies:
+  build-android-apk:
 
     runs-on: ubuntu-latest
 
@@ -52,7 +50,7 @@ jobs:
       run: sdkmanager "platform-tools" "platforms;android-${{ matrix.android-version }}"
 
     - name: Create APK with EAS
-      run: eas build -p android --profile preview --local --output builds/preview.apk --non-interactive
+      run: API_URL={{secrets.NOVAAN_API_URL}} API_TIMEOUT=5000 KEYCHAIN_ID={{secrets.NOVAAN_KEYCHAIN_ID}} GOOGLE_API_KEY={{secrets.NOVAAN_GG_API_KEY}} npm run build:android:prod eas build -p android --profile production --local --output builds/novaan-mobile.apk --non-interactive
 
     - name: Upload APK to Firebase App Distribution
       uses: wzieba/Firebase-Distribution-Github-Action@v1

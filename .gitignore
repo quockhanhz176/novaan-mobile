@@ -65,3 +65,9 @@ web-build/
 
 .env
 builds
+
+google-services.json
+GoogleService-Info.plist
+
+android
+ios
