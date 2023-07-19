@@ -8,6 +8,9 @@ export interface PostResponseBase {
     createdAt?: Date; // 2023-06-29T20:11:06.124Z
     updatedAt?: Date;
     adminComment?: string;
+    isLiked: boolean;
+    isSaved: boolean;
+    likeCount: number;
 }
 
 export interface Instruction {
@@ -38,5 +41,7 @@ export type TipResponse = PostResponseBase & {
 };
 
 type PostResponse = RecipeResponse | TipResponse;
+
+export type PostType = PostResponse["type"];
 
 export default PostResponse;

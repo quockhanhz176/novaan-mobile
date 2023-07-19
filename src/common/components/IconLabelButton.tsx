@@ -1,36 +1,39 @@
 import { customColors } from "@root/tailwind.config";
-import React, { type FC, type ReactElement } from "react";
+import React, { Fragment, type FC, type ReactElement } from "react";
 import {
     TouchableOpacity,
     Text,
     type TextProps,
     type TouchableOpacityProps,
-    View,
     type ViewStyle,
     type StyleProp,
 } from "react-native";
 import { type IconProps } from "react-native-vector-icons/Icon";
 import IconIonicons from "react-native-vector-icons/Ionicons";
+import IconCommunity from "react-native-vector-icons/MaterialCommunityIcons";
+import IconMaterial from "react-native-vector-icons/MaterialIcons";
+import IconEvil from "react-native-vector-icons/EvilIcons";
+import IconEntypo from "react-native-vector-icons/Entypo";
 
-interface IconLabelButtonProps {
-    iconPack?: "Ionicons";
+export interface IconLabelButtonProps {
+    iconPack?: "Ionicons" | "Community" | "Material" | "Evil" | "Entypo";
     iconProps?: IconProps;
-    buttonClassName?: string;
-    buttonProps?: TouchableOpacityProps;
     text?: string;
     textClassName?: string;
     textProps?: TextProps;
+    buttonClassName?: string;
+    buttonProps?: TouchableOpacityProps;
     style?: StyleProp<ViewStyle>;
 }
 
 const IconLabelButton: FC<IconLabelButtonProps> = ({
     iconPack = "Ionicons",
     iconProps,
-    buttonClassName = "",
-    buttonProps,
     text,
     textClassName = "",
     textProps,
+    buttonClassName = "bg-white",
+    buttonProps,
     style,
 }: IconLabelButtonProps) => {
     const iProps: IconProps = {
@@ -40,22 +43,32 @@ const IconLabelButton: FC<IconLabelButtonProps> = ({
         ...iconProps,
     };
 
-    const renderIcon = (): ReactElement | undefined => {
+    const renderIcon = (): ReactElement | null => {
         if (iconProps?.name == null) {
-            return undefined;
+            return null;
         }
 
         switch (iconPack) {
             case "Ionicons":
                 return <IconIonicons {...iProps} />;
+            case "Community":
+                return <IconCommunity {...iProps} />;
+            case "Material":
+                return <IconMaterial {...iProps} />;
+            case "Evil":
+                return <IconEvil {...iProps} />;
+            case "Entypo":
+                return <IconEntypo {...iProps} />;
         }
     };
 
     return (
-        <TouchableOpacity {...buttonProps} style={style}>
-            <View
-                className={`flex-row space-x-1 items-center ${buttonClassName}`}
-            >
+        <TouchableOpacity
+            {...buttonProps}
+            style={style}
+            className={`flex-row items-center space-x-1 ${buttonClassName}`}
+        >
+            <>
                 {renderIcon()}
                 {text !== null && (
                     <Text
@@ -65,7 +78,7 @@ const IconLabelButton: FC<IconLabelButtonProps> = ({
                         {text}
                     </Text>
                 )}
-            </View>
+            </>
         </TouchableOpacity>
     );
 };

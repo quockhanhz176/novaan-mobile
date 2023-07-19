@@ -131,6 +131,12 @@ const InfiniteScroll: FC<InfiniteScrollProps> = ({
                 onEndReachedThreshold={END_REACH_THRESHOLD}
                 onEndReached={fetchMoreData}
                 onLayout={onLayout}
+                windowSize={3}
+                getItemLayout={(data, index) => ({
+                    length: SCROLL_ITEM_HEIGHT,
+                    offset: SCROLL_ITEM_HEIGHT * index,
+                    index,
+                })}
             />
             {/* TODO: Add loading overlay for video here */}
             {loading && null}

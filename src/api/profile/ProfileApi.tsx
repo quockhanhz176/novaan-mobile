@@ -22,7 +22,7 @@ const parseJwt = (token: string): any => {
     return JSON.parse(jsonPayload);
 };
 
-const getUserIdFromToken = async (): Promise<string> => {
+export const getUserIdFromToken = async (): Promise<string> => {
     const token = await getKeychainValue(KEYCHAIN_ID);
     const payload = parseJwt(token);
     if (payload == null || typeof payload === "string") {

@@ -1,6 +1,8 @@
 import { getKeychainValue } from "@/common/keychainService";
 import { type Undefinable } from "@/types/app";
 import { API_URL, API_TIMEOUT, KEYCHAIN_ID } from "@env";
+import { type FailableResponse } from "./common/types/FailableResponse";
+import { type NonConcrete } from "@/common/utils";
 
 interface RequestConfig {
     timeout: number;
@@ -9,7 +11,7 @@ interface RequestConfig {
     needJsonBody?: boolean;
 }
 
-enum HttpMethod {
+export enum HttpMethod {
     GET = "GET",
     POST = "POST",
     PUT = "PUT",
@@ -75,7 +77,7 @@ class BaseApi {
 
     async post<RequestType>(
         url: string,
-        body: RequestType,
+        body?: RequestType,
         requestConfig?: RequestConfig
     ): Promise<Response> {
         return await this.sendRequestBase(
@@ -150,11 +152,57 @@ class BaseApi {
             signal: controller.signal,
         });
 
-        console.log(JSON.stringify(response));
-
         clearTimeout(timeoutId);
 
         return response;
+    }
+
+    async sendReceiveBase<T>(
+        url: string,
+        caller: string,
+        method: HttpMethod,
+        body?: any,
+        config?: NonConcrete<RequestConfig>
+    ): Promise<FailableResponse<T>> {
+        try {
+            const response = await this.sendRequestBase(
+                url,
+                method,
+                {
+                    timeout: 3000,
+                    authorizationRequired: true,
+                    ...config,
+                },
+                method === HttpMethod.GET ? undefined : body
+            );
+            console.log(`${caller} - response: ${JSON.stringify(response)}`);
+            let responseBody: any;
+            try {
+                responseBody = await response.json();
+                console.log(
+                    `${caller} - body: ${JSON.stringify(responseBody)}`
+                );
+            } catch {}
+
+            if (!response.ok) {
+                const code: number = responseBody?.code ?? -1;
+                return {
+                    success: false,
+                    code,
+                };
+            }
+
+            return {
+                success: true,
+                value: responseBody,
+            };
+        } catch (e) {
+            console.error(`${caller} - error:`, e);
+            return {
+                success: false,
+                code: -1,
+            };
+        }
     }
 }
 

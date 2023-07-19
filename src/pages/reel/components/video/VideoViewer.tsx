@@ -4,21 +4,37 @@ import React, {
     useState,
     useCallback,
     useEffect,
+    memo,
 } from "react";
-import { type GestureResponderEvent, View } from "react-native";
+import {
+    Text,
+    type GestureResponderEvent,
+    View,
+    TouchableOpacity,
+} from "react-native";
 import Video from "react-native-video";
 import PlayPause from "./PlayPause";
 import Seeker from "./Seeker";
 import { useFetchResourceUrl } from "@/api/utils/resourceHooks";
+import ButtonColumn from "./ButtonColumn";
+import ResourceImage from "@/common/components/ResourceImage";
+import IconFeather from "react-native-vector-icons/Feather";
+import LinearGradient from "react-native-linear-gradient";
+import type Post from "../../types/Post";
+import type ScrollItemController from "../../types/ScrollItemController";
 
 interface VideoViewrProps {
-    videoId: string;
+    post: Post;
+    commentCount: number;
     isPaused?: boolean;
+    scrollItemController: ScrollItemController;
 }
 
 const VideoViewer: FC<VideoViewrProps> = ({
-    videoId,
+    post,
+    commentCount,
     isPaused: pausedFromHigherUp = true,
+    scrollItemController,
 }: VideoViewrProps) => {
     const videoRef = useRef<Video>(null);
     const [paused, setPaused] = useState(pausedFromHigherUp);
@@ -30,7 +46,7 @@ const VideoViewer: FC<VideoViewrProps> = ({
     const { resourceUrl, fetchUrl } = useFetchResourceUrl();
 
     useEffect(() => {
-        void fetchUrl(videoId)
+        void fetchUrl(post.video)
             .then((success) => {
                 if (!success) {
                     // Do something to alert user or retry
@@ -60,13 +76,17 @@ const VideoViewer: FC<VideoViewrProps> = ({
         [videoDuration.current]
     );
 
-    const onVideoError = async (): Promise<void> => {
+    const onVideoError = async (error): Promise<void> => {
+        console.log("VideoViewer - video error:" + JSON.stringify(error));
+        if (error.error?.what === 1 && error.error?.extra === -1005) {
+            void fetchUrl(post.video);
+        }
         // Show error
     };
 
     return (
         <View
-            className="absolute top-0 left-0 bottom-0 right-0"
+            className="absolute top-0 left-0 bottom-0 right-0 bg-black"
             onTouchEnd={onVideoPress}
         >
             {resourceUrl !== "" && (
@@ -97,12 +117,52 @@ const VideoViewer: FC<VideoViewrProps> = ({
             )}
             <PlayPause showToggle={pauseToggle} icon="pause" />
             <PlayPause showToggle={playToggle} icon="play" />
-            <Seeker
-                progress={currentTimeStamp / videoDuration.current}
-                onSeek={onSeek}
-            />
+            <View className="absolute bottom-0 left-0 right-0 flex-col-reverse">
+                <LinearGradient
+                    colors={["#ffffff00", "#00000066"]}
+                    className="absolute bottom-0 top-0 left-0 right-0 h-[140]"
+                />
+                <Seeker
+                    progress={currentTimeStamp / videoDuration.current}
+                    onSeek={onSeek}
+                />
+                <View className="flex-row-reverse items-end">
+                    <ButtonColumn
+                        post={post}
+                        commentCount={commentCount}
+                        scrollItemController={scrollItemController}
+                    />
+                    <View className="flex-1 pl-6 pr-6 space-y-2">
+                        <TouchableOpacity
+                            className="flex-row items-center space-x-3"
+                            onPress={scrollItemController.showProfile}
+                            onPressOut={(e) => {
+                                e.stopPropagation();
+                            }}
+                        >
+                            <View className="bg-xanthous w-[35] h-[35] rounded-full items-center justify-center overflow-hidden">
+                                {post.creator.avatar == null ||
+                                post.creator.avatar === "" ? (
+                                    <IconFeather name="user" size={30} />
+                                ) : (
+                                    <ResourceImage
+                                        resourceId={post.creator.avatar}
+                                        className="h-full w-full"
+                                    />
+                                )}
+                            </View>
+                            <Text className="text-white font-medium">
+                                {post.creator.username}
+                            </Text>
+                        </TouchableOpacity>
+                        <Text className="text-white" style={{ fontSize: 15 }}>
+                            {post.title}
+                        </Text>
+                    </View>
+                </View>
+            </View>
         </View>
     );
 };
 
-export default VideoViewer;
+export default memo(VideoViewer);

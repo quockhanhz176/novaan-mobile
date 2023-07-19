@@ -1,5 +1,5 @@
-import { useMemo, type FC } from "react";
-import React, { ScrollView, View, Text } from "react-native";
+import { type FC } from "react";
+import React, { ScrollView, View, Text, TouchableOpacity } from "react-native";
 import { Divider } from "react-native-paper";
 import IconFeather from "react-native-vector-icons/Feather";
 import StarRating from "react-native-star-rating";
@@ -9,7 +9,9 @@ import {
     REEL_DETAILS_DIFFICULTY_TITLE,
     REEL_DETAILS_INGREDIENTS_TITLE,
     REEL_DETAILS_INSTRUCTIONS_TITLE,
+    REEL_DETAILS_SAVE,
     REEL_DETAILS_PREPARE_TIME_TITLE,
+    REEL_DETAILS_RATING,
 } from "@/common/strings";
 import { getDifficultyLabel } from "@/pages/create-post/create-recipe/types/DifficultyItems";
 import DetailTime from "./DetailTime";
@@ -18,21 +20,28 @@ import DetailInstruction from "./DetailInstruction";
 import ResourceImage from "@/common/components/ResourceImage";
 import { getPortionLabel } from "@/pages/create-post/create-recipe/types/PortionTypeItems";
 import type Post from "../../types/Post";
+import numeral from "numeral";
+import type ScrollItemController from "../../types/ScrollItemController";
 
 interface DetailsProps {
     post: Post;
+    commentCount: number;
+    scrollItemController: ScrollItemController;
 }
 
-const Details: FC<DetailsProps> = ({ post }: DetailsProps) => {
-    const portionInfo = useMemo((): string => {
-        if (post.type === "tip") {
-            return "";
-        }
-
-        return `${post.portionQuantity.toString()} ${getPortionLabel(
-            post.portionType
-        )}`;
-    }, [post]);
+const Details: FC<DetailsProps> = ({
+    post,
+    commentCount,
+    scrollItemController,
+}: DetailsProps) => {
+    const {
+        liked,
+        saved,
+        likePressed,
+        savePressed,
+        showRating: ratingPressed,
+    } = scrollItemController;
+    const disabledColor = customColors.cgrey.dim;
 
     return (
         <ScrollView className="w-full h-full bg-white">
@@ -41,36 +50,50 @@ const Details: FC<DetailsProps> = ({ post }: DetailsProps) => {
             </View>
             <Divider bold={true} />
             <View className="py-8 pb-9 items-center">
-                <StarRating
-                    starSize={15}
-                    containerStyle={{ width: 120 }}
-                    fullStarColor={customColors.star}
-                    emptyStar={"star"}
-                    emptyStarColor={customColors.cgrey.platinum}
-                    rating={4}
-                />
-                <Text className="text-cgrey-dim mt-1" style={{ fontSize: 13 }}>
-                    377 ratings
-                </Text>
+                <TouchableOpacity
+                    onPress={ratingPressed}
+                    className="items-center"
+                >
+                    <StarRating
+                        starSize={15}
+                        containerStyle={{ width: 120 }}
+                        fullStarColor={customColors.star}
+                        emptyStar={"star"}
+                        disabled
+                        emptyStarColor={customColors.cgrey.platinum}
+                        rating={4}
+                    />
+                    <Text
+                        className="text-cgrey-dim mt-1"
+                        style={{ fontSize: 13 }}
+                    >
+                        {commentCount} {REEL_DETAILS_RATING}
+                    </Text>
+                </TouchableOpacity>
                 <View className="flex-row justify-center items-center space-x-7 mt-5">
                     <IconLabelButton
-                        iconProps={{ name: "heart" }}
-                        text="140.0K"
+                        iconProps={{
+                            name: liked ? "heart" : "heart-outline",
+                            color: liked ? customColors.heart : disabledColor,
+                        }}
+                        text={numeral(post.likeCount).format("0 a")}
+                        buttonProps={{ onPress: likePressed }}
                     />
                     <IconLabelButton
                         iconProps={{
-                            name: "bookmark-outline",
-                            color: customColors.cgrey.dim,
+                            name: saved ? "bookmark" : "bookmark-outline",
+                            color: saved ? customColors.save : disabledColor,
                             size: 28,
                         }}
-                        text="SAVE"
+                        text={REEL_DETAILS_SAVE}
+                        buttonProps={{ onPress: savePressed }}
                     />
                 </View>
             </View>
             <Divider bold={true} />
             <View className="py-5 px-5">
                 <View className="flex-row space-x-5 ">
-                    <View className="bg-xanthous w-[70] h-[70] rounded items-center justify-center overflow-hiddenr">
+                    <View className="bg-xanthous w-[70] h-[70] rounded items-center justify-center overflow-hidden">
                         {post.creator.avatar == null ||
                         post.creator.avatar === "" ? (
                             <IconFeather name="user" size={50} />
@@ -118,7 +141,9 @@ const Details: FC<DetailsProps> = ({ post }: DetailsProps) => {
                         <Text className="font-semibold text-lg uppercase">
                             {REEL_DETAILS_INGREDIENTS_TITLE}
                         </Text>
-                        <Text className="mt-3 pl-4 text-lg">{portionInfo}</Text>
+                        <Text className="mt-3 pl-4 text-lg">{`${post.portionQuantity.toString()} ${getPortionLabel(
+                            post.portionType
+                        )}`}</Text>
                         <View className="mt-5 pl-4">
                             {post.ingredients.map((ingredient, index) => (
                                 <View key={index} className="flex-row w-full">

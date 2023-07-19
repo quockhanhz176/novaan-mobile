@@ -4,12 +4,12 @@ import IconEvill from "react-native-vector-icons/EvilIcons";
 import IconAnt from "react-native-vector-icons/AntDesign";
 import TouchableView from "@/common/components/TouchableView";
 import { type NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { type RootStackParamList } from "App";
 import {
     CREATE_POST_UPLOAD_TITLE,
     CREATE_POST_UPLOAD_RECIPE_TITLE,
     CREATE_POST_UPLOAD_TIP_TITLE,
 } from "@/common/strings";
+import { type RootStackParamList } from "@/types/navigation";
 
 interface CreatePostPopupProps {
     visible?: boolean;

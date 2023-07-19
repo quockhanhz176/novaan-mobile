@@ -1,6 +1,9 @@
-import { useState, type FC, useEffect } from "react";
+import { useState, type FC, useEffect, type ReactNode, memo } from "react";
 import React, { View, type StyleProp, Image } from "react-native";
-import FastImage, { type ImageStyle } from "react-native-fast-image";
+import FastImage, {
+    type ResizeMode,
+    type ImageStyle,
+} from "react-native-fast-image";
 
 import { windowWidth } from "../utils";
 import { useFetchResourceUrl } from "@/api/utils/resourceHooks";
@@ -8,12 +11,18 @@ interface ResourceImageProps {
     resourceId: string;
     style?: StyleProp<ImageStyle>;
     className?: string;
+    defaultView?: ReactNode;
+    width?: number;
+    resizeMode?: ResizeMode;
 }
 
 const ResourceImage: FC<ResourceImageProps> = ({
     resourceId,
     style,
     className,
+    defaultView,
+    width,
+    resizeMode = "contain",
 }) => {
     const [dimensions, setDimensions] = useState<{
         width: number;
@@ -41,27 +50,32 @@ const ResourceImage: FC<ResourceImageProps> = ({
         });
     }, [resourceUrl]);
 
-    if (resourceUrl === "") {
-        return <View></View>;
-    }
-
     return (
-        <FastImage
-            source={{ uri: resourceUrl }}
+        <View
             style={[
                 dimensions != null
                     ? {
-                          width: windowWidth,
+                          width: width ?? windowWidth,
                           height:
-                              (windowWidth / dimensions.width) *
+                              ((width ?? windowWidth) / dimensions.width) *
                               dimensions.height,
                       }
                     : {},
                 style,
             ]}
             className={className}
-        />
+        >
+            {resourceUrl != null && resourceUrl !== "" ? (
+                <FastImage
+                    source={{ uri: resourceUrl }}
+                    className="flex-1"
+                    resizeMode={resizeMode}
+                />
+            ) : (
+                defaultView
+            )}
+        </View>
     );
 };
 
-export default ResourceImage;
+export default memo(ResourceImage);
