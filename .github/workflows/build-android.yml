@@ -20,6 +20,18 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+
+    - name: Install Node dependencies
+      run: npm ci
+
+    - name: App Prebuild
+      run: npx expo prebuild
+
     - name: Use Java JDK 11
       uses: actions/setup-java@v3
       with:
@@ -30,27 +42,18 @@ jobs:
     - name: Use Android Manager (for SDK and Build Tools)
       uses: android-actions/setup-android@v2
 
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-
     - name: 🏗 Setup EAS
       uses: expo/expo-github-action@v8
       with:
-        eas-version: latest
+        eas-version: 3.15.1
         token: ${{ secrets.EXPO_TOKEN }}
         expo-cache: true
-
-    - name: Install Node dependencies
-      run: npm ci
 
     - name: Install Android SDK and platform tools
       run: sdkmanager "platform-tools" "platforms;android-${{ matrix.android-version }}"
 
     - name: Create APK with EAS
-      run: API_URL={{secrets.NOVAAN_API_URL}} API_TIMEOUT=5000 KEYCHAIN_ID={{secrets.NOVAAN_KEYCHAIN_ID}} GOOGLE_API_KEY={{secrets.NOVAAN_GG_API_KEY}} npm run build:android:prod eas build -p android --profile production --local --output builds/novaan-mobile.apk --non-interactive
+      run: API_URL={{secrets.NOVAAN_API_URL}} API_TIMEOUT=5000 KEYCHAIN_ID={{secrets.NOVAAN_KEYCHAIN_ID}} GOOGLE_API_KEY={{secrets.NOVAAN_GG_API_KEY}} eas build -p android --profile production --local --output builds/novaan-mobile.apk --non-interactive
 
     - name: Upload APK to Firebase App Distribution
       uses: wzieba/Firebase-Distribution-Github-Action@v1
@@ -58,4 +61,4 @@ jobs:
         appId: ${{secrets.FIREBASE_APP_ID}}
         serviceCredentialsFileContent: ${{ secrets.CREDENTIAL_FILE_CONTENT }}
         groups: testers
-        file: builds/preview.apk
+        file: builds/novaan-mobile.apk
