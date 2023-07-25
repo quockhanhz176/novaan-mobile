@@ -1,72 +1,32 @@
 import React, { View, Text } from "react-native";
 import type PostComment from "../../types/PostComment";
-import { memo, type FC, type ReactElement } from "react";
+import { memo, type ReactElement } from "react";
 import ResourceImage from "@/common/components/ResourceImage";
 import IconFeather from "react-native-vector-icons/Feather";
 import StarRating from "react-native-star-rating";
 import { customColors } from "@root/tailwind.config";
 import "moment/locale/vi";
-import {
-    Menu,
-    MenuOption,
-    MenuOptions,
-    MenuTrigger,
-} from "react-native-popup-menu";
 import IconMaterial from "react-native-vector-icons/MaterialIcons";
-import IconLabelButton from "@/common/components/IconLabelButton";
 import {
     REEL_COMMENTS_DELETE_BUTTON,
     REEL_COMMENTS_EDIT_BUTTON,
 } from "@/common/strings";
-import PostApi from "@/api/post/PostApi";
-import { type PostType } from "@/api/post/types/PostResponse";
-
-const getMenuItem = (
-    iconName: string,
-    text: string,
-    onSelect?: () => void
-): ReactElement => {
-    return (
-        <MenuOption onSelect={onSelect}>
-            <IconLabelButton
-                iconPack="Material"
-                iconProps={{
-                    name: iconName,
-                    color: customColors.cgrey.dim,
-                    size: 20,
-                }}
-                text={text}
-                buttonProps={{ disabled: true }}
-                buttonClassName="bg-transparent space-x-2 px-2 py-1"
-            />
-        </MenuOption>
-    );
-};
+import CommentMenuItem from "./CommentMenuItem";
+import { Menu, MenuOptions, MenuTrigger } from "react-native-popup-menu";
 
 interface CommentItemProps {
     comment: PostComment;
-    isThisUsersComment: boolean;
-    postId: string;
-    postType: PostType;
+    isUserComment?: boolean;
     openEditComment?: () => void;
-    onDeleteSuccess?: () => void;
+    onDeleteComment?: () => void;
 }
 
-const CommentItem: FC<CommentItemProps> = ({
+const CommentItem = ({
     comment,
-    isThisUsersComment,
-    postId,
-    postType,
+    isUserComment = false,
     openEditComment,
-    onDeleteSuccess,
-}) => {
-    const deleteComment = async (): Promise<void> => {
-        const result = await PostApi.deleteComment(postId, postType);
-        if (result.success) {
-            onDeleteSuccess?.();
-        }
-    };
-
+    onDeleteComment,
+}: CommentItemProps): ReactElement<CommentItemProps> => {
     return (
         <View className="px-4 py-3 flex-row space-x-4">
             <ResourceImage
@@ -101,31 +61,35 @@ const CommentItem: FC<CommentItemProps> = ({
                     />
                 )}
             </View>
-            {isThisUsersComment && (
-                <View>
+            {isUserComment && (
+                <View
+                    onTouchEnd={(e) => {
+                        e.stopPropagation();
+                    }}
+                >
                     <Menu>
                         <MenuTrigger>
                             <IconMaterial
                                 name="more-vert"
                                 color={customColors.cgrey.battleship}
-                                size={20}
+                                size={16}
                             />
                         </MenuTrigger>
                         <MenuOptions
                             customStyles={{
-                                optionsContainer: { width: 140 },
+                                optionsContainer: { width: 130 },
                             }}
                         >
-                            {getMenuItem(
-                                "edit",
-                                REEL_COMMENTS_EDIT_BUTTON,
-                                openEditComment
-                            )}
-                            {getMenuItem(
-                                "delete",
-                                REEL_COMMENTS_DELETE_BUTTON,
-                                deleteComment
-                            )}
+                            <CommentMenuItem
+                                icon="edit"
+                                text={REEL_COMMENTS_EDIT_BUTTON}
+                                onSelect={openEditComment}
+                            />
+                            <CommentMenuItem
+                                icon="delete"
+                                text={REEL_COMMENTS_DELETE_BUTTON}
+                                onSelect={onDeleteComment}
+                            />
                         </MenuOptions>
                     </Menu>
                 </View>

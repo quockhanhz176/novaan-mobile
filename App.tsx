@@ -15,7 +15,6 @@ import Toast from "react-native-toast-message";
 import { type RootStackParamList } from "@/types/navigation";
 import { enableScreens } from "react-native-screens";
 import { OrientationLock, lockAsync } from "expo-screen-orientation";
-import { MenuProvider } from "react-native-popup-menu";
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 
@@ -33,7 +32,7 @@ const App = () => {
     }, []);
 
     return (
-        <MenuProvider>
+        <>
             <PaperProvider
                 settings={{
                     rippleEffectEnabled: false,
@@ -88,7 +87,7 @@ const App = () => {
                 </Portal>
             </PaperProvider>
             <Toast config={toastConfig} />
-        </MenuProvider>
+        </>
     );
 };
 

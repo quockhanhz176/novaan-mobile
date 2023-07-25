@@ -2,12 +2,11 @@ import React, {
     useRef,
     type FC,
     useEffect,
-    Fragment,
     type ReactNode,
     useState,
     memo,
 } from "react";
-import { Animated } from "react-native";
+import { Animated, Modal, View } from "react-native";
 import TouchableView from "@/common/components/TouchableView";
 import { windowHeight } from "../utils";
 
@@ -46,8 +45,8 @@ const CustomModal: FC<CusomModalProps> = ({ visible, onDismiss, children }) => {
     }, [visible]);
 
     return (
-        <>
-            <>
+        <Modal visible={internalVisible} transparent>
+            <View className="w-full h-full">
                 {internalVisible && (
                     <TouchableView
                         onPress={dismissModal}
@@ -70,8 +69,8 @@ const CustomModal: FC<CusomModalProps> = ({ visible, onDismiss, children }) => {
                 >
                     {children}
                 </Animated.View>
-            </>
-        </>
+            </View>
+        </Modal>
     );
 };
 

@@ -59,7 +59,7 @@ const ViewIngredients = (): ReactElement => {
                 className="bg-white"
                 ListHeaderComponent={
                     <View>
-                        <Text className="text-base p-5 bg-ctertiary ">
+                        <Text className="text-base p-5 bg-ctertiary">
                             {CREATE_RECIPE_INGREDIENTS_SUBTITLE}
                         </Text>
                         <Text className={labelClassName + " mt-6 mx-3"}>

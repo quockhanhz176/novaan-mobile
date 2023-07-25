@@ -12,4 +12,14 @@ interface CommentInformation {
     previousImageId?: string;
 }
 
+export interface CommentFormInfo {
+    rating: number;
+    comment?: string;
+    image?: {
+        uri: string;
+        extension: string;
+    };
+    previousImageId?: string;
+}
+
 export default CommentInformation;

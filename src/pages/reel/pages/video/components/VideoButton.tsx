@@ -35,7 +35,7 @@ const VideoButton: FC<VideoButtonProps> = ({
         textClassName="text-white text-xs"
         buttonClassName="flex-col space-x-0 space-y-1"
         buttonProps={{
-            onPress
+            onPress,
         }}
     />
 );

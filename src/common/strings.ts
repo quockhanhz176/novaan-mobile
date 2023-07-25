@@ -210,7 +210,7 @@ export const PROFILE_PAGE_LABEL = "Trang cá nhân";
 
 // Reel screen
 export const REEL_DETAILS_RATING = "đánh giá";
-export const REEL_DETAILS_DIFFICULTY_TITLE = "Độ khó: ";
+export const REEL_DETAILS_DIFFICULTY_TITLE = "Độ khó";
 export const REEL_DETAILS_INGREDIENTS_TITLE = "Nguyên liệu";
 export const REEL_DETAILS_INSTRUCTIONS_TITLE = "Hướng dẫn chi tiết";
 export const REEL_DETAILS_INSTRUCTION_TITLE = "Bước";
@@ -236,6 +236,9 @@ export const REEL_COMMENTS_BUTTON_TITLE = "Thêm đánh giá...";
 export const REEL_COMMENTS_BUTTON_EDIT_TITLE = "Chỉnh sửa đánh giá...";
 export const REEL_COMMENTS_EDIT_BUTTON = "Chỉnh sửa";
 export const REEL_COMMENTS_DELETE_BUTTON = "Xóa";
+export const REEL_REPORT_FORM_TITLE = "Lý do báo cáo nội dung";
+export const REEL_REPORT_FORM_SORRY =
+    "Chúng tôi rất tiếc khi đã có nội dung làm bạn không thoải mái. Xin vui lòng cho biết lý do để chúng tôi có thể đánh giá lại nội dung này.";
 
 // Add comment
 export const ADD_COMMENT_TITLE = "Đánh giá";

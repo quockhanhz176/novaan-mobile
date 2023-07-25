@@ -33,6 +33,8 @@ const getDefaultConfig = (): RequestConfig => {
     return {
         timeout: Number(API_TIMEOUT),
         authorizationRequired: false,
+        contentType: "application/json",
+        needJsonBody: true,
     };
 };
 
@@ -43,18 +45,23 @@ export const useFetch = (config?: RequestConfig): UseFetchReturn => {
     // Substitute missing config
     config = { ...getDefaultConfig(), ...config };
 
-    const getHeaders = async (
-        accessTokenRequired: boolean = false
-    ): Promise<Headers> => {
+    const getHeaders = async (): Promise<Headers> => {
         const headers = new Headers();
-        headers.append("Content-Type", "application/json");
+        if (config?.contentType == null) {
+            headers.append("Content-Type", "application/json");
+        } else {
+            headers.append("Content-Type", config.contentType);
+        }
         headers.append("Accept", "application/json");
         headers.append(
             "Access-Control-Allow-Headers",
             "Origin, X-Requested-With, Content-Type, Accept, Authorization"
         );
 
-        if (accessTokenRequired) {
+        if (
+            config?.authorizationRequired != null &&
+            config.authorizationRequired
+        ) {
             // Get access token from secure storage
             const accessToken = await getKeychainValue(KEYCHAIN_ID);
             if (accessToken == null) {
@@ -76,6 +83,15 @@ export const useFetch = (config?: RequestConfig): UseFetchReturn => {
         return false;
     };
 
+    /**
+     *
+     * @param url
+     * @param method
+     * @param body
+     * @description This return the response body when it's parsable, or true. Will return false when it's a failed request
+     *
+     * @returns Promise<any> [object | true | false]
+     */
     const sendBaseRequest = async (
         url: string,
         method: HttpMethod,
@@ -84,13 +100,14 @@ export const useFetch = (config?: RequestConfig): UseFetchReturn => {
         if (
             config == null ||
             config.authorizationRequired == null ||
-            config.timeout == null
+            config.timeout == null ||
+            config.needJsonBody == null
         ) {
             return;
         }
 
         try {
-            const headers = await getHeaders(config.authorizationRequired);
+            const headers = await getHeaders();
 
             // Use signal to avoid running the request for too long
             // Docs for canceling fetch API request
@@ -107,12 +124,18 @@ export const useFetch = (config?: RequestConfig): UseFetchReturn => {
                 controller.abort();
             }, timeout);
 
-            const response = await fetch(`${API_URL}${url}`, {
+            const options = {
                 method,
                 headers,
-                body: JSON.stringify(body),
+                body: config.needJsonBody ? JSON.stringify(body) : body,
                 signal: controller.signal,
-            });
+            };
+
+            if (options.headers.get("Content-Type") === "multipart/form-data") {
+                delete headers["Content-Type"];
+            }
+
+            const response = await fetch(`${API_URL}${url}`, options);
 
             if (response.status === 401) {
                 throw new UnauthorizedError();
@@ -123,14 +146,13 @@ export const useFetch = (config?: RequestConfig): UseFetchReturn => {
             // Avoid empty response body from server
             try {
                 const body = await response.json();
-                console.log(body);
                 return body;
             } catch {
                 return true;
             }
         } catch (err) {
             if (handleServerError(err)) {
-                return;
+                return false;
             }
 
             throw err;

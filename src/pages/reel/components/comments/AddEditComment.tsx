@@ -20,35 +20,31 @@ import {
     ADD_COMMENT_STAR_TITLE,
     ADD_COMMENT_SUBMIT,
     ADD_COMMENT_TITLE,
-    ADD_COMMENT_UPLOAD_ERROR,
 } from "@/common/strings";
 import StarRating from "react-native-star-rating";
 import IconLabelButton from "@/common/components/IconLabelButton";
-import reelServices from "../../services/reelServices";
-import type Post from "../../types/Post";
-import { Toast } from "react-native-toast-message/lib/src/Toast";
 import type PostComment from "../../types/PostComment";
 import ResourceImage from "@/common/components/ResourceImage";
+import { getUrlExtension } from "@/common/utils";
+import { type CommentFormInfo } from "@/api/post/types/CommentInformation";
 
 interface AddEditCommentProps {
-    post: Post;
-    thisUserComment?: PostComment;
-    hideAddComment: () => void;
-    onSuccess?: () => void;
+    comment?: PostComment;
+    onClose: () => void;
+    onSubmit: (commentInfo: CommentFormInfo) => void;
 }
 
 const AddEditComment: FC<AddEditCommentProps> = ({
-    post,
-    thisUserComment,
-    hideAddComment,
-    onSuccess,
+    comment,
+    onClose,
+    onSubmit,
 }) => {
-    const [rating, setRating] = useState(thisUserComment?.rating ?? 0);
-    const [detail, setDetail] = useState(thisUserComment?.comment ?? "");
+    const [rating, setRating] = useState(comment?.rating ?? 0);
+    const [detail, setDetail] = useState(comment?.comment ?? "");
     const [imageUri, setImageUri] = useState<string | undefined>(undefined);
     const imageAsset = useRef<Asset | undefined>(undefined);
     const [previousImageId, setPreviousImageId] = useState<string | undefined>(
-        thisUserComment?.image
+        comment?.image
     );
 
     const resetState = (): void => {
@@ -60,7 +56,7 @@ const AddEditComment: FC<AddEditCommentProps> = ({
 
     const onClosePressed = (): void => {
         resetState();
-        hideAddComment();
+        onClose();
     };
 
     const submit = async (): Promise<void> => {
@@ -72,26 +68,19 @@ const AddEditComment: FC<AddEditCommentProps> = ({
             error(ADD_COMMENT_NO_RATING_ERROR);
         }
 
-        hideAddComment();
+        onClose();
 
-        const result = await reelServices.sendComment(
-            post.id,
+        const image =
+            imageUri == null
+                ? undefined
+                : { uri: imageUri, extension: getUrlExtension(imageUri) };
+        const commentInfo: CommentFormInfo = {
             rating,
-            post.type,
-            detail !== "" ? detail : undefined,
-            imageUri,
+            comment: detail,
+            image,
             previousImageId,
-            thisUserComment != null
-        );
-
-        if (result) {
-            onSuccess?.();
-        } else {
-            Toast.show({
-                type: "error",
-                text1: ADD_COMMENT_UPLOAD_ERROR,
-            });
-        }
+        };
+        onSubmit(commentInfo);
     };
 
     const selectImage = async (): Promise<void> => {
@@ -132,7 +121,7 @@ const AddEditComment: FC<AddEditCommentProps> = ({
                         <IconEvill name="close" size={25} color="#000" />
                     </TouchableOpacity>
                     <Text className="text-xl font-medium">
-                        {thisUserComment == null
+                        {comment == null
                             ? ADD_COMMENT_TITLE
                             : ADD_COMMENT_EDIT_TITLE}
                     </Text>
@@ -181,7 +170,8 @@ const AddEditComment: FC<AddEditCommentProps> = ({
                         maxLength={500}
                         className="text-base py-2"
                     />
-                    {(imageUri == null ||  imageUri === "") && (previousImageId == null || previousImageId === "") ? (
+                    {(imageUri == null || imageUri === "") &&
+                    (previousImageId == null || previousImageId === "") ? (
                         <IconLabelButton
                             iconPack="Ionicons"
                             iconProps={{
@@ -200,7 +190,8 @@ const AddEditComment: FC<AddEditCommentProps> = ({
                             className="h-[380] mt-2 rounded-md overflow-hidden bg-ctertiary align-middle items-center"
                         >
                             <View className="w-full h-full">
-                                {previousImageId != null  && previousImageId !== ""? (
+                                {previousImageId != null &&
+                                previousImageId !== "" ? (
                                     <ResourceImage
                                         className="h-full w-full"
                                         resourceId={previousImageId}

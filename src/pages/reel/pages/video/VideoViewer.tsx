@@ -2,9 +2,9 @@ import React, {
     useRef,
     type FC,
     useState,
-    useCallback,
     useEffect,
     memo,
+    useContext,
 } from "react";
 import {
     Text,
@@ -13,40 +13,44 @@ import {
     TouchableOpacity,
 } from "react-native";
 import Video from "react-native-video";
-import PlayPause from "./PlayPause";
-import Seeker from "./Seeker";
+import PlayPause from "./components/PlayPause";
+import Seeker from "./components/Seeker";
 import { useFetchResourceUrl } from "@/api/utils/resourceHooks";
-import ButtonColumn from "./ButtonColumn";
+import ButtonColumn from "./components/interact-btn/ButtonColumn";
 import ResourceImage from "@/common/components/ResourceImage";
 import IconFeather from "react-native-vector-icons/Feather";
 import LinearGradient from "react-native-linear-gradient";
-import type Post from "../../types/Post";
-import type ScrollItemController from "../../types/ScrollItemController";
 import { SCROLL_ITEM_HEIGHT } from "../../commons/constants";
+import { ScrollItemContext } from "../../components/scroll-items/ScrollItemv2";
 
-interface VideoViewrProps {
-    post: Post;
-    commentCount: number;
+interface VideoViewerProps {
     isPaused?: boolean;
-    scrollItemController: ScrollItemController;
+    onShowDetails: () => void;
+    onShowProfile: () => void;
 }
 
-const VideoViewer: FC<VideoViewrProps> = ({
-    post,
-    commentCount,
-    isPaused: pausedFromHigherUp = true,
-    scrollItemController,
-}: VideoViewrProps) => {
+const VideoViewer: FC<VideoViewerProps> = ({
+    isPaused = true,
+    onShowDetails,
+    onShowProfile,
+}: VideoViewerProps) => {
+    const { currentPost: post } = useContext(ScrollItemContext);
+
     const videoRef = useRef<Video>(null);
-    const [paused, setPaused] = useState(pausedFromHigherUp);
+    const [paused, setPaused] = useState(false);
+
     const [currentTimeStamp, setCurrentTimeStamp] = useState(0);
+    const [videoDuration, setVideoDuration] = useState(1);
+
     const [playToggle, setPlayToggle] = useState<boolean>();
     const [pauseToggle, setPauseToggle] = useState<boolean>();
-    const videoDuration = useRef(1);
 
     const { resourceUrl, fetchUrl } = useFetchResourceUrl();
 
     useEffect(() => {
+        if (post == null) {
+            return;
+        }
         void fetchUrl(post.video)
             .then((success) => {
                 if (!success) {
@@ -54,11 +58,15 @@ const VideoViewer: FC<VideoViewrProps> = ({
                 }
             })
             .catch(console.log);
-    }, []);
+    }, [post]);
 
     useEffect(() => {
-        setPaused(pausedFromHigherUp);
-    }, [pausedFromHigherUp]);
+        // Avoid unecessary render
+        if (isPaused === paused) {
+            return;
+        }
+        setPaused(isPaused);
+    }, [isPaused]);
 
     const onVideoPress = (e: GestureResponderEvent): void => {
         const pauseState = !paused;
@@ -70,20 +78,24 @@ const VideoViewer: FC<VideoViewrProps> = ({
         }
     };
 
-    const onSeek = useCallback(
-        (progress: number): void => {
-            videoRef.current?.seek(progress * videoDuration.current);
-        },
-        [videoDuration.current]
-    );
+    const onSeek = (progress: number): void => {
+        videoRef.current?.seek(progress * videoDuration);
+    };
 
     const onVideoError = async (error): Promise<void> => {
+        if (post == null) {
+            return;
+        }
+
         console.log("VideoViewer - video error:" + JSON.stringify(error));
         if (error.error?.what === 1 && error.error?.extra === -1005) {
             void fetchUrl(post.video);
         }
-        // Show error
     };
+
+    if (post == null) {
+        return <View></View>;
+    }
 
     return (
         <View
@@ -98,46 +110,42 @@ const VideoViewer: FC<VideoViewrProps> = ({
                     source={{
                         uri: resourceUrl,
                     }}
-                    style={{
-                        position: "absolute",
-                        top: 0,
-                        left: 0,
-                        bottom: 0,
-                        right: 0,
-                    }}
+                    className="absolute top-0 left-0 bottom-0 right-0 w-full h-full"
                     resizeMode="contain"
                     repeat
                     onLoad={({ duration }) => {
-                        videoRef.current?.seek(1);
-                        videoDuration.current = duration;
+                        videoRef.current?.seek(0);
+                        setVideoDuration(duration);
                     }}
                     onProgress={({ currentTime }) => {
+                        // Update timestamp each 2 seconds to avoid re-rendering
+                        if (currentTime - currentTimeStamp <= 2) {
+                            return;
+                        }
                         setCurrentTimeStamp(currentTime);
                     }}
                     onError={onVideoError}
+                    minLoadRetryCount={3}
                 />
             )}
             <PlayPause showToggle={pauseToggle} icon="pause" />
             <PlayPause showToggle={playToggle} icon="play" />
-            <View className="absolute bottom-0 left-0 right-0 flex-col-reverse">
+            <View className="absolute bottom-0 left-0 right-0 flex-col-reverse w-full h-full">
                 <LinearGradient
                     colors={["#ffffff00", "#00000066"]}
                     className="absolute bottom-0 top-0 left-0 right-0 h-[140]"
                 />
                 <Seeker
-                    progress={currentTimeStamp / videoDuration.current}
+                    progress={currentTimeStamp / videoDuration}
                     onSeek={onSeek}
                 />
                 <View className="flex-row-reverse items-end">
-                    <ButtonColumn
-                        post={post}
-                        commentCount={commentCount}
-                        scrollItemController={scrollItemController}
-                    />
-                    <View className="flex-1 pl-6 pr-6 space-y-2">
+                    <ButtonColumn onShowDetails={onShowDetails} />
+                    <View className="flex-1 pl-6 pr-6">
                         <TouchableOpacity
                             className="flex-row items-center space-x-3"
-                            onPress={scrollItemController.showProfile}
+                            // TODO: Add on press to change to profile here
+                            onPress={onShowProfile}
                             onPressOut={(e) => {
                                 e.stopPropagation();
                             }}
@@ -157,7 +165,10 @@ const VideoViewer: FC<VideoViewrProps> = ({
                                 {post.creator.username}
                             </Text>
                         </TouchableOpacity>
-                        <Text className="text-white" style={{ fontSize: 15 }}>
+                        <Text
+                            className="text-white pt-2"
+                            style={{ fontSize: 15 }}
+                        >
                             {post.title}
                         </Text>
                     </View>

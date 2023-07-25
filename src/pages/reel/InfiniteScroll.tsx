@@ -7,7 +7,7 @@ import React, {
     useEffect,
     memo,
 } from "react";
-import ScrollItem, { type Page } from "./ScrollItem";
+import ScrollItem, { type Page } from "./components/ScrollItem";
 import {
     FlatList,
     type LayoutChangeEvent,
@@ -15,9 +15,9 @@ import {
     type NativeSyntheticEvent,
     SafeAreaView,
 } from "react-native";
-import { SCROLL_ITEM_HEIGHT } from "../commons/constants";
-import type Post from "../types/Post";
-import reelServices from "../services/reelServices";
+import { SCROLL_ITEM_HEIGHT } from "./commons/constants";
+import type Post from "./types/Post";
+import reelServices from "./services/reelServices";
 
 interface InfiniteScrollProps {
     postGetter?: (index: number) => Promise<Post | null>;

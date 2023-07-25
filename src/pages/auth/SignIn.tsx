@@ -118,10 +118,6 @@ const SignIn = (props: SignInProps): ReactElement<SignInProps> => {
                 alert(SIGN_IN_GOOGLE_ERROR_OCCURED);
                 return;
             }
-
-            // Save token to secure store
-            console.log(response.token);
-
             await saveKeychain(KEYCHAIN_ID, response.token);
             navigation.navigate("MainScreens");
         } catch (error) {

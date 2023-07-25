@@ -25,9 +25,8 @@ import {
 } from "@/common/strings";
 import { type PostType } from "@/api/post/types/PostResponse";
 import IconMaterial from "react-native-vector-icons/MaterialIcons";
-import InfiniteScroll from "@/pages/reel/components/InfiniteScroll";
-import type Post from "@/pages/reel/types/Post";
-import reelServices from "@/pages/reel/services/reelServices";
+import InfiniteScroll from "@/pages/reel/InfiniteScrollv2";
+import { type Undefinable } from "@/types/app";
 
 const routes: Route[] = [
     {
@@ -49,7 +48,9 @@ const RecipeSearch: FC = () => {
     const [recipesLoading, setRecipesLoading] = useState(false);
     const [tipsLoading, setTipsLoading] = useState(false);
     const [reelVisible, hideReel, showReel] = useModalHook();
-    const [reelInitialIndex, setReelInitialIndex] = useState(0);
+    // const [reelInitialIndex, setReelInitialIndex] = useState(0);
+    const [selectedItem, setSelectedItem] =
+        useState<Undefinable<PostResponse>>(undefined);
 
     useEffect(() => {
         void searchServices.getPreferences().then((suite) => {
@@ -108,21 +109,22 @@ const RecipeSearch: FC = () => {
         void search("tip");
     };
 
-    const reelPostGetter = useCallback(
-        async (index: number): Promise<Post | null> => {
-            const list =
-                getCurrentPostType() === "recipe" ? recipeResults : tipResults;
-            if (index !== reelInitialIndex || index > list.length - 1) {
-                return null;
-            }
-            return await reelServices.toPost(list[index]);
-        },
-        [recipeResults, tipResults, reelInitialIndex]
-    );
+    // const reelPostGetter = useCallback(
+    //     async (index: number): Promise<Post | null> => {
+    //         const list =
+    //             getCurrentPostType() === "recipe" ? recipeResults : tipResults;
+    //         if (index !== reelInitialIndex || index > list.length - 1) {
+    //             return null;
+    //         }
+    //         return await reelServices.toPost(list[index]);
+    //     },
+    //     [recipeResults, tipResults, reelInitialIndex]
+    // );
 
     const itemPressed = useCallback(
         (_item: PostResponse, index: number): void => {
-            setReelInitialIndex(index);
+            // setReelInitialIndex(index);
+            setSelectedItem(_item);
             showReel();
         },
         []
@@ -273,7 +275,19 @@ const RecipeSearch: FC = () => {
                         </Text>
                     </View>
                 </View>
-                <InfiniteScroll postGetter={reelPostGetter} />
+                {selectedItem != null && (
+                    <InfiniteScroll
+                        postIds={[
+                            {
+                                postId: selectedItem.id,
+                                postType:
+                                    selectedItem.type === "recipe"
+                                        ? "Recipe"
+                                        : "CulinaryTip",
+                            },
+                        ]}
+                    />
+                )}
             </Modal>
         </>
     );

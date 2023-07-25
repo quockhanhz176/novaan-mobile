@@ -12,21 +12,21 @@ import {
     type NativeSyntheticEvent,
 } from "react-native";
 import Swiper, { type SwiperInternals } from "react-native-swiper";
-import Details from "./details/Details";
-import VideoViewer from "./video/VideoViewer";
+import Details from "../pages/details/Details";
+import VideoViewer from "../pages/video/VideoViewer";
 import { SCROLL_ITEM_HEIGHT } from "../commons/constants";
 import { windowWidth } from "@/common/utils";
-import { type InternalPost } from "./InfiniteScroll";
+import { type InternalPost } from "../InfiniteScroll";
 import UserProfile from "@/pages/user-profile/UserProfile";
-import ReportForm from "./common/ReportForm";
 import CustomModal from "@/common/components/CustomModal";
-import Comments from "./common/Comments";
 import type ScrollItemController from "../types/ScrollItemController";
 import useModalHook from "../../../common/components/ModalHook";
 import postApi from "@/api/post/PostApi";
 import type PostComment from "../types/PostComment";
 import reelServices from "../services/reelServices";
 import { getUserIdFromToken } from "@/api/profile/ProfileApi";
+import ReportForm from "./ReportForm";
+import Comments from "./comments/Comments";
 
 interface MainScrollItemProps {
     post: InternalPost;

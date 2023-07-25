@@ -84,6 +84,7 @@ const IconLabelButton: FC<IconLabelButtonProps> = ({
             {...buttonProps}
             style={style}
             className={`flex-row items-center space-x-1 ${buttonClassName}`}
+            activeOpacity={1}
         >
             <>
                 {renderIcon()}

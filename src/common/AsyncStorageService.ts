@@ -8,6 +8,10 @@ export interface StorageKey {
         lastItem: number;
         lastUpdate: Moment;
     };
+    reelsData: {
+        data: PostListResponse;
+        exp: number;
+    };
 }
 
 export const storeData = async <T extends keyof StorageKey>(
@@ -27,7 +31,9 @@ export const getData = async <T extends keyof StorageKey>(
 ): Promise<StorageKey[T] | null> => {
     try {
         const jsonValue = await AsyncStorage.getItem(key);
-        return jsonValue != null ? JSON.parse(jsonValue) : null;
+        return jsonValue != null && jsonValue !== ""
+            ? JSON.parse(jsonValue)
+            : null;
     } catch (e) {
         console.error(e);
         return null;

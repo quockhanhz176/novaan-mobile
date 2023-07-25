@@ -4,6 +4,7 @@ import React, {
     useState,
     createContext,
     useMemo,
+    memo,
 } from "react";
 import { Pressable, Text, View } from "react-native";
 import CreatedPosts from "./pages/created-post/CreatedPosts";
@@ -219,4 +220,4 @@ const UserProfile = (
     );
 };
 
-export default UserProfile;
+export default memo(UserProfile);

@@ -27,7 +27,8 @@ const customColors = {
     xanthous: "#f7b01c",
     star: "#ffcb01",
     heart: "#ff6531",
-    save: "#2ca58d",
+    save: "#688BE8", // Save blue
+    // save: "#2ca58d", // Save green?
     seeker: {
         background: "#898b8B",
         foreground: "#a40605",
