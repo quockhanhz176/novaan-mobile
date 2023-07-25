@@ -1,21 +1,13 @@
 import React, { type FC } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { View } from "react-native";
+import RecipeTipSearch from "./components/RecipeTipSearch";
 
 const Search: FC = () => {
     return (
-        <View style={styles.container}>
-            <Text>Search</Text>
+        <View className="flex-1">
+            <RecipeTipSearch />
         </View>
     );
 };
 
 export default Search;
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: "#fff",
-        alignItems: "center",
-        justifyContent: "center",
-    },
-});

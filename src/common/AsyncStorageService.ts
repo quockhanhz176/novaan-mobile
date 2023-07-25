@@ -1,11 +1,12 @@
 import type PostListResponse from "@/api/post/types/PostListResponse";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { type Moment } from "moment";
 
 export interface StorageKey {
     reelListData: {
         list: PostListResponse;
         lastItem: number;
-        lastUpdate: Date;
+        lastUpdate: Moment;
     };
 }
 

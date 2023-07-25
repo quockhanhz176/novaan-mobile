@@ -1,5 +1,5 @@
 import { customColors } from "@root/tailwind.config";
-import React, { Fragment, type FC, type ReactElement } from "react";
+import React, { Fragment, type FC, type ReactElement, memo } from "react";
 import {
     TouchableOpacity,
     Text,
@@ -14,9 +14,20 @@ import IconCommunity from "react-native-vector-icons/MaterialCommunityIcons";
 import IconMaterial from "react-native-vector-icons/MaterialIcons";
 import IconEvil from "react-native-vector-icons/EvilIcons";
 import IconEntypo from "react-native-vector-icons/Entypo";
+import IconAnt from "react-native-vector-icons/AntDesign";
+import IconFA5 from "react-native-vector-icons/FontAwesome5";
+import IconFeather from "react-native-vector-icons/Feather";
 
 export interface IconLabelButtonProps {
-    iconPack?: "Ionicons" | "Community" | "Material" | "Evil" | "Entypo";
+    iconPack?:
+        | "Ionicons"
+        | "Community"
+        | "Material"
+        | "Evil"
+        | "Entypo"
+        | "Ant"
+        | "FA5"
+        | "Feather";
     iconProps?: IconProps;
     text?: string;
     textClassName?: string;
@@ -32,7 +43,7 @@ const IconLabelButton: FC<IconLabelButtonProps> = ({
     text,
     textClassName = "",
     textProps,
-    buttonClassName = "bg-white",
+    buttonClassName = "",
     buttonProps,
     style,
 }: IconLabelButtonProps) => {
@@ -59,6 +70,12 @@ const IconLabelButton: FC<IconLabelButtonProps> = ({
                 return <IconEvil {...iProps} />;
             case "Entypo":
                 return <IconEntypo {...iProps} />;
+            case "Ant":
+                return <IconAnt {...iProps} />;
+            case "FA5":
+                return <IconFA5 {...iProps} />;
+            case "Feather":
+                return <IconFeather {...iProps} />;
         }
     };
 
@@ -83,4 +100,4 @@ const IconLabelButton: FC<IconLabelButtonProps> = ({
     );
 };
 
-export default IconLabelButton;
+export default memo(IconLabelButton);

@@ -236,7 +236,7 @@ const setPostSave = async (
 ): Promise<FailableResponse<undefined>> => {
     return await baseApi.sendReceiveBase<undefined>(
         `${POST_SAVE_URL}/${id}`,
-        "PostApi.savePost",
+        "PostApi.setPostSave",
         HttpMethod.POST,
         {
             submissionType: getRequestPostType(type),

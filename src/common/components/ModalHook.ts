@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-type ScrollModalHookReturn = [
+type ModalHookReturn = [
     boolean,
     () => void,
     () => void,
@@ -9,7 +9,7 @@ type ScrollModalHookReturn = [
 
 const useModalHook = (
     onModalShownChange?: (modalVisible: boolean) => void
-): ScrollModalHookReturn => {
+): ModalHookReturn => {
     const [modalVisible, setModalVisible] = useState(false);
 
     const setModalShown = (value: boolean): void => {

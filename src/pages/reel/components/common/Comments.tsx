@@ -19,7 +19,7 @@ import IconLabelButton from "@/common/components/IconLabelButton";
 import { customColors } from "@root/tailwind.config";
 import IconFeather from "react-native-vector-icons/Feather";
 import ResourceImage from "@/common/components/ResourceImage";
-import useModalHook from "./ScrollModalHook";
+import useModalHook from "../../../../common/components/ModalHook";
 import AddEditComment from "./AddEditComment";
 import type Post from "../../types/Post";
 

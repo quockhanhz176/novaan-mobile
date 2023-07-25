@@ -8,6 +8,7 @@ import PostApi from "@/api/post/PostApi";
 import moment from "moment";
 import { getRecipeTime } from "@/pages/create-post/create-recipe/types/RecipeTime";
 import type PostComment from "../types/PostComment";
+import type PostResponse from "@/api/post/types/PostResponse";
 import { type PostType } from "@/api/post/types/PostResponse";
 import { getUrlExtension } from "@/common/utils";
 
@@ -87,13 +88,44 @@ const getListData = async (): Promise<boolean> => {
         postListData = {
             list: response.value,
             lastItem: -1,
-            lastUpdate: new Date(),
+            lastUpdate: moment(),
         };
+        void storeData("reelListData", postListData);
         return true;
     }
 
     serverError();
     return false;
+};
+
+const toPost = async (postResponse: PostResponse): Promise<Post> => {
+    const profile = await PostApi.getProfile(postResponse.creatorId);
+
+    const creator = profile.success
+        ? profile.value
+        : {
+              username: "Điện máy XANH",
+              userId: "123332",
+          };
+
+    if (postResponse.type === "tip") {
+        return {
+            ...postResponse,
+            creator,
+        };
+    }
+
+    const prepDuration = moment.duration(postResponse.prepTime);
+    const cookDuration = moment.duration(postResponse.cookTime);
+    const prepTime = getRecipeTime(prepDuration);
+    const cookTime = getRecipeTime(cookDuration);
+
+    return {
+        ...postResponse,
+        creator,
+        prepTime,
+        cookTime,
+    };
 };
 
 // TODO: implement busninesses when recommendation is clearer
@@ -125,33 +157,7 @@ const getPost = async (index: number): Promise<Post | null> => {
                 JSON.stringify(postResponse)
         );
 
-        const profile = await PostApi.getProfile(postResponse.value.creatorId);
-
-        const creator = profile.success
-            ? profile.value
-            : {
-                  username: "Điện máy XANH",
-                  userId: "123332",
-              };
-
-        if (postResponse.value.type === "tip") {
-            return {
-                ...postResponse.value,
-                creator,
-            };
-        }
-
-        const prepDuration = moment.duration(postResponse.value.prepTime);
-        const cookDuration = moment.duration(postResponse.value.cookTime);
-        const prepTime = getRecipeTime(prepDuration);
-        const cookTime = getRecipeTime(cookDuration);
-
-        return {
-            ...postResponse.value,
-            creator,
-            prepTime,
-            cookTime,
-        };
+        return await toPost(postResponse.value);
     } catch (e) {
         console.error(e);
         serverError();
@@ -231,6 +237,7 @@ const reelServices = {
     getComments,
     getMockComments,
     sendComment,
+    toPost,
 };
 
 export default reelServices;

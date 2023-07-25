@@ -22,6 +22,7 @@ import IconFeather from "react-native-vector-icons/Feather";
 import LinearGradient from "react-native-linear-gradient";
 import type Post from "../../types/Post";
 import type ScrollItemController from "../../types/ScrollItemController";
+import { SCROLL_ITEM_HEIGHT } from "../../commons/constants";
 
 interface VideoViewrProps {
     post: Post;
@@ -87,6 +88,7 @@ const VideoViewer: FC<VideoViewrProps> = ({
     return (
         <View
             className="absolute top-0 left-0 bottom-0 right-0 bg-black"
+            style={{ height: SCROLL_ITEM_HEIGHT }}
             onTouchEnd={onVideoPress}
         >
             {resourceUrl !== "" && (

@@ -22,7 +22,7 @@ import ReportForm from "./common/ReportForm";
 import CustomModal from "@/common/components/CustomModal";
 import Comments from "./common/Comments";
 import type ScrollItemController from "../types/ScrollItemController";
-import useModalHook from "./common/ScrollModalHook";
+import useModalHook from "../../../common/components/ModalHook";
 import postApi from "@/api/post/PostApi";
 import type PostComment from "../types/PostComment";
 import reelServices from "../services/reelServices";
@@ -137,11 +137,13 @@ const ScrollItem: FC<MainScrollItemProps> = ({
     };
 
     const scrollToProfile = (): void => {
-        scrollTo(0);
+        if (showUserProfile) {
+            scrollTo(0);
+        }
     };
 
     const showDetails = (): void => {
-        scrollTo(2);
+        scrollTo(showUserProfile ? 2 : 1);
     };
 
     const onLikePress = (): void => {

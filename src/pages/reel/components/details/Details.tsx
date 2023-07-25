@@ -1,4 +1,4 @@
-import { type FC } from "react";
+import { memo, type FC } from "react";
 import React, { ScrollView, View, Text, TouchableOpacity } from "react-native";
 import { Divider } from "react-native-paper";
 import IconFeather from "react-native-vector-icons/Feather";
@@ -180,4 +180,4 @@ const Details: FC<DetailsProps> = ({
     );
 };
 
-export default Details;
+export default memo(Details);

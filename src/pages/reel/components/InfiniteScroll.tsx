@@ -5,6 +5,7 @@ import React, {
     useRef,
     type ReactElement,
     useEffect,
+    memo,
 } from "react";
 import ScrollItem, { type Page } from "./ScrollItem";
 import {
@@ -21,6 +22,8 @@ import reelServices from "../services/reelServices";
 interface InfiniteScrollProps {
     postGetter?: (index: number) => Promise<Post | null>;
     showUserProfile?: boolean;
+    // currently not working
+    initialIndex?: number;
 }
 
 export type InternalPost = Post & {
@@ -33,6 +36,7 @@ const END_REACH_THRESHOLD = 2;
 const InfiniteScroll: FC<InfiniteScrollProps> = ({
     postGetter,
     showUserProfile = true,
+    initialIndex = 0,
 }) => {
     const [loading, setLoading] = useState(false);
 
@@ -124,6 +128,7 @@ const InfiniteScroll: FC<InfiniteScrollProps> = ({
                 showsVerticalScrollIndicator={false}
                 keyExtractor={(item) => item.id}
                 data={internalPosts}
+                initialScrollIndex={initialIndex}
                 onMomentumScrollEnd={onMomentumScrollEnd}
                 scrollEnabled={scrollEnabled}
                 pagingEnabled={true}
@@ -144,4 +149,4 @@ const InfiniteScroll: FC<InfiniteScrollProps> = ({
     );
 };
 
-export default InfiniteScroll;
+export default memo(InfiniteScroll);

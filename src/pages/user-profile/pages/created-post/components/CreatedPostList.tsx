@@ -1,18 +1,20 @@
 // Why I need a different FlatList (from react-native-gesture-handler, not react-native)
 // https://stackoverflow.com/questions/60498103/nested-flatlist-with-the-same-scroll-direction-not-scrolling
 // https://github.com/facebook/react-native/issues/15375
-import React, { type ReactElement } from "react";
+import React, { memo, type ReactElement } from "react";
 import { FlatList } from "react-native-gesture-handler";
 import CreatedPostItem from "./CreatedPostItem";
 import type PostResponse from "@/api/post/types/PostResponse";
 import { uuidv4 } from "react-native-compressor";
+import { type StyleProp, type ViewStyle } from "react-native";
 
 interface CreatedPostListProps {
     data: PostResponse[];
     hidden: boolean;
-    handleItemPress: (item: PostResponse) => void;
+    handleItemPress: (item: PostResponse, index: number) => void;
     handleOnEndReached: () => void;
     loading: boolean;
+    contentContainerStyle?: StyleProp<ViewStyle>;
 }
 
 const CreatedPostList = ({
@@ -21,6 +23,7 @@ const CreatedPostList = ({
     loading,
     handleItemPress,
     handleOnEndReached,
+    contentContainerStyle,
 }: CreatedPostListProps): ReactElement<CreatedPostListProps> => {
     // Generate listKey to avoid nested FlatList error
     const uniqueListKey = uuidv4();
@@ -34,12 +37,12 @@ const CreatedPostList = ({
             className="w-full"
             numColumns={2}
             keyExtractor={(item) => item.id}
-            contentContainerStyle={{ marginTop: 8 }}
-            renderItem={({ item }) => (
+            contentContainerStyle={[{ marginTop: 8 }, contentContainerStyle]}
+            renderItem={({ item, index }) => (
                 <CreatedPostItem
                     item={item}
                     onItemPress={() => {
-                        handleItemPress(item);
+                        handleItemPress(item, index);
                     }}
                 />
             )}
@@ -51,4 +54,4 @@ const CreatedPostList = ({
     );
 };
 
-export default CreatedPostList;
+export default memo(CreatedPostList);

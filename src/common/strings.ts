@@ -7,6 +7,8 @@ export const DIFFICULTY_MEDIUM = "Trung bình";
 export const DIFFICULTY_HARD = "Khó";
 export const PORTION_PIECE = "miếng";
 export const PORTION_SERVING = "phần ăn";
+export const POST_TYPE_RECIPE = "Công thức"
+export const POST_TYPE_TIP = "Mẹo vặt"
 // Common messages
 export const COMMON_SERVER_CONNECTION_FAIL_ERROR =
     "Hiện đang không thể kết nối được với server, xin vui lòng thử lại sau";
@@ -249,3 +251,12 @@ export const ADD_COMMENT_SUBMIT = "Hoàn tất";
 export const ADD_COMMENT_NO_RATING_ERROR = "Trường đánh giá sao là bắt buộc";
 export const ADD_COMMENT_UPLOAD_ERROR =
     "Đã có lỗi xảy ra khi đăng tải đánh giá";
+
+// Filter
+export const FILTER_TITLE = "Lọc kết quả";
+export const FILTER_CATEGORY_DIET = "Chế độ ăn";
+export const FILTER_CATEGORY_CUISINE = "Đặc sản";
+export const FILTER_CATEGORY_ALLERGEN = "Dị ứng";
+
+// Search
+export const SEARCH_POST_DETAILS_TITLE = "Chi tiết kết quả tìm kiếm"
