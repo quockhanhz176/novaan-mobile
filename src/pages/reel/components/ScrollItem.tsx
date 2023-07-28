@@ -24,9 +24,9 @@ import useModalHook from "../../../common/components/ModalHook";
 import postApi from "@/api/post/PostApi";
 import type PostComment from "../types/PostComment";
 import reelServices from "../services/reelServices";
-import { getUserIdFromToken } from "@/api/profile/ProfileApi";
 import ReportForm from "./ReportForm";
 import Comments from "./comments/Comments";
+import { getUserIdFromToken } from "@/api/common/utils/TokenUtils";
 
 interface MainScrollItemProps {
     post: InternalPost;

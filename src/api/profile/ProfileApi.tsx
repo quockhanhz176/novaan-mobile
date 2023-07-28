@@ -1,36 +1,18 @@
 import { useState } from "react";
 import { useFetch } from "../baseApiHook";
-import { KEYCHAIN_ID } from "@env";
-import { decode as decodeBase64 } from "base-64";
 import {
     type UseProfileInfoReturn,
     type ProfileInfo,
     type MinimalUserInfo,
 } from "./types";
-import { getKeychainValue } from "@/common/keychainService";
 import {
     type TipResponse,
     type RecipeResponse,
 } from "../post/types/PostResponse";
 import { type PaginationHookReturn } from "../common/types/PaginationHook";
+import { getUserIdFromToken } from "../common/utils/TokenUtils";
 
 const PAGE_SIZE = 4;
-
-const parseJwt = (token: string): any => {
-    const base64Url = token.split(".")[1];
-    const jsonPayload = decodeBase64(base64Url);
-    return JSON.parse(jsonPayload);
-};
-
-export const getUserIdFromToken = async (): Promise<string> => {
-    const token = await getKeychainValue(KEYCHAIN_ID);
-    const payload = parseJwt(token);
-    if (payload == null || typeof payload === "string") {
-        throw new Error();
-    }
-
-    return payload.nameid;
-};
 
 export const useProfileInfo = (): UseProfileInfoReturn => {
     const { getReq } = useFetch({

@@ -21,8 +21,8 @@ import { getRecipeTime } from "@/pages/create-post/create-recipe/types/RecipeTim
 import moment from "moment";
 import mime from "react-native-mime-types";
 import { type CommentFormInfo } from "./types/CommentInformation";
-import { getUserIdFromToken } from "../profile/ProfileApi";
 import { responseObjectValid } from "../common/utils/ResponseUtils";
+import { getUserIdFromToken } from "../common/utils/TokenUtils";
 
 const POST_LIST_URL = "content/posts";
 

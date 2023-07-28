@@ -21,12 +21,12 @@ import VideoViewer from "../../pages/video/VideoViewer";
 import { SCROLL_ITEM_HEIGHT } from "../../commons/constants";
 import { windowWidth } from "@/common/utils";
 import UserProfile from "@/pages/user-profile/UserProfile";
-import { getUserIdFromToken } from "@/api/profile/ProfileApi";
 import { type MinimalPost } from "@/api/post/types/PostListResponse";
 import { usePostInfo } from "@/api/post/PostApiHook";
 import type Post from "../../types/Post";
 import { type Undefinable } from "@/types/app";
 import { type ScrollItemAction, scrollItemReducer } from "./ScrollItemReducer";
+import { getUserIdFromToken } from "@/api/common/utils/TokenUtils";
 
 interface MainScrollItemProps {
     post: MinimalPost;
