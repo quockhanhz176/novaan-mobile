@@ -3,21 +3,26 @@ import React, { View, Text } from "react-native";
 import CheckBox from "@react-native-community/checkbox";
 import type Preference from "../types/Preference";
 import { customColors } from "@root/tailwind.config";
+import { type SuiteDispatchValue } from "./filterReducer";
+
+export type FilterItemDispatchValue = Omit<
+    Extract<SuiteDispatchValue, { type: "change_preference" }>,
+    "type" | "category"
+>;
 
 interface FilterItemProps {
     preference: Preference;
-    onPreferenceChange: (preference: Preference) => void;
+    dispatchPreference: (value: FilterItemDispatchValue) => void;
 }
 
 export const FILTER_ITEM_HEIGHT = 50;
 
 const FilterItem: FC<FilterItemProps> = ({
     preference,
-    onPreferenceChange,
+    dispatchPreference,
 }) => {
     const onValueChange = (value: boolean): void => {
-        const newPreference = { ...preference, checked: value };
-        onPreferenceChange(newPreference);
+        dispatchPreference({ preferenceIndex: preference.index, value });
     };
 
     return (

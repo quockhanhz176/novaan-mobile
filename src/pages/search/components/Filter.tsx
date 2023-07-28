@@ -1,38 +1,31 @@
-import { useCallback, type FC, type ReactElement } from "react";
+import { memo, type FC, type ReactElement, useCallback } from "react";
 import React, { ScrollView, TouchableOpacity, View, Text } from "react-native";
 import type PreferenceSuite from "../types/PreferenceSuite";
 import FilterCategory from "./FilterCategory";
 import type PreferenceCategory from "../types/PreferenceCategory";
 import IconAnt from "react-native-vector-icons/AntDesign";
 import { FILTER_TITLE } from "@/common/strings";
+import { type SuiteDispatchValue } from "./filterReducer";
 
 interface FilterProps {
     suite: PreferenceSuite;
-    onSuiteChange: (value: PreferenceSuite) => void;
+    dispatchSuite: (value: SuiteDispatchValue) => void;
     hideModal: () => void;
 }
 
-const Filter: FC<FilterProps> = ({ suite, onSuiteChange, hideModal }) => {
-    const onCategoryChange = useCallback(
-        (category: PreferenceCategory): void => {
-            suite[Object.keys(suite)[category.index]] = category;
-            onSuiteChange({ ...suite });
+const Filter: FC<FilterProps> = ({ suite, dispatchSuite, hideModal }) => {
+    const renderItem = useCallback(
+        (category: PreferenceCategory, index: number): ReactElement => {
+            return (
+                <FilterCategory
+                    key={index}
+                    category={category}
+                    dispatchSuite={dispatchSuite}
+                />
+            );
         },
-        []
+        [dispatchSuite]
     );
-
-    const renderItem = (
-        category: PreferenceCategory,
-        index: number
-    ): ReactElement => {
-        return (
-            <FilterCategory
-                key={index}
-                category={category}
-                onCategoryChange={onCategoryChange}
-            />
-        );
-    };
 
     return (
         <View className="flex-1">
@@ -59,4 +52,4 @@ const Filter: FC<FilterProps> = ({ suite, onSuiteChange, hideModal }) => {
     );
 };
 
-export default Filter;
+export default memo(Filter);

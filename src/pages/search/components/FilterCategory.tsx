@@ -2,26 +2,31 @@ import {
     memo,
     type FC,
     type ReactElement,
-    useCallback,
     useRef,
     useState,
+    useCallback,
 } from "react";
 import React, { View, Text, Animated } from "react-native";
 import type Preference from "../types/Preference";
-import FilterItem, { FILTER_ITEM_HEIGHT } from "./FilterItem";
+import FilterItem, {
+    FILTER_ITEM_HEIGHT,
+    type FilterItemDispatchValue,
+} from "./FilterItem";
 import type PreferenceCategory from "../types/PreferenceCategory";
 import IconLabelButton from "@/common/components/IconLabelButton";
+import { getPreferenceProperty } from "../types/PreferenceSuite";
+import { type SuiteDispatchValue } from "./filterReducer";
 
 interface FilterCategoryProps {
     category: PreferenceCategory;
-    onCategoryChange: (value: PreferenceCategory) => void;
+    dispatchSuite: (value: SuiteDispatchValue) => void;
 }
 
 const ITEM_LIST_PADDING_TOP = 16;
 
 const FilterCategory: FC<FilterCategoryProps> = ({
     category,
-    onCategoryChange,
+    dispatchSuite,
 }) => {
     const dropDownAnimation = useRef(new Animated.Value(0)).current;
     const [expanded, setExpanded] = useState(false);
@@ -39,28 +44,31 @@ const FilterCategory: FC<FilterCategoryProps> = ({
         setExpanded(!expanded);
     };
 
-    const onPreferenceChange = useCallback((preference: Preference): void => {
-        const items = [
-            ...category.preferences.slice(0, preference.index),
-            preference,
-            ...category.preferences.slice(preference.index + 1),
-        ];
-        category = { ...category, preferences: items };
-        onCategoryChange(category);
-    }, []);
+    const dispatchPreference = useCallback(
+        (value: FilterItemDispatchValue): void => {
+            const currentCategory = getPreferenceProperty(category.index);
 
-    const renderItem = (
-        preference: Preference,
-        index: number
-    ): ReactElement => {
-        return (
-            <FilterItem
-                key={index}
-                preference={preference}
-                onPreferenceChange={onPreferenceChange}
-            />
-        );
-    };
+            dispatchSuite({
+                type: "change_preference",
+                category: currentCategory,
+                ...value,
+            });
+        },
+        [category.index]
+    );
+
+    const renderItem = useCallback(
+        (preference: Preference, index: number): ReactElement => {
+            return (
+                <FilterItem
+                    key={index}
+                    preference={preference}
+                    dispatchPreference={dispatchPreference}
+                />
+            );
+        },
+        [dispatchPreference]
+    );
 
     return (
         <View className="overflow-hidden mb-7">

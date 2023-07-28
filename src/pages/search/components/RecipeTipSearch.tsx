@@ -1,6 +1,13 @@
 import IconLabelButton from "@/common/components/IconLabelButton";
 import { customColors } from "@root/tailwind.config";
-import { useState, type FC, useEffect, useCallback, useMemo } from "react";
+import {
+    useState,
+    type FC,
+    useEffect,
+    useCallback,
+    useMemo,
+    useReducer,
+} from "react";
 import React, {
     Modal,
     TextInput,
@@ -14,7 +21,6 @@ import IconEvil from "react-native-vector-icons/EvilIcons";
 import CreatedPostList from "../../user-profile/pages/created-post/components/CreatedPostList";
 import type PostResponse from "@/api/post/types/PostResponse";
 import searchServices from "../services/searchServices";
-import type PreferenceSuite from "../types/PreferenceSuite";
 import useModalHook from "@/common/components/ModalHook";
 import Filter from "./Filter";
 import { type Route, TabBar, TabView } from "react-native-tab-view";
@@ -27,6 +33,7 @@ import { type PostType } from "@/api/post/types/PostResponse";
 import IconMaterial from "react-native-vector-icons/MaterialIcons";
 import InfiniteScroll from "@/pages/reel/InfiniteScrollv2";
 import { type Undefinable } from "@/types/app";
+import { suiteReducer } from "./filterReducer";
 
 const routes: Route[] = [
     {
@@ -36,13 +43,14 @@ const routes: Route[] = [
     { key: "tip", title: POST_TYPE_TIP },
 ];
 
-const RecipeSearch: FC = () => {
+const RecipeTipSearch: FC = () => {
     const [searchString, setSearchString] = useState("");
     const [recipeResults, setRecipeResults] = useState<PostResponse[]>([]);
     const [tipResults, setTipResults] = useState<PostResponse[]>([]);
-    const [preferenceSuite, setPreferenceSuite] = useState<
-        PreferenceSuite | undefined
-    >();
+    const [preferenceSuite, dispatchSuite] = useReducer(
+        suiteReducer,
+        undefined
+    );
     const [filterVisible, hideFilter, showFilter] = useModalHook();
     const [tabIndex, setTabIndex] = useState(0);
     const [recipesLoading, setRecipesLoading] = useState(false);
@@ -57,7 +65,7 @@ const RecipeSearch: FC = () => {
             if (suite == null) {
                 return;
             }
-            setPreferenceSuite(suite);
+            dispatchSuite({ type: "new_value", value: suite });
         });
     }, []);
 
@@ -249,7 +257,7 @@ const RecipeSearch: FC = () => {
                 {preferenceSuite != null && (
                     <Filter
                         suite={preferenceSuite}
-                        onSuiteChange={setPreferenceSuite}
+                        dispatchSuite={dispatchSuite}
                         hideModal={hideFilter}
                     />
                 )}
@@ -293,4 +301,4 @@ const RecipeSearch: FC = () => {
     );
 };
 
-export default RecipeSearch;
+export default RecipeTipSearch;
