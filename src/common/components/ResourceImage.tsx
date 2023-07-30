@@ -39,7 +39,7 @@ const ResourceImage: FC<ResourceImageProps> = ({
                 }
             })
             .catch(console.log);
-    }, []);
+    }, [resourceId]);
 
     useEffect(() => {
         if (resourceUrl == null || resourceUrl === "") {

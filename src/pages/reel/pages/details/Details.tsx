@@ -1,4 +1,4 @@
-import React, { useContext, type ReactElement, useMemo, memo } from "react";
+import React, { useContext, type ReactElement, memo, useMemo } from "react";
 import { ScrollView, View, Text } from "react-native";
 import { Avatar, Divider } from "react-native-paper";
 import { customColors } from "@root/tailwind.config";
@@ -21,27 +21,24 @@ import StarRating from "react-native-star-rating";
 import ViewMoreText from "react-native-view-more-text";
 
 const Details = (): ReactElement => {
-    const { currentPost, dispatch } = useContext(ScrollItemContext);
+    const {
+        currentPost,
+        likeInfo,
+        saved,
+        handleLike,
+        handleUnlike,
+        handleSave,
+        handleUnsave,
+    } = useContext(ScrollItemContext);
 
-    const liked = useMemo(() => {
-        return currentPost?.isLiked ?? false;
-    }, [currentPost]);
-
-    const saved = useMemo(() => {
-        return currentPost?.isSaved ?? false;
-    }, [currentPost]);
-
-    const handleLike = (): void => {
-        liked
-            ? dispatch({ type: "UNLIKE_POST" })
-            : dispatch({ type: "LIKE_POST" });
-    };
-
-    const handleSave = (): void => {
-        saved
-            ? dispatch({ type: "UNSAVE_POST" })
-            : dispatch({ type: "SAVE_POST" });
-    };
+    const handleLikePress = useMemo(
+        () => (likeInfo.liked ? handleUnlike : handleLike),
+        [likeInfo.liked]
+    );
+    const handleSavePress = useMemo(
+        () => (saved ? handleUnsave : handleSave),
+        [saved]
+    );
 
     if (currentPost == null) {
         return <OverlayLoading />;
@@ -86,14 +83,16 @@ const Details = (): ReactElement => {
                 <View className="flex-row items-center space-x-2 ml-4">
                     <IconLabelButton
                         iconProps={{
-                            name: liked ? "heart" : "heart-outline",
-                            color: liked
+                            name: likeInfo.liked ? "heart" : "heart-outline",
+                            color: likeInfo.liked
                                 ? customColors.heart
                                 : customColors.cgrey.dim,
                             size: 26,
                         }}
                         // text={numeral(currentPost.likeCount).format("0 a")}
-                        buttonProps={{ onPress: handleLike }}
+                        buttonProps={{
+                            onPress: handleLikePress,
+                        }}
                     />
                     <IconLabelButton
                         iconProps={{
@@ -104,7 +103,7 @@ const Details = (): ReactElement => {
                             size: 26,
                         }}
                         // text={REEL_DETAILS_SAVE}
-                        buttonProps={{ onPress: handleSave }}
+                        buttonProps={{ onPress: handleSavePress }}
                     />
                 </View>
             </View>

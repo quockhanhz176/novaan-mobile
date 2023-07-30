@@ -50,11 +50,10 @@ const CustomModal: FC<CusomModalProps> = ({ visible, onDismiss, children }) => {
                 {internalVisible && (
                     <TouchableView
                         onPress={dismissModal}
-                        className="absolute top-0 left-0 right-0 bottom-0 bg-[#00000077]"
+                        className="absolute top-0 left-0 right-0 bottom-0 bg-[#00000077] h-auto"
                     />
                 )}
                 <Animated.View
-                    onTouchEnd={dismissModal}
                     className="absolute bottom-0 top-0 left-0 right-0"
                     style={{
                         transform: [
@@ -65,6 +64,10 @@ const CustomModal: FC<CusomModalProps> = ({ visible, onDismiss, children }) => {
                                 }),
                             },
                         ],
+                    }}
+                    onTouchStart={(e) => {
+                        e.stopPropagation();
+                        dismissModal();
                     }}
                 >
                     {children}

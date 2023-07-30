@@ -1,4 +1,4 @@
-import React, { View, Text } from "react-native";
+import React, { View, Text, TouchableOpacity } from "react-native";
 import type PostComment from "../../types/PostComment";
 import { memo, type ReactElement } from "react";
 import ResourceImage from "@/common/components/ResourceImage";
@@ -7,26 +7,34 @@ import StarRating from "react-native-star-rating";
 import { customColors } from "@root/tailwind.config";
 import "moment/locale/vi";
 import IconMaterial from "react-native-vector-icons/MaterialIcons";
-import {
-    REEL_COMMENTS_DELETE_BUTTON,
-    REEL_COMMENTS_EDIT_BUTTON,
-} from "@/common/strings";
-import CommentMenuItem from "./CommentMenuItem";
-import { Menu, MenuOptions, MenuTrigger } from "react-native-popup-menu";
 
 interface CommentItemProps {
     comment: PostComment;
     isUserComment?: boolean;
-    openEditComment?: () => void;
-    onDeleteComment?: () => void;
+    showCommentMenu?: () => void;
+    showReportMenu?: (commentId: string) => void;
 }
 
 const CommentItem = ({
     comment,
     isUserComment = false,
-    openEditComment,
-    onDeleteComment,
+    showCommentMenu,
+    showReportMenu,
 }: CommentItemProps): ReactElement<CommentItemProps> => {
+    const handleShowCommentMenu = (): void => {
+        if (showCommentMenu == null) {
+            return;
+        }
+        showCommentMenu();
+    };
+
+    const handleShowReportMenu = (): void => {
+        if (showReportMenu == null) {
+            return;
+        }
+        showReportMenu(comment.commentId);
+    };
+
     return (
         <View className="px-4 py-3 flex-row space-x-4">
             <ResourceImage
@@ -36,10 +44,7 @@ const CommentItem = ({
             />
             <View className="flex-1">
                 <View className="flex-row items-center">
-                    <Text
-                        className="mr-3 text-cgrey-battleship font-semibold"
-                        style={{ fontSize: 13 }}
-                    >
+                    <Text className="mr-3 text-cgrey-battleship text-sm font-semibold">
                         {comment.username} •{" "}
                         {comment.createdAt.locale("vi").fromNow()}
                     </Text>
@@ -57,45 +62,48 @@ const CommentItem = ({
                     <ResourceImage
                         className="mt-2"
                         resourceId={comment.image}
-                        width={300}
+                        width={150}
                     />
                 )}
             </View>
-            {isUserComment && (
+            {isUserComment ? (
                 <View
                     onTouchEnd={(e) => {
                         e.stopPropagation();
                     }}
                 >
-                    <Menu>
-                        <MenuTrigger>
-                            <IconMaterial
-                                name="more-vert"
-                                color={customColors.cgrey.battleship}
-                                size={16}
-                            />
-                        </MenuTrigger>
-                        <MenuOptions
-                            customStyles={{
-                                optionsContainer: { width: 130 },
-                            }}
-                        >
-                            <CommentMenuItem
-                                icon="edit"
-                                text={REEL_COMMENTS_EDIT_BUTTON}
-                                onSelect={openEditComment}
-                            />
-                            <CommentMenuItem
-                                icon="delete"
-                                text={REEL_COMMENTS_DELETE_BUTTON}
-                                onSelect={onDeleteComment}
-                            />
-                        </MenuOptions>
-                    </Menu>
+                    <TouchableOpacity onPress={handleShowCommentMenu}>
+                        <IconMaterial
+                            name="more-vert"
+                            color={customColors.cgrey.battleship}
+                            size={24}
+                            className="p-2"
+                        />
+                    </TouchableOpacity>
+                </View>
+            ) : (
+                <View
+                    onTouchEnd={(e) => {
+                        e.stopPropagation();
+                    }}
+                >
+                    <TouchableOpacity onPress={handleShowReportMenu}>
+                        <IconMaterial
+                            name="more-vert"
+                            color={customColors.cgrey.battleship}
+                            size={24}
+                            className="p-2"
+                        />
+                    </TouchableOpacity>
                 </View>
             )}
         </View>
     );
 };
 
-export default memo(CommentItem);
+export default memo(CommentItem, (prev, next) => {
+    return (
+        prev.comment.comment === next.comment.comment &&
+        prev.comment.image === next.comment.image
+    );
+});

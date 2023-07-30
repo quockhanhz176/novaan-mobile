@@ -13,7 +13,7 @@ import { type MinimalPost } from "@/api/post/types/PostListResponse";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
 
 const ReportButton = (): ReactElement => {
-    const { currentPost, nextVideo } = useContext(ScrollItemContext);
+    const { currentPost } = useContext(ScrollItemContext);
     const { reportPost } = usePostReport();
     const [showReport, setShowReport] = useState(false);
 
@@ -44,9 +44,6 @@ const ReportButton = (): ReactElement => {
             type: "success",
             text1: REEL_REPORT_FORM_REPORT_SUCCESS_MESSAGE,
         });
-
-        // Skip reported video
-        nextVideo();
     };
 
     if (currentPost == null) {

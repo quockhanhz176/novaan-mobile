@@ -74,11 +74,20 @@ const AddEditComment: FC<AddEditCommentProps> = ({
             imageUri == null
                 ? undefined
                 : { uri: imageUri, extension: getUrlExtension(imageUri) };
+
+        let prevImage = previousImageId;
+        if (imageUri != null && imageUri !== "") {
+            // Require prevImage
+            prevImage =
+                comment?.image != null && comment.image !== ""
+                    ? comment.image
+                    : previousImageId;
+        }
         const commentInfo: CommentFormInfo = {
             rating,
             comment: detail,
             image,
-            previousImageId,
+            previousImageId: prevImage,
         };
         onSubmit(commentInfo);
     };
@@ -96,6 +105,8 @@ const AddEditComment: FC<AddEditCommentProps> = ({
             console.error("impossible!");
             return;
         }
+
+        setPreviousImageId(undefined);
         setImageUri(asset.uri);
         imageAsset.current = asset;
     };
@@ -107,7 +118,7 @@ const AddEditComment: FC<AddEditCommentProps> = ({
 
     return (
         <ScrollView
-            onTouchEnd={(e) => {
+            onTouchStart={(e) => {
                 e.stopPropagation();
             }}
         >

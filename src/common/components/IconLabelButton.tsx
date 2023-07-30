@@ -1,12 +1,12 @@
 import { customColors } from "@root/tailwind.config";
 import React, { Fragment, type FC, type ReactElement, memo } from "react";
 import {
-    TouchableOpacity,
     Text,
     type TextProps,
     type TouchableOpacityProps,
     type ViewStyle,
     type StyleProp,
+    TouchableOpacity,
 } from "react-native";
 import { type IconProps } from "react-native-vector-icons/Icon";
 import IconIonicons from "react-native-vector-icons/Ionicons";
@@ -84,7 +84,7 @@ const IconLabelButton: FC<IconLabelButtonProps> = ({
             {...buttonProps}
             style={style}
             className={`flex-row items-center space-x-1 ${buttonClassName}`}
-            activeOpacity={1}
+            activeOpacity={0.6}
         >
             <>
                 {renderIcon()}

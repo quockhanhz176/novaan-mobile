@@ -1,10 +1,4 @@
-import React, {
-    useState,
-    type ReactElement,
-    useCallback,
-    useContext,
-    useEffect,
-} from "react";
+import React, { type ReactElement, useCallback, useContext, memo } from "react";
 import VideoButton from "../VideoButton";
 import { REEL_VIDEO_SAVE } from "@/common/strings";
 import { customColors } from "@root/tailwind.config";
@@ -13,14 +7,10 @@ import { debounce } from "lodash";
 import { ScrollItemContext } from "@/pages/reel/components/scroll-items/ScrollItemv2";
 
 const SaveButton = (): ReactElement => {
-    const { currentPost, currentUserId, dispatch } =
+    const { currentPost, currentUserId, saved, handleSave, handleUnsave } =
         useContext(ScrollItemContext);
-    const { savePost } = usePostInteract();
-    const [saved, setSaved] = useState(false);
 
-    useEffect(() => {
-        setSaved(currentPost?.isSaved ?? false);
-    }, [currentPost?.isSaved]);
+    const { savePost } = usePostInteract();
 
     // Memoize debounce function, crucial for this to work
     const sendSaveRequest = useCallback(
@@ -37,12 +27,7 @@ const SaveButton = (): ReactElement => {
                             ? "Recipe"
                             : "CulinaryTip",
                 };
-                const result = await savePost(interaction, currentUserId);
-                if (!result) {
-                    // Revert save
-                    setSaved(saved);
-                    dispatch({ type: saved ? "SAVE_POST" : "UNSAVE_POST" });
-                }
+                await savePost(interaction, currentPost.title);
             },
             1000,
             {}
@@ -50,14 +35,18 @@ const SaveButton = (): ReactElement => {
         [currentPost, currentUserId]
     );
 
-    const handleSavePost = async (saved: boolean): Promise<void> => {
-        setSaved(!saved);
-        dispatch({ type: saved ? "UNSAVE_POST" : "SAVE_POST" });
+    const handleSavePost = useCallback(
+        async (saved: boolean): Promise<void> => {
+            if (currentPost == null) {
+                return;
+            }
 
-        // Cancel last request to avoid duplicate request
-        sendSaveRequest.cancel();
-        await sendSaveRequest(saved);
-    };
+            saved ? handleUnsave() : handleSave();
+            sendSaveRequest.cancel();
+            await sendSaveRequest(saved);
+        },
+        []
+    );
 
     return (
         <VideoButton
@@ -71,4 +60,4 @@ const SaveButton = (): ReactElement => {
     );
 };
 
-export default SaveButton;
+export default memo(SaveButton);

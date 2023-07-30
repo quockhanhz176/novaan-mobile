@@ -5,8 +5,9 @@ import React, {
     useRef,
     type ReactElement,
     useEffect,
+    memo,
 } from "react";
-import ScrollItem, { type Page } from "./components/scroll-items/ScrollItemv2";
+import ScrollItem from "./components/scroll-items/ScrollItemv2";
 import {
     FlatList,
     type LayoutChangeEvent,
@@ -18,6 +19,8 @@ import { SCROLL_ITEM_HEIGHT } from "./commons/constants";
 import type Post from "./types/Post";
 import { usePostList } from "@/api/post/PostApiHook";
 import { type MinimalPost } from "@/api/post/types/PostListResponse";
+import { type Page } from "./components/ScrollItem";
+import OverlayLoading from "@/common/components/OverlayLoading";
 
 interface InfiniteScrollProps {
     postIds?: MinimalPost[];
@@ -28,7 +31,7 @@ export type InternalPost = Post & {
     index: number;
 };
 
-const END_REACH_THRESHOLD = 1;
+const END_REACH_THRESHOLD = 1.1;
 
 const InfiniteScroll: FC<InfiniteScrollProps> = ({
     postIds,
@@ -58,7 +61,7 @@ const InfiniteScroll: FC<InfiniteScrollProps> = ({
         }
 
         // Init list of posts that need to be renders in the FlatList
-        fetchPost(0, 3);
+        fetchPost(0, 2);
     }, [postList]);
 
     const fetchPost = (startIndex: number, count: number = 1): void => {
@@ -121,23 +124,32 @@ const InfiniteScroll: FC<InfiniteScrollProps> = ({
         });
     };
 
-    const renderItem = ({
-        item,
-        index,
-    }: {
-        item: MinimalPost;
-        index: number;
-    }): ReactElement => {
-        return (
-            <ScrollItem
-                post={item}
-                showUserProfile={showUserProfile}
-                onPageChange={onScrollItemPageChange}
-                isVideoPaused={index !== currentPage}
-                nextVideo={nextVideo}
-            />
-        );
-    };
+    const renderItem = useCallback(
+        ({
+            item,
+            index,
+            currentPage,
+        }: {
+            item: MinimalPost;
+            index: number;
+            currentPage: number;
+        }): ReactElement => {
+            return (
+                <ScrollItem
+                    post={item}
+                    showUserProfile={showUserProfile}
+                    onPageChange={onScrollItemPageChange}
+                    isVideoPaused={index !== currentPage}
+                    nextVideo={nextVideo}
+                />
+            );
+        },
+        []
+    );
+
+    if (renderPosts.length === 0) {
+        return <OverlayLoading />;
+    }
 
     return (
         <SafeAreaView style={{ height: SCROLL_ITEM_HEIGHT }}>
@@ -149,23 +161,23 @@ const InfiniteScroll: FC<InfiniteScrollProps> = ({
                 onMomentumScrollEnd={onMomentumScrollEnd}
                 scrollEnabled={scrollEnabled}
                 pagingEnabled={true}
-                renderItem={renderItem}
+                renderItem={({ item, index }) =>
+                    renderItem({ item, index, currentPage })
+                }
                 onEndReachedThreshold={END_REACH_THRESHOLD}
                 onEndReached={fetchNextData}
                 onLayout={onLayout}
-                initialScrollIndex={0}
-                initialNumToRender={1}
-                removeClippedSubviews={true}
-                maxToRenderPerBatch={2}
-                windowSize={3}
                 getItemLayout={(data, index) => ({
                     length: SCROLL_ITEM_HEIGHT,
                     offset: SCROLL_ITEM_HEIGHT * index,
                     index,
                 })}
+                // Test improvement
+                maxToRenderPerBatch={2}
+                updateCellsBatchingPeriod={10000}
             />
         </SafeAreaView>
     );
 };
 
-export default InfiniteScroll;
+export default memo(InfiniteScroll);

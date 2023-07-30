@@ -11,6 +11,7 @@ const getDefaultProps: (color: ColorValue) => BaseToastProps = (color) => ({
     style: {
         borderLeftColor: color,
         borderLeftWidth: 12,
+        zIndex: 100,
     },
     contentContainerStyle: {
         paddingHorizontal: 16,

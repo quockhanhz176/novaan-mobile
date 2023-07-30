@@ -44,4 +44,4 @@ const ButtonColumn: FC<ButtonColumnProps> = ({
     );
 };
 
-export default memo(ButtonColumn);
+export default memo(ButtonColumn, () => true);

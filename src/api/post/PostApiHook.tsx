@@ -13,6 +13,7 @@ import {
     type UsePostListReturn,
     type UsePostSaveReturn,
     type UsePostReportReturn,
+    type UseReportCommentReturn,
 } from "./types/hooks.type";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import type PostComment from "@/pages/reel/types/PostComment";
@@ -97,11 +98,13 @@ export const usePostInfo = (): UsePostInfoReturn => {
 
     const [postInfo, setPostInfo] = useState<Undefinable<Post>>(undefined);
 
-    const fetchPostInfo = async (info: MinimalPost): Promise<boolean> => {
+    const fetchPostInfo = async (
+        info: MinimalPost
+    ): Promise<Undefinable<Post>> => {
         const cacheData = await getCacheData(info);
         if (cacheData != null) {
             setPostInfo(cacheData);
-            return true;
+            return cacheData;
         }
 
         const requestUrl =
@@ -110,7 +113,7 @@ export const usePostInfo = (): UsePostInfoReturn => {
             info.postType === "Recipe" ? "recipe" : "tip";
         const postResponse = await getReq(`${requestUrl}/${info.postId}`);
         if (!responseObjectValid(postResponse)) {
-            return false;
+            return undefined;
         }
 
         // Format response based on postType
@@ -130,7 +133,7 @@ export const usePostInfo = (): UsePostInfoReturn => {
 
         await storeCacheData(postResponse);
         setPostInfo(postResponse);
-        return true;
+        return postResponse;
     };
 
     const getCacheData = async (
@@ -234,16 +237,56 @@ export const useSendComment = (): UseSendCommentReturn => {
 
         // Determine request type
         if (action === "add") {
-            return await postReq(
+            const response = await postReq(
                 `${INTERACT_POST_COMMENT}/${postId}`,
                 formData
             );
+            return sendCommentSuccess(response);
         }
 
-        return await putReq(`${INTERACT_POST_COMMENT}/${postId}`, formData);
+        const response = await putReq(
+            `${INTERACT_POST_COMMENT}/${postId}`,
+            formData
+        );
+        return sendCommentSuccess(response);
+    };
+
+    const sendCommentSuccess = (response: any): boolean => {
+        if (!responseObjectValid(response)) {
+            return false;
+        }
+        if (response.success != null && response.success === false) {
+            return false;
+        }
+
+        return true;
     };
 
     return { sendComment };
+};
+
+export const useReportComment = (): UseReportCommentReturn => {
+    const { postReq } = useFetch({ authorizationRequired: true });
+
+    const reportComment = async (
+        { postId, commentId, postType }: MinimalComment,
+        reason: string
+    ): Promise<boolean> => {
+        const payload = {
+            reason,
+            postType,
+        };
+        const reportResponse = await postReq(
+            `${INTERACT_REPORT}/${postId}/${commentId}`,
+            payload
+        );
+        if (!responseObjectValid(reportResponse)) {
+            return false;
+        }
+        return true;
+    };
+
+    return { reportComment };
 };
 
 // For like/save a post
@@ -314,23 +357,5 @@ export const usePostReport = (): UsePostReportReturn => {
         return true;
     };
 
-    const reportComment = async (
-        { postId, commentId, postType }: MinimalComment,
-        reason: string
-    ): Promise<boolean> => {
-        const payload = {
-            reason,
-            postType,
-        };
-        const reportResponse = await postReq(
-            `${INTERACT_REPORT}/${postId}/${commentId}`,
-            payload
-        );
-        if (!responseObjectValid(reportResponse)) {
-            return false;
-        }
-        return true;
-    };
-
-    return { reportPost, reportComment };
+    return { reportPost };
 };

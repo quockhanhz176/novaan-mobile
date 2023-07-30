@@ -12,7 +12,7 @@ export interface UsePostListReturn {
 
 export interface UsePostInfoReturn {
     postInfo: Undefinable<Post>;
-    fetchPostInfo: (info: MinimalPost) => Promise<boolean>;
+    fetchPostInfo: (info: MinimalPost) => Promise<Undefinable<Post>>;
 }
 
 export interface UsePostCommentsReturn {
@@ -29,6 +29,13 @@ export interface UseSendCommentReturn {
     ) => Promise<boolean>;
 }
 
+export interface UseReportCommentReturn {
+    reportComment: (
+        commentInfo: MinimalComment,
+        reason: string
+    ) => Promise<boolean>;
+}
+
 export interface UsePostSaveReturn {
     savePost: (
         interaction: PostInteraction,
@@ -42,8 +49,4 @@ export interface UsePostSaveReturn {
 
 export interface UsePostReportReturn {
     reportPost: (postInfo: MinimalPost, reason: string) => Promise<boolean>;
-    reportComment: (
-        commentInfo: MinimalComment,
-        reason: string
-    ) => Promise<boolean>;
 }

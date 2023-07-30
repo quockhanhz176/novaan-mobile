@@ -1,32 +1,44 @@
-import { useEffect, useMemo, useContext, type ReactElement } from "react";
-import React, {
-    FlatList,
-    View,
-    Text,
-    Modal,
-    TouchableOpacity,
-} from "react-native";
+import {
+    useEffect,
+    useMemo,
+    useContext,
+    type ReactElement,
+    memo,
+    useCallback,
+    useState,
+} from "react";
+import React, { FlatList, View, Text, Modal } from "react-native";
 import type PostComment from "../../types/PostComment";
 import CommentItem from "./CommentItem";
 import {
     ADD_COMMENT_UPLOAD_ERROR,
-    REEL_COMMENTS_BUTTON_TITLE,
     REEL_COMMENTS_TITLE,
+    REEL_REPORT_FORM_REPORT_FAIL_MESSAGE,
+    REEL_REPORT_FORM_REPORT_SUCCESS_MESSAGE,
 } from "@/common/strings";
-import { Divider } from "react-native-paper";
 import IconLabelButton from "@/common/components/IconLabelButton";
 import { customColors } from "@root/tailwind.config";
-import IconFeather from "react-native-vector-icons/Feather";
-import ResourceImage from "@/common/components/ResourceImage";
 import AddEditComment from "./AddEditComment";
-import { usePostComments, useSendComment } from "@/api/post/PostApiHook";
+import {
+    usePostComments,
+    useReportComment,
+    useSendComment,
+} from "@/api/post/PostApiHook";
 import { type Undefinable } from "@/types/app";
 import { ScrollItemContext } from "../scroll-items/ScrollItemv2";
-import { type MinimalPost } from "@/api/post/types/PostListResponse";
+import {
+    type MinimalComment,
+    type MinimalPost,
+} from "@/api/post/types/PostListResponse";
 import type CommentInformation from "@/api/post/types/CommentInformation";
 import Toast from "react-native-toast-message";
 import { getRequestPostType } from "@/api/post/types/RequestPostType";
 import useModalHook from "@/common/components/ModalHook";
+import CustomModal from "@/common/components/CustomModal";
+import CommentMenu from "./CommentMenu";
+import ReportMenu from "./ReportMenu";
+import CommentListHeader from "./CommentListHeader";
+import ReportForm from "../report/ReportForm";
 
 interface CommentsProps {
     closeComments?: () => void;
@@ -38,9 +50,16 @@ const Comments = ({
     const { currentUserId, currentPost } = useContext(ScrollItemContext);
     const { comments, fetchComments, deleteComment } = usePostComments();
     const { sendComment } = useSendComment();
+    const { reportComment } = useReportComment();
 
-    // const [showCommentModal, setShowCommentModal] = useState(false);
-    const [addEditVisible, showAddEdit, hideAddEdit] = useModalHook();
+    const [addEditVisible, hideAddEdit, showAddEdit] = useModalHook();
+    const [commentMenuVisible, hideCommentMenu, showCommentMenu] =
+        useModalHook();
+    const [reportMenuVisible, hideReportMenu, showReportMenu] = useModalHook();
+    const [reportFormVisible, hideReportForm, showReportForm] = useModalHook();
+
+    const [selectedComment, setSelectedComment] =
+        useState<Undefinable<string>>(undefined);
 
     const userComment: Undefinable<PostComment> = useMemo(() => {
         if (comments.length === 0) {
@@ -86,6 +105,20 @@ const Comments = ({
             return;
         }
         const action = userComment == null ? "add" : "edit";
+        console.log(userComment);
+
+        // Check if comment need to edit
+        if (action === "edit") {
+            if (
+                commentInfo.image == null &&
+                commentInfo.comment === userComment?.comment &&
+                commentInfo.previousImageId === userComment?.image &&
+                commentInfo.rating === userComment?.rating
+            ) {
+                return;
+            }
+        }
+
         const success = await sendComment(
             {
                 postId: currentPost.id,
@@ -102,6 +135,7 @@ const Comments = ({
             return;
         }
         await refreshComments();
+        hideCommentMenu();
     };
 
     const handleDeleteComment = async (): Promise<void> => {
@@ -116,45 +150,74 @@ const Comments = ({
         await fetchComments(minimalPostInfo);
     };
 
-    // Show existed user's comment or form for user to input their rating
-    const header = (
-        <View className="flex-1">
-            <Divider />
-            {userComment == null ? (
-                <>
-                    <View className="flex-row justify-between items-center px-4 py-2 space-x-4">
-                        <ResourceImage
-                            resourceId=""
-                            className="w-[25] h-[25] rounded-full bg-xanthous items-center justify-center overflow-hidden"
-                            defaultView={<IconFeather name="user" size={17} />}
-                        />
-                        <TouchableOpacity
-                            className="grow bg-cgrey-whitesmoke rounded-lg p-2 justify-center"
-                            onPress={showAddEdit}
-                        >
-                            <Text className="text-cgrey-grey">
-                                {REEL_COMMENTS_BUTTON_TITLE}
-                            </Text>
-                        </TouchableOpacity>
-                    </View>
-                    <Divider />
-                </>
-            ) : (
+    const handleOpenReportMenu = (commentId: string): void => {
+        showReportMenu();
+        setSelectedComment(commentId);
+    };
+
+    const handleCloseReportForm = (): void => {
+        hideReportForm();
+        hideReportMenu();
+        setSelectedComment(undefined);
+    };
+
+    const handleCloseAddEdit = (): void => {
+        hideAddEdit();
+        hideCommentMenu();
+    };
+
+    const handleReportComment = async (reason: string): Promise<void> => {
+        if (currentPost == null || selectedComment === undefined) {
+            return;
+        }
+        const payload: MinimalComment = {
+            postId: currentPost.id,
+            commentId: selectedComment,
+            postType: currentPost.type === "recipe" ? "Recipe" : "CulinaryTip",
+        };
+        const succeed = await reportComment(payload, reason);
+        if (!succeed) {
+            Toast.show({
+                type: "error",
+                text1: REEL_REPORT_FORM_REPORT_FAIL_MESSAGE,
+            });
+        }
+        Toast.show({
+            type: "success",
+            text1: REEL_REPORT_FORM_REPORT_SUCCESS_MESSAGE,
+        });
+
+        hideReportMenu();
+        setSelectedComment(undefined);
+    };
+
+    const renderItem = useCallback(
+        ({
+            item,
+            currentUserId,
+        }: {
+            item: PostComment;
+            currentUserId: string;
+        }) => {
+            if (item.userId === currentUserId) {
+                return <View></View>;
+            }
+
+            return (
                 <CommentItem
-                    comment={userComment}
-                    isUserComment
-                    onDeleteComment={handleDeleteComment}
-                    openEditComment={showAddEdit}
+                    comment={item}
+                    showReportMenu={handleOpenReportMenu}
                 />
-            )}
-        </View>
+            );
+        },
+        []
     );
 
     return (
         <View className="flex-1 justify-end">
             <View
                 className="bg-white rounded-t-xl pt-4 h-2/3"
-                onTouchEnd={(e) => {
+                onTouchStart={(e) => {
                     e.stopPropagation();
                 }}
             >
@@ -183,37 +246,70 @@ const Comments = ({
                 </View>
                 <FlatList
                     data={comments}
-                    ListHeaderComponent={header}
-                    renderItem={({ item }) => {
-                        if (item.userId === currentUserId) {
-                            return <View></View>;
-                        }
-
-                        return (
-                            <CommentItem
-                                comment={item}
-                                onDeleteComment={handleDeleteComment}
-                                openEditComment={showAddEdit}
-                            />
-                        );
-                    }}
+                    ListHeaderComponent={
+                        <CommentListHeader
+                            userComment={userComment}
+                            showAddEdit={showAddEdit}
+                            showCommentMenu={showCommentMenu}
+                        />
+                    }
+                    ListHeaderComponentStyle={{ flex: 1 }}
+                    renderItem={({ item }) =>
+                        renderItem({ item, currentUserId })
+                    }
+                    extraData={userComment}
                 />
             </View>
             {currentPost != null && (
-                <Modal
-                    visible={addEditVisible}
-                    animationType="slide"
-                    onRequestClose={hideAddEdit}
-                >
-                    <AddEditComment
-                        comment={userComment}
-                        onClose={hideAddEdit}
-                        onSubmit={handleSubmitComment}
-                    />
-                </Modal>
+                <>
+                    <Modal
+                        visible={addEditVisible}
+                        animationType="slide"
+                        onRequestClose={handleCloseAddEdit}
+                    >
+                        <AddEditComment
+                            comment={userComment}
+                            onClose={hideAddEdit}
+                            onSubmit={handleSubmitComment}
+                        />
+                    </Modal>
+                    <CustomModal
+                        visible={reportMenuVisible}
+                        onDismiss={hideReportMenu}
+                    >
+                        <ReportMenu handleReportComment={showReportForm} />
+                    </CustomModal>
+                    <Modal
+                        visible={reportFormVisible}
+                        onRequestClose={hideReportForm}
+                        animationType="slide"
+                    >
+                        <ReportForm
+                            onClose={handleCloseReportForm}
+                            onSubmit={handleReportComment}
+                        />
+                    </Modal>
+                </>
             )}
+            {
+                // Only render when user have a comment
+                currentPost != null && userComment != null && (
+                    <>
+                        <CustomModal
+                            visible={commentMenuVisible}
+                            onDismiss={hideCommentMenu}
+                        >
+                            <CommentMenu
+                                handleEditComment={showAddEdit}
+                                handleDeleteComment={handleDeleteComment}
+                            />
+                        </CustomModal>
+                    </>
+                )
+            }
+            <Toast />
         </View>
     );
 };
 
-export default Comments;
+export default memo(Comments);

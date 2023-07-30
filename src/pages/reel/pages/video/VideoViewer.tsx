@@ -1,10 +1,12 @@
 import React, {
     useRef,
-    type FC,
     useState,
     useEffect,
-    memo,
     useContext,
+    forwardRef,
+    useImperativeHandle,
+    type ReactElement,
+    useCallback,
 } from "react";
 import {
     Text,
@@ -22,22 +24,33 @@ import IconFeather from "react-native-vector-icons/Feather";
 import LinearGradient from "react-native-linear-gradient";
 import { SCROLL_ITEM_HEIGHT } from "../../commons/constants";
 import { ScrollItemContext } from "../../components/scroll-items/ScrollItemv2";
+import { throttle } from "lodash";
+import { type Undefinable } from "@/types/app";
 
 interface VideoViewerProps {
-    isPaused?: boolean;
+    onShowDetails: () => void;
+    onShowProfile: () => void;
+    pauseVideo: () => void;
+    resumeVideo: () => void;
+    paused: boolean;
+}
+
+interface VideoViewerWrapProps {
+    isVideoPaused: boolean;
     onShowDetails: () => void;
     onShowProfile: () => void;
 }
 
-const VideoViewer: FC<VideoViewerProps> = ({
-    isPaused = true,
+const VideoViewer = ({
     onShowDetails,
     onShowProfile,
-}: VideoViewerProps) => {
-    const { currentPost: post } = useContext(ScrollItemContext);
+    pauseVideo,
+    resumeVideo,
+    paused,
+}: VideoViewerProps): ReactElement<VideoViewerProps> => {
+    const { currentPost } = useContext(ScrollItemContext);
 
     const videoRef = useRef<Video>(null);
-    const [paused, setPaused] = useState(false);
 
     const [currentTimeStamp, setCurrentTimeStamp] = useState(0);
     const [videoDuration, setVideoDuration] = useState(1);
@@ -48,34 +61,44 @@ const VideoViewer: FC<VideoViewerProps> = ({
     const { resourceUrl, fetchUrl } = useFetchResourceUrl();
 
     useEffect(() => {
-        if (post == null) {
+        if (currentPost == null) {
             return;
         }
-        void fetchUrl(post.video)
+        void fetchUrl(currentPost.video)
             .then((success) => {
                 if (!success) {
                     // Do something to alert user or retry
                 }
             })
             .catch(console.log);
-    }, [post]);
+    }, [currentPost]);
 
-    useEffect(() => {
-        // Avoid unecessary render
-        if (isPaused === paused) {
-            return;
-        }
-        setPaused(isPaused);
-    }, [isPaused]);
+    const toggleVideoPlayPause = useCallback(
+        throttle(
+            (
+                paused: boolean,
+                playToggle: Undefinable<boolean>,
+                pauseToggle: Undefinable<boolean>
+            ) => {
+                if (!paused) {
+                    setPauseToggle(
+                        pauseToggle !== undefined ? !pauseToggle : true
+                    );
+                    pauseVideo();
+                } else {
+                    setPlayToggle(
+                        playToggle !== undefined ? !playToggle : true
+                    );
+                    resumeVideo();
+                }
+            },
+            1000
+        ),
+        []
+    );
 
     const onVideoPress = (e: GestureResponderEvent): void => {
-        const pauseState = !paused;
-        setPaused(pauseState);
-        if (pauseState) {
-            setPauseToggle(pauseToggle !== undefined ? !pauseToggle : true);
-        } else {
-            setPlayToggle(playToggle !== undefined ? !playToggle : true);
-        }
+        toggleVideoPlayPause(paused, playToggle, pauseToggle);
     };
 
     const onSeek = (progress: number): void => {
@@ -83,17 +106,17 @@ const VideoViewer: FC<VideoViewerProps> = ({
     };
 
     const onVideoError = async (error): Promise<void> => {
-        if (post == null) {
+        if (currentPost == null) {
             return;
         }
 
         console.log("VideoViewer - video error:" + JSON.stringify(error));
         if (error.error?.what === 1 && error.error?.extra === -1005) {
-            void fetchUrl(post.video);
+            void fetchUrl(currentPost.video);
         }
     };
 
-    if (post == null) {
+    if (currentPost == null) {
         return <View></View>;
     }
 
@@ -113,9 +136,11 @@ const VideoViewer: FC<VideoViewerProps> = ({
                     className="absolute top-0 left-0 bottom-0 right-0 w-full h-full"
                     resizeMode="contain"
                     repeat
+                    playInBackground={false}
+                    playWhenInactive={false}
                     onLoad={({ duration }) => {
-                        videoRef.current?.seek(0);
                         setVideoDuration(duration);
+                        paused && pauseVideo();
                     }}
                     onProgress={({ currentTime }) => {
                         // Update timestamp each 2 seconds to avoid re-rendering
@@ -151,25 +176,25 @@ const VideoViewer: FC<VideoViewerProps> = ({
                             }}
                         >
                             <View className="bg-xanthous w-[35] h-[35] rounded-full items-center justify-center overflow-hidden">
-                                {post.creator.avatar == null ||
-                                post.creator.avatar === "" ? (
+                                {currentPost.creator.avatar == null ||
+                                currentPost.creator.avatar === "" ? (
                                     <IconFeather name="user" size={30} />
                                 ) : (
                                     <ResourceImage
-                                        resourceId={post.creator.avatar}
+                                        resourceId={currentPost.creator.avatar}
                                         className="h-full w-full"
                                     />
                                 )}
                             </View>
                             <Text className="text-white font-medium">
-                                {post.creator.username}
+                                {currentPost.creator.username}
                             </Text>
                         </TouchableOpacity>
                         <Text
                             className="text-white pt-2"
                             style={{ fontSize: 15 }}
                         >
-                            {post.title}
+                            {currentPost.title}
                         </Text>
                     </View>
                 </View>
@@ -178,4 +203,40 @@ const VideoViewer: FC<VideoViewerProps> = ({
     );
 };
 
-export default memo(VideoViewer);
+const VideoViewerWrap = forwardRef<any, VideoViewerWrapProps>((props, ref) => {
+    const [paused, setPaused] = useState(props.isVideoPaused);
+
+    useEffect(() => {
+        setPaused(props.isVideoPaused);
+    }, [props.isVideoPaused]);
+
+    const pauseVideo = useCallback((): void => {
+        setPaused(true);
+    }, []);
+
+    const resumeVideo = useCallback((): void => {
+        setPaused(false);
+    }, []);
+
+    useImperativeHandle(
+        ref,
+        () => ({
+            pauseVideo,
+            resumeVideo,
+        }),
+        []
+    );
+
+    return (
+        <VideoViewer
+            {...props}
+            paused={paused}
+            pauseVideo={pauseVideo}
+            resumeVideo={resumeVideo}
+        />
+    );
+});
+
+VideoViewerWrap.displayName = "VideoViewerWrap";
+
+export default VideoViewerWrap;

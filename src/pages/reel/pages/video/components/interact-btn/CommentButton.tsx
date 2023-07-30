@@ -1,25 +1,20 @@
-import React, { type ReactElement, useState, useContext } from "react";
+import React, { type ReactElement, useContext, memo, useEffect } from "react";
 import VideoButton from "../VideoButton";
 import CustomModal from "@/common/components/CustomModal";
 import { ScrollItemContext } from "@/pages/reel/components/scroll-items/ScrollItemv2";
 import Comments from "@/pages/reel/components/comments/Comments";
-import { MenuProvider } from "react-native-popup-menu";
 import { View } from "react-native";
 import { REEL_COMMENTS_TITLE } from "@/common/strings";
+import useModalHook from "@/common/components/ModalHook";
 
 const CommentButton = (): ReactElement => {
     const { pauseVideo, resumeVideo } = useContext(ScrollItemContext);
-    const [showComment, setShowComment] = useState(false);
 
-    const handleCommentPress = (): void => {
-        setShowComment(true);
-        pauseVideo();
-    };
+    const [commentsVisible, hideComments, showComments] = useModalHook();
 
-    const handleCloseComments = (): void => {
-        setShowComment(false);
-        resumeVideo();
-    };
+    useEffect(() => {
+        commentsVisible ? pauseVideo() : resumeVideo();
+    }, [commentsVisible]);
 
     return (
         <>
@@ -27,22 +22,20 @@ const CommentButton = (): ReactElement => {
                 iconPack="Community"
                 icon="message-text"
                 text={REEL_COMMENTS_TITLE}
-                onPress={handleCommentPress}
+                onPress={showComments}
             />
-            <CustomModal visible={showComment} onDismiss={handleCloseComments}>
+            <CustomModal visible={commentsVisible} onDismiss={hideComments}>
                 <View
                     className="flex-1"
                     onTouchEnd={(e) => {
                         e.stopPropagation();
                     }}
                 >
-                    <MenuProvider>
-                        <Comments closeComments={handleCloseComments} />
-                    </MenuProvider>
+                    <Comments closeComments={hideComments} />
                 </View>
             </CustomModal>
         </>
     );
 };
 
-export default CommentButton;
+export default memo(CommentButton);

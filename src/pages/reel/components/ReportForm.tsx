@@ -10,9 +10,9 @@ import {
 import { customColors } from "@root/tailwind.config";
 import { useState, type FC, memo } from "react";
 import React, { View, TextInput, Alert } from "react-native";
-import type Post from "../../types/Post";
 import postApi from "@/api/post/PostApi";
 import Toast from "react-native-toast-message";
+import type Post from "../types/Post";
 
 interface ReportFormProps {
     post: Post;

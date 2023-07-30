@@ -48,7 +48,12 @@ const ReportForm = ({
     };
 
     return (
-        <>
+        <View
+            onTouchStart={(e) => {
+                e.stopPropagation();
+            }}
+            className="flex-1"
+        >
             <View className="h-[58] flex-row items-center justify-between px-1 border-b-2 border-cgrey-platinum">
                 <View className="flex-row space-x-2 items-center">
                     <TouchableOpacity
@@ -95,7 +100,7 @@ const ReportForm = ({
                     />
                 </View>
             </View>
-        </>
+        </View>
     );
 };
 
