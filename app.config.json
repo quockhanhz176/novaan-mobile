@@ -6,13 +6,15 @@
         "currentFullName": "Novaan",
         "originalFullName": "Novaan",
         "backgroundColor": "#ffffff",
+        "jsEngine": "jsc",
         "extra": {
             "eas": {
                 "projectId": "babc80ee-da56-4401-95da-3f9272aa68cf"
             }
         },
         "android": {
-            "package": "com.saltytuna.novaanmobile"
+            "package": "com.saltytuna.novaanmobile",
+            "softwareKeyboardLayoutMode": "pan"
         },
         "ios": {
             "bundleIdentifier": "com.saltytuna.novaanmobile"

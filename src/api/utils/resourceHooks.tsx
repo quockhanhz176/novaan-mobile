@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useFetch } from "../baseApiHook";
 import { type UseFetchResourceUrlReturn } from "./utils.type";
+import { responseObjectValid } from "../common/utils/ResponseUtils";
 
 const GET_RESOURCE_URL = "content/download";
 
@@ -14,7 +15,11 @@ export const useFetchResourceUrl = (): UseFetchResourceUrlReturn => {
 
     const fetchUrl = async (id: string): Promise<boolean> => {
         const response = await getReq(`${GET_RESOURCE_URL}/${id}`);
-        if (response == null || !("url" in response)) {
+        if (!responseObjectValid(response)) {
+            return false;
+        }
+
+        if (!("url" in response)) {
             return false;
         }
 

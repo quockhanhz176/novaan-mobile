@@ -5,8 +5,9 @@ import React, {
     useRef,
     type ReactElement,
     useEffect,
+    memo,
 } from "react";
-import ScrollItem, { type Page } from "./ScrollItem";
+import ScrollItem, { type Page } from "./components/ScrollItem";
 import {
     FlatList,
     type LayoutChangeEvent,
@@ -14,13 +15,15 @@ import {
     type NativeSyntheticEvent,
     SafeAreaView,
 } from "react-native";
-import { SCROLL_ITEM_HEIGHT } from "../commons/constants";
-import type Post from "../types/Post";
-import reelServices from "../services/reelServices";
+import { SCROLL_ITEM_HEIGHT } from "./commons/constants";
+import type Post from "./types/Post";
+import reelServices from "./services/reelServices";
 
 interface InfiniteScrollProps {
     postGetter?: (index: number) => Promise<Post | null>;
     showUserProfile?: boolean;
+    // currently not working
+    initialIndex?: number;
 }
 
 export type InternalPost = Post & {
@@ -33,6 +36,7 @@ const END_REACH_THRESHOLD = 2;
 const InfiniteScroll: FC<InfiniteScrollProps> = ({
     postGetter,
     showUserProfile = true,
+    initialIndex = 0,
 }) => {
     const [loading, setLoading] = useState(false);
 
@@ -124,6 +128,7 @@ const InfiniteScroll: FC<InfiniteScrollProps> = ({
                 showsVerticalScrollIndicator={false}
                 keyExtractor={(item) => item.id}
                 data={internalPosts}
+                initialScrollIndex={initialIndex}
                 onMomentumScrollEnd={onMomentumScrollEnd}
                 scrollEnabled={scrollEnabled}
                 pagingEnabled={true}
@@ -131,6 +136,12 @@ const InfiniteScroll: FC<InfiniteScrollProps> = ({
                 onEndReachedThreshold={END_REACH_THRESHOLD}
                 onEndReached={fetchMoreData}
                 onLayout={onLayout}
+                windowSize={3}
+                getItemLayout={(data, index) => ({
+                    length: SCROLL_ITEM_HEIGHT,
+                    offset: SCROLL_ITEM_HEIGHT * index,
+                    index,
+                })}
             />
             {/* TODO: Add loading overlay for video here */}
             {loading && null}
@@ -138,4 +149,4 @@ const InfiniteScroll: FC<InfiniteScrollProps> = ({
     );
 };
 
-export default InfiniteScroll;
+export default memo(InfiniteScroll);

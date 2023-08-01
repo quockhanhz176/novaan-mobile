@@ -35,3 +35,5 @@ export type DistributiveOmit<T, K extends PropertyKey> = T extends any
     : never;
 
 export type IntersectUnion<T, U, V> = T extends U ? T & V : T;
+
+export type NonConcrete<T> = { [Property in keyof T]?: T[Property] };

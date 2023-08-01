@@ -1,6 +1,6 @@
 import React, { type FC } from "react";
 import { View } from "react-native";
-import InfiniteScroll from "./components/InfiniteScroll";
+import InfiniteScroll from "./InfiniteScrollv2";
 
 const Reel: FC = () => {
     return (

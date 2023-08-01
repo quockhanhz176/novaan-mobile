@@ -87,6 +87,7 @@ const MainScreens: FC<MainScreensProps> = ({
                     name="Search"
                     component={Search}
                     options={{
+                        unmountOnBlur: true,
                         tabBarLabel: "Tìm kiếm",
                         tabBarIcon: ({ color }) => (
                             <Icon name="search" size={24} color={color} />

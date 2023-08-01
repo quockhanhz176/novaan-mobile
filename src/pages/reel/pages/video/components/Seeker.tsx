@@ -29,7 +29,7 @@ const Seeker: FC<SeekerProps> = ({ progress = 0, onSeek }) => {
     return (
         <View
             onLayout={onLayout}
-            className="absolute bottom-0 left-0 right-0 pt-6"
+            className="pt-6"
             onTouchEnd={onTouchEnd}
         >
             <Bar

@@ -1,5 +1,5 @@
-import { capitalizeFirstLetter } from "@/common/utils";
-import BaseApi from "../BaseApi";
+import { type DistributiveOmit, capitalizeFirstLetter } from "@/common/utils";
+import BaseApi, { HttpMethod } from "../BaseApi";
 import {
     type IngredientInformation,
     type InstructionInformation,
@@ -12,6 +12,10 @@ import type PostListResponse from "./types/PostListResponse";
 import type PostResponse from "./types/PostResponse";
 import type ResourceResponse from "./types/ResourceResponse";
 import { type ProfileInfo } from "../profile/types";
+import type CommentResponse from "./types/CommentResponse";
+import { type PostType } from "./types/PostResponse";
+import { getRequestPostType } from "./types/RequestPostType";
+import type CommentInformation from "./types/CommentInformation";
 
 // upload
 const UPLOAD_RECIPE_URL = "content/upload/recipe";
@@ -22,6 +26,13 @@ const GET_RECIPE_URL = "content/post/recipe";
 const GET_TIP_URL = "content/post/tip";
 const GET_RESOURCE_URL = "content/download";
 const GET_USER_URL = "profile";
+const GET_COMMENTS_URL = "content/comments";
+// interact
+const POST_LIKE_URL = "content/interaction/like";
+const POST_SAVE_URL = "content/interaction/save";
+const POST_PUT_DELETE_COMMENT_URL = "content/interaction/comment";
+const POST_REPORT_URL = "content/interaction/report";
+// const COMMENT_REPORT_URL = "content/interaction/comment";
 
 const baseApi = new BaseApi();
 
@@ -161,35 +172,20 @@ const getPost = async (
 ): Promise<FailableResponse<PostResponse>> => {
     const url =
         type === "tip" ? `${GET_TIP_URL}/${id}` : `${GET_RECIPE_URL}/${id}`;
-    const response = await baseApi.get(url, {
-        timeout: 3000,
-        authorizationRequired: true,
-    });
-    console.log(`PostApi.getPost - response: ${JSON.stringify(response)}`);
-    const body = await response.json();
-    console.log(`PostApi.getPost - body: ${JSON.stringify(body)}`);
-
-    if (!response.ok) {
-        const code: number = body.code ?? -1;
-        return {
-            success: false,
-            code,
-        };
+    const result = await getBase<DistributiveOmit<PostResponse, "type">>(
+        url,
+        "getPost"
+    );
+    if (!result.success) {
+        return result;
     }
 
-    return {
-        success: true,
-        value: {
-            ...body,
-            type,
-            ...(type === "recipe"
-                ? {
-                      difficulty: 1,
-                      portionType: 0,
-                  }
-                : {}),
-        },
+    const postResult: FailableResponse<PostResponse> = {
+        success: result.success,
+        value: { ...result.value, type: type as any, likeCount: 634734 },
     };
+
+    return postResult;
 };
 
 const getResource = async (
@@ -211,26 +207,115 @@ const getBase = async <T>(
     url: string,
     caller: string
 ): Promise<FailableResponse<T>> => {
-    const response = await baseApi.get(url, {
-        timeout: 3000,
-        authorizationRequired: true,
-    });
-    console.log(`PostApi.${caller} - response: ${JSON.stringify(response)}`);
-    const body = await response.json();
-    console.log(`PostApi.${caller} - body: ${JSON.stringify(body)}`);
+    return await baseApi.sendReceiveBase<T>(
+        url,
+        `PostApi.${caller}`,
+        HttpMethod.GET
+    );
+};
 
-    if (!response.ok) {
-        const code: number = body.code ?? -1;
-        return {
-            success: false,
-            code,
-        };
+const setPostLike = async (
+    id: string,
+    _value: boolean,
+    type: PostType
+): Promise<FailableResponse<undefined>> => {
+    return await baseApi.sendReceiveBase<undefined>(
+        `${POST_LIKE_URL}/${id}`,
+        "PostApi.likePost",
+        HttpMethod.POST,
+        {
+            postType: getRequestPostType(type),
+        }
+    );
+};
+
+const setPostSave = async (
+    id: string,
+    _value: boolean,
+    type: PostType
+): Promise<FailableResponse<undefined>> => {
+    return await baseApi.sendReceiveBase<undefined>(
+        `${POST_SAVE_URL}/${id}`,
+        "PostApi.setPostSave",
+        HttpMethod.POST,
+        {
+            submissionType: getRequestPostType(type),
+        }
+    );
+};
+
+const getComments = async (
+    postId: string
+): Promise<FailableResponse<CommentResponse[]>> => {
+    return await getBase<CommentResponse[]>(
+        `${GET_COMMENTS_URL}/${postId}`,
+        "getComments"
+    );
+};
+
+const reportPost = async (
+    postId: string,
+    reportMessage: string,
+    type: PostType
+): Promise<FailableResponse<undefined>> => {
+    return await baseApi.sendReceiveBase<undefined>(
+        `${POST_REPORT_URL}/${postId}`,
+        "PostApi.reportPost",
+        HttpMethod.POST,
+        {
+            postType: getRequestPostType(type),
+            reason: reportMessage,
+        }
+    );
+};
+
+const sendComment = async (
+    information: CommentInformation,
+    isEdit: boolean = false
+): Promise<FailableResponse<undefined>> => {
+    const formData = new FormData();
+
+    formData.append("Rating", information.rating.toString());
+    formData.append("PostType", getRequestPostType(information.postType));
+    if (information.comment != null) {
+        formData.append("Comment", information.comment);
+    }
+    if (information.image != null) {
+        formData.append("Image", {
+            name: `upload.${information.image.extension}`,
+            uri: information.image.uri,
+            type: mime.lookup(information.image.extension),
+        } as any);
+    }
+    if (information.previousImageId != null) {
+        formData.append("ExistingImage", information.previousImageId);
     }
 
-    return {
-        success: true,
-        value: body,
-    };
+    return await baseApi.sendReceiveBase<undefined>(
+        `${POST_PUT_DELETE_COMMENT_URL}/${information.postId}`,
+        "PostApi.sendComment",
+        isEdit ? HttpMethod.PUT : HttpMethod.POST,
+        formData,
+        {
+            contentType: "multipart/form-data",
+            needJsonBody: false,
+        }
+    );
+};
+
+const deleteComment = async (
+    postId: string,
+    postType: PostType
+): Promise<FailableResponse<undefined>> => {
+    return await baseApi.sendReceiveBase<undefined>(
+        `${POST_PUT_DELETE_COMMENT_URL}/${postId}`,
+        "PostApi.deleteComment",
+        HttpMethod.DELETE,
+        {
+            postId,
+            postType: getRequestPostType(postType),
+        }
+    );
 };
 
 const postApi = {
@@ -240,6 +325,12 @@ const postApi = {
     getPost,
     getResource,
     getProfile,
+    setPostLike,
+    setPostSave,
+    getComments,
+    reportPost,
+    sendComment,
+    deleteComment,
 };
 
 export default postApi;

@@ -18,13 +18,17 @@ const customColors = {
     cwarning: "#f32839",
     cgrey: {
         seasalt: "#f9f9f9",
+        whitesmoke: "#f2f2f2",
         platinum: "#dedede",
-        dim: "#606060",
         battleship: "#999999",
+        grey: "#777777",
+        dim: "#606060",
     },
     xanthous: "#f7b01c",
     star: "#ffcb01",
     heart: "#ff6531",
+    save: "#688BE8", // Save blue
+    // save: "#2ca58d", // Save green?
     seeker: {
         background: "#898b8B",
         foreground: "#a40605",

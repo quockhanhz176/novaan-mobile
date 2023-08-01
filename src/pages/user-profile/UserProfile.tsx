@@ -4,6 +4,7 @@ import React, {
     useState,
     createContext,
     useMemo,
+    memo,
 } from "react";
 import { Pressable, Text, View } from "react-native";
 import CreatedPosts from "./pages/created-post/CreatedPosts";
@@ -58,7 +59,6 @@ const UserProfile = (
 
     const isUserProfile = useMemo(() => userId == null, [userId]);
 
-    const [loading, setLoading] = useState(true);
     const [index, setIndex] = useState(0);
     const [routes, setRoutes] = useState<Array<{ key: string }>>([]);
 
@@ -92,7 +92,6 @@ const UserProfile = (
     }, [isUserProfile]);
 
     const handleFetchProfile = async (): Promise<void> => {
-        setLoading(true);
         try {
             let fetched = false;
             if (userId == null) {
@@ -113,8 +112,6 @@ const UserProfile = (
                 type: "error",
                 text1: "Failed to fetch user profile",
             });
-        } finally {
-            setLoading(false);
         }
     };
 
@@ -136,6 +133,8 @@ const UserProfile = (
     }
 
     const { username, followersCount, followingCount } = profileInfo;
+
+    console.log("Rendering user profle", profileInfo);
 
     return (
         <View className="flex-1 bg-white">
@@ -214,9 +213,9 @@ const UserProfile = (
                     )}
                 />
             </UserProfileContext.Provider>
-            {loading && <OverlayLoading />}
+            {profileInfo == null && <OverlayLoading />}
         </View>
     );
 };
 
-export default UserProfile;
+export default memo(UserProfile);

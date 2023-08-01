@@ -7,13 +7,17 @@ import type Post from "../types/Post";
 import PostApi from "@/api/post/PostApi";
 import moment from "moment";
 import { getRecipeTime } from "@/pages/create-post/create-recipe/types/RecipeTime";
+import type PostComment from "../types/PostComment";
+import type PostResponse from "@/api/post/types/PostResponse";
+import { type PostType } from "@/api/post/types/PostResponse";
+import { getUrlExtension } from "@/common/utils";
 
-const getNextPost = (): Post => ({
+const getMockPost = (): Post => ({
     id: "1",
     title: "Cách làm bánh kem (bánh gato) dâu tây tại nhà",
     description:
         "Bánh kem thường xuất hiện trong những bữa tiệc sinh nhật hay những ngày vui trong các gia đình và hội bạn thân nên được rất nhiều người yêu thích. Hôm nay Điện máy XANH sẽ vào bếp góp vào niềm vui của mọi người bằng món bánh kem (bánh gato) dâu tây thơm ngon nhé!",
-    video: "https://v.pinimg.com/videos/mc/720p/f6/88/88/f68888290d70aca3cbd4ad9cd3aa732f.mp4",
+    video: "015b8d24-ebc7-4b4a-8008-6f8632ebeedc.mp4",
     type: "recipe",
     difficulty: 1,
     portionQuantity: 1,
@@ -52,6 +56,9 @@ const getNextPost = (): Post => ({
         avatar: "bcdf1b90-d48a-45ff-8480-cf4f5259e59f.jpg",
     },
     status: 0,
+    isLiked: true,
+    isSaved: true,
+    likeCount: 203,
 });
 
 let postListData: StorageKey["reelListData"] | undefined;
@@ -81,13 +88,44 @@ const getListData = async (): Promise<boolean> => {
         postListData = {
             list: response.value,
             lastItem: -1,
-            lastUpdate: new Date(),
+            lastUpdate: moment(),
         };
+        void storeData("reelListData", postListData);
         return true;
     }
 
     serverError();
     return false;
+};
+
+const toPost = async (postResponse: PostResponse): Promise<Post> => {
+    const profile = await PostApi.getProfile(postResponse.creatorId);
+
+    const creator = profile.success
+        ? profile.value
+        : {
+              username: "Điện máy XANH",
+              userId: "123332",
+          };
+
+    if (postResponse.type === "tip") {
+        return {
+            ...postResponse,
+            creator,
+        };
+    }
+
+    const prepDuration = moment.duration(postResponse.prepTime);
+    const cookDuration = moment.duration(postResponse.cookTime);
+    const prepTime = getRecipeTime(prepDuration);
+    const cookTime = getRecipeTime(cookDuration);
+
+    return {
+        ...postResponse,
+        creator,
+        prepTime,
+        cookTime,
+    };
 };
 
 // TODO: implement busninesses when recommendation is clearer
@@ -119,33 +157,7 @@ const getPost = async (index: number): Promise<Post | null> => {
                 JSON.stringify(postResponse)
         );
 
-        const profile = await PostApi.getProfile(postResponse.value.creatorId);
-
-        const creator = profile.success
-            ? profile.value
-            : {
-                  username: "Điện máy XANH",
-                  userId: "123332",
-              };
-
-        if (postResponse.value.type === "tip") {
-            return {
-                ...postResponse.value,
-                creator,
-            };
-        }
-
-        const prepDuration = moment.duration(postResponse.value.prepTime);
-        const cookDuration = moment.duration(postResponse.value.cookTime);
-        const prepTime = getRecipeTime(prepDuration);
-        const cookTime = getRecipeTime(cookDuration);
-
-        return {
-            ...postResponse.value,
-            creator,
-            prepTime,
-            cookTime,
-        };
+        return await toPost(postResponse.value);
     } catch (e) {
         console.error(e);
         serverError();
@@ -153,9 +165,79 @@ const getPost = async (index: number): Promise<Post | null> => {
     }
 };
 
+const getComments = async (id: string): Promise<PostComment[] | null> => {
+    const result = await PostApi.getComments(id);
+    if (!result.success) {
+        serverError();
+        return null;
+    }
+
+    return result.value.map((commentResponse): PostComment => {
+        const createdAt = moment(commentResponse.createdAt);
+        return { ...commentResponse, createdAt };
+    });
+};
+
+const getMockComments = (): PostComment[] => {
+    return [
+        {
+            commentId: "0",
+            userId: "12",
+            username: "sanguine",
+            avatar: "f2341b44-e0d0-48d1-99ea-82c41a3ba41e.jpg",
+            comment: "món này hơi mặn",
+            image: "f2341b44-e0d0-48d1-99ea-82c41a3ba41e.jpg",
+            rating: 2,
+            createdAt: moment("2023-07-16T06:56:54.474Z"),
+        },
+        {
+            commentId: "12",
+            userId: "13",
+            username: "Liquid Oxygen",
+            avatar: "",
+            rating: 7,
+            createdAt: moment("1997-03-26T06:56:54.474Z"),
+        },
+    ];
+};
+
+const sendComment = async (
+    postId: string,
+    rating: number,
+    postType: PostType,
+    comment?: string,
+    imageUri?: string,
+    previousImageId?: string,
+    isEdit: boolean = false
+): Promise<boolean> => {
+    const result = await PostApi.sendComment(
+        {
+            postId,
+            rating,
+            postType,
+            image:
+                imageUri != null
+                    ? {
+                          uri: imageUri,
+                          extension: getUrlExtension(imageUri),
+                      }
+                    : undefined,
+            comment,
+            previousImageId,
+        },
+        isEdit
+    );
+
+    return result.success;
+};
+
 const reelServices = {
-    getNextPost,
+    getMockPost,
     getPost,
+    getComments,
+    getMockComments,
+    sendComment,
+    toPost,
 };
 
 export default reelServices;

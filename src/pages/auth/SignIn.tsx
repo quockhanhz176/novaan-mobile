@@ -32,6 +32,10 @@ import { maybeCompleteAuthSession } from "expo-web-browser";
 import { useAuthRequest } from "expo-auth-session/providers/google";
 import { saveKeychain } from "@/common/keychainService";
 import { type RootStackParamList } from "@/types/navigation";
+import moment from "moment";
+import { useRefreshToken } from "@/api/auth/authApiHook";
+import { type TokenPayload } from "@/api/baseApiHook";
+import { getPayloadFromToken } from "@/api/common/utils/TokenUtils";
 
 interface SignInProps {
     navigation: NativeStackNavigationProp<RootStackParamList, "SignIn">;
@@ -49,6 +53,7 @@ const SignIn = (props: SignInProps): ReactElement<SignInProps> => {
     const [, response, promptAsync] = useAuthRequest({
         androidClientId: GOOGLE_API_KEY,
     });
+    const { refreshToken } = useRefreshToken();
     const [token, setToken] = useState<string>("");
 
     const {
@@ -63,8 +68,45 @@ const SignIn = (props: SignInProps): ReactElement<SignInProps> => {
         mode: "all",
     });
 
+    const handlePersistentSignIn = async (): Promise<void> => {
+        setIsLoading(true);
+
+        // Check if there is a token exist
+        try {
+            const currentUserToken = await getPayloadFromToken<TokenPayload>();
+            if (currentUserToken.exp == null) {
+                return;
+            }
+
+            // Check token exp
+            const exp = moment.unix(Number(currentUserToken.exp));
+            const expired = moment().diff(exp) >= 0;
+
+            if (!expired) {
+                // Skip sign in
+                navigation.navigate("MainScreens");
+                return;
+            }
+
+            // This will also throw error if there are no token exist in keychain store
+            const newToken = await refreshToken();
+            if (newToken == null) {
+                throw new Error();
+            }
+
+            // Save new token to secure store
+            await saveKeychain(KEYCHAIN_ID, newToken);
+            navigation.navigate("MainScreens");
+        } catch (e) {
+            // Continue with normal sign in
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     useEffect(() => {
         maybeCompleteAuthSession();
+        void handlePersistentSignIn();
     }, []);
 
     useEffect(() => {
@@ -118,10 +160,6 @@ const SignIn = (props: SignInProps): ReactElement<SignInProps> => {
                 alert(SIGN_IN_GOOGLE_ERROR_OCCURED);
                 return;
             }
-
-            // Save token to secure store
-            console.log(response.token);
-
             await saveKeychain(KEYCHAIN_ID, response.token);
             navigation.navigate("MainScreens");
         } catch (error) {

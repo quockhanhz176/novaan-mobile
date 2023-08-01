@@ -5,10 +5,10 @@ import React, {
     type ReactElement,
     useContext,
     useMemo,
+    memo,
 } from "react";
 import { Modal, View, Pressable, Text } from "react-native";
-import InfiniteScroll from "@/pages/reel/components/InfiniteScroll";
-import type Post from "@/pages/reel/types/Post";
+import InfiniteScroll from "@/pages/reel/InfiniteScrollv2";
 import MaterialIcon from "react-native-vector-icons/MaterialIcons";
 import IonIcon from "react-native-vector-icons/Ionicons";
 import {
@@ -19,13 +19,10 @@ import {
 import { ToggleButton } from "react-native-paper";
 import CustomToggleButton from "./components/CustomToggleButton";
 import { UserProfileContext } from "../../UserProfile";
-import moment from "moment";
-import { getRecipeTime } from "@/pages/create-post/create-recipe/types/RecipeTime";
 import CreatedPostList from "./components/CreatedPostList";
 import EmptyCreatedPost from "./components/EmptyCreatedPost";
 import type PostResponse from "@/api/post/types/PostResponse";
 import { type Undefinable } from "@/types/app";
-import { type RecipeResponse } from "@/api/post/types/PostResponse";
 
 type ViewCategory = "recipe" | "tips";
 
@@ -79,42 +76,42 @@ const CreatedPosts = (): ReactElement => {
         setFetching(false);
     };
 
-    const postGetterProfile = async (index: number): Promise<Post | null> => {
-        // Only allow viewing current item for now
-        // TODO: Improve by adding option to navigate to a specific index in InfiniteScroll
-        if (index !== 0) {
-            return null;
-        }
+    // const postGetterProfile = async (index: number): Promise<Post | null> => {
+    //     // Only allow viewing current item for now
+    //     // TODO: Improve by adding option to navigate to a specific index in InfiniteScroll
+    //     if (index !== 0) {
+    //         return null;
+    //     }
 
-        if (viewItem === undefined) {
-            return null;
-        }
+    //     if (viewItem === undefined) {
+    //         return null;
+    //     }
 
-        const userInfo = userProfileContext.userInfo;
-        if (userInfo == null) {
-            return null;
-        }
+    //     const userInfo = userProfileContext.userInfo;
+    //     if (userInfo == null) {
+    //         return null;
+    //     }
 
-        const isRecipe = (item: PostResponse): item is RecipeResponse => {
-            return "ingredients" in item;
-        };
+    //     const isRecipe = (item: PostResponse): item is RecipeResponse => {
+    //         return "ingredients" in item;
+    //     };
 
-        if (viewCategory === "recipe" && isRecipe(viewItem)) {
-            return {
-                ...viewItem,
-                type: "recipe",
-                creator: userInfo,
-                prepTime: getRecipeTime(moment.duration(viewItem.prepTime)),
-                cookTime: getRecipeTime(moment.duration(viewItem.cookTime)),
-            };
-        }
+    //     if (viewCategory === "recipe" && isRecipe(viewItem)) {
+    //         return {
+    //             ...viewItem,
+    //             type: "recipe",
+    //             creator: userInfo,
+    //             prepTime: getRecipeTime(moment.duration(viewItem.prepTime)),
+    //             cookTime: getRecipeTime(moment.duration(viewItem.cookTime)),
+    //         };
+    //     }
 
-        return {
-            ...viewItem,
-            type: "tip",
-            creator: userInfo,
-        };
-    };
+    //     return {
+    //         ...viewItem,
+    //         type: "tip",
+    //         creator: userInfo,
+    //     };
+    // };
 
     const handleItemPress = (item: PostResponse): void => {
         setViewingItem(true);
@@ -212,13 +209,23 @@ const CreatedPosts = (): ReactElement => {
                         </Pressable>
                     </View>
                 </View>
-                <InfiniteScroll
-                    postGetter={postGetterProfile}
-                    showUserProfile={false}
-                />
+                {viewItem != null && (
+                    <InfiniteScroll
+                        postIds={[
+                            {
+                                postId: viewItem.id,
+                                postType:
+                                    viewCategory === "recipe"
+                                        ? "Recipe"
+                                        : "CulinaryTip",
+                            },
+                        ]}
+                        showUserProfile={false}
+                    />
+                )}
             </Modal>
         </View>
     );
 };
 
-export default CreatedPosts;
+export default memo(CreatedPosts);

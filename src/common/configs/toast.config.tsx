@@ -1,54 +1,38 @@
 import React from "react";
 import { customColors } from "@root/tailwind.config";
-import { BaseToast } from "react-native-toast-message";
+import {
+    BaseToast,
+    type ToastConfig,
+    type BaseToastProps,
+} from "react-native-toast-message";
+import { type ColorValue } from "react-native";
 
-export const toastConfig = {
-    success: (props) => (
+const getDefaultProps: (color: ColorValue) => BaseToastProps = (color) => ({
+    style: {
+        borderLeftColor: color,
+        borderLeftWidth: 12,
+        zIndex: 100,
+    },
+    contentContainerStyle: {
+        paddingHorizontal: 16,
+    },
+    text1Style: {
+        fontSize: 16,
+    },
+    text1NumberOfLines: 2,
+});
+
+export const toastConfig: ToastConfig = {
+    success: (props: BaseToastProps) => (
         <BaseToast
             {...props}
-            style={{
-                borderLeftColor: customColors.cprimary["300"],
-                borderLeftWidth: 12,
-            }}
-            contentContainerStyle={{
-                paddingHorizontal: 16,
-            }}
-            text1Style={{
-                fontSize: 16,
-            }}
-            text1NumberOfLines={2}
+            {...getDefaultProps(customColors.cprimary["300"])}
         />
     ),
-    error: (props) => (
-        <BaseToast
-            {...props}
-            style={{
-                borderLeftColor: customColors.cwarning,
-                borderLeftWidth: 12,
-            }}
-            contentContainerStyle={{
-                paddingHorizontal: 16,
-            }}
-            text1Style={{
-                fontSize: 16,
-            }}
-            text1NumberOfLines={2}
-        />
+    error: (props: BaseToastProps) => (
+        <BaseToast {...props} {...getDefaultProps(customColors.cwarning)} />
     ),
-    info: (props) => (
-        <BaseToast
-            {...props}
-            style={{
-                borderLeftColor: customColors.cinfo,
-                borderLeftWidth: 12,
-            }}
-            contentContainerStyle={{
-                paddingHorizontal: 16,
-            }}
-            text1Style={{
-                fontSize: 16,
-            }}
-            text1NumberOfLines={2}
-        />
+    info: (props: BaseToastProps) => (
+        <BaseToast {...props} {...getDefaultProps(customColors.cinfo)} />
     ),
 };

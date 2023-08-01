@@ -7,6 +7,8 @@ export const DIFFICULTY_MEDIUM = "Trung bình";
 export const DIFFICULTY_HARD = "Khó";
 export const PORTION_PIECE = "miếng";
 export const PORTION_SERVING = "phần ăn";
+export const POST_TYPE_RECIPE = "Công thức";
+export const POST_TYPE_TIP = "Mẹo vặt";
 // Common messages
 export const COMMON_SERVER_CONNECTION_FAIL_ERROR =
     "Hiện đang không thể kết nối được với server, xin vui lòng thử lại sau";
@@ -207,7 +209,8 @@ export const PROFILE_EMPTY_FOLLOWING = "Oops, bạn chưa theo dõi ai cả";
 export const PROFILE_PAGE_LABEL = "Trang cá nhân";
 
 // Reel screen
-export const REEL_DETAILS_DIFFICULTY_TITLE = "Độ khó: ";
+export const REEL_DETAILS_RATING = "đánh giá";
+export const REEL_DETAILS_DIFFICULTY_TITLE = "Độ khó";
 export const REEL_DETAILS_INGREDIENTS_TITLE = "Nguyên liệu";
 export const REEL_DETAILS_INSTRUCTIONS_TITLE = "Hướng dẫn chi tiết";
 export const REEL_DETAILS_INSTRUCTION_TITLE = "Bước";
@@ -215,3 +218,48 @@ export const REEL_DETAILS_PREPARE_TIME_TITLE = "Thời gian chuẩn bị";
 export const REEL_DETAILS_PREPARE_COOK_TIME = "Thời gian nấu";
 export const REEL_DETAILS_HOUR = "giờ";
 export const REEL_DETAILS_MINUTE = "phút";
+export const REEL_DETAILS_SAVE = "Lưu";
+export const REEL_VIDEO_SAVE = "Lưu";
+export const REEL_VIDEO_DETAILS = "Chi tiết";
+export const REEL_VIDEO_REPORT = "Báo cáo";
+export const REEL_REPORT_FORM_REPORT = "Báo cáo";
+export const REEL_REPORT_FORM_REPORT_PLACEHOLDER = "Nhập nội dung báo cáo ...";
+export const REEL_REPORT_FORM_REPORT_SUCCESS_MESSAGE =
+    "Báo cáo của bạn đã được gửi";
+export const REEL_REPORT_FORM_REPORT_FAIL_MESSAGE =
+    "Đã có lỗi xảy ra khi gửi báo cáo";
+export const REEL_REPORT_FORM_REPORT_ALERT_TITLE = "";
+export const REEL_REPORT_FORM_REPORT_NO_MESSAGE_ERROR =
+    "Nội dung báo cáo không được để trống!";
+export const REEL_COMMENTS_TITLE = "Đánh giá";
+export const REEL_COMMENTS_BUTTON_TITLE = "Thêm đánh giá...";
+export const REEL_COMMENTS_BUTTON_EDIT_TITLE = "Chỉnh sửa đánh giá...";
+export const REEL_COMMENTS_EDIT_BUTTON = "Chỉnh sửa";
+export const REEL_COMMENTS_DELETE_BUTTON = "Xóa";
+export const REEL_REPORT_FORM_TITLE = "Lý do báo cáo nội dung";
+export const REEL_REPORT_FORM_SORRY =
+    "Chúng tôi rất tiếc khi đã có nội dung làm bạn không thoải mái. Xin vui lòng cho biết lý do để chúng tôi có thể đánh giá lại nội dung này.";
+
+// Add comment
+export const ADD_COMMENT_TITLE = "Đánh giá";
+export const ADD_COMMENT_EDIT_TITLE = "Chỉnh sửa đánh giá";
+export const ADD_COMMENT_STAR_TITLE = "Bạn nghĩ thế nào về bài đăng?";
+export const ADD_COMMENT_STAR_SUBTITLE = "Đánh giá bài đăng bằng số sao";
+export const ADD_COMMENT_DETAIL_TITLE =
+    "Bạn có muốn thêm đánh giá chi tiết nào để chia sẻ với tác giả và cộng đồng không?";
+export const ADD_COMMENT_DETAIL_PLACEHOLDER =
+    "Rất ngon! Tôi đã thêm... (không bắt buộc)";
+export const ADD_COMMENT_SUBMIT = "Hoàn tất";
+// Add comment message
+export const ADD_COMMENT_NO_RATING_ERROR = "Trường đánh giá sao là bắt buộc";
+export const ADD_COMMENT_UPLOAD_ERROR =
+    "Đã có lỗi xảy ra khi đăng tải đánh giá";
+
+// Filter
+export const FILTER_TITLE = "Lọc kết quả";
+export const FILTER_CATEGORY_DIET = "Chế độ ăn";
+export const FILTER_CATEGORY_CUISINE = "Đặc sản";
+export const FILTER_CATEGORY_ALLERGEN = "Dị ứng";
+
+// Search
+export const SEARCH_POST_DETAILS_TITLE = "Chi tiết kết quả tìm kiếm";

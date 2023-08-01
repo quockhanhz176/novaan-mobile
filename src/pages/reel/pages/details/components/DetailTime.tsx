@@ -29,7 +29,7 @@ const DetailTime: FC<DetailTimeProps> = ({ title, time, style }) => {
     return (
         <View className="items-center space-y-3" style={style}>
             <Text className="text-base font-normal">{title}</Text>
-            <Text className="text-lg font-semibold text-csecondary">
+            <Text className="text-lg font-semibold text-cprimary-300">
                 {timeText}
             </Text>
         </View>
