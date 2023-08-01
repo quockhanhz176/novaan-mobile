@@ -8,26 +8,25 @@ import {
     FILTER_CATEGORY_CUISINE,
     FILTER_CATEGORY_DIET,
 } from "@/common/strings";
+import { type RecipeResponse } from "@/api/post/types/PostResponse";
 
 const searchPost = async (query: string): Promise<PostResponse[] | null> => {
     const minimalPostsResult = await postApi.getPostList();
     if (!minimalPostsResult.success) {
-        return [];
+        return null;
     }
 
     const posts: PostResponse[] = [];
 
-    await Promise.all(
-        minimalPostsResult.value.map(async (mPost) => {
-            const result = await postApi.getPost(
-                mPost.postId,
-                mPost.postType === "Recipe" ? "recipe" : "tip"
-            );
-            if (result.success) {
-                posts.push(result.value);
-            }
-        })
-    );
+    for (const mPost of minimalPostsResult.value) {
+        const result = await postApi.getPost(
+            mPost.postId,
+            mPost.postType === "Recipe" ? "recipe" : "tip"
+        );
+        if (result.success) {
+            posts.push(result.value);
+        }
+    }
 
     return posts;
 };
@@ -74,9 +73,39 @@ const getPreferences = async (): Promise<PreferenceSuite | null> => {
     return suite;
 };
 
+const searchAdvanced = async (
+    ingredients: string[],
+    start: number,
+    size: number
+): Promise<RecipeResponse[] | null> => {
+    const result = await searchApi.getAdvancedSearchResult(
+        ingredients,
+        start,
+        size
+    );
+
+    if (!result.success) {
+        return null;
+    }
+
+    const posts: RecipeResponse[] = [];
+
+    for (const p of result.value) {
+        const result = await postApi.getPost(p.id, "recipe");
+        if (result.success) {
+            if (result.value.type === "recipe") {
+                posts.push(result.value);
+            }
+        }
+    }
+
+    return posts;
+};
+
 const searchServices = {
     searchPost,
     getPreferences,
+    searchAdvanced,
 };
 
 export default searchServices;

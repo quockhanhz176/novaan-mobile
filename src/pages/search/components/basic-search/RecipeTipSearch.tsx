@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import IconLabelButton from "@/common/components/IconLabelButton";
 import { customColors } from "@root/tailwind.config";
 import {
@@ -7,33 +8,30 @@ import {
     useCallback,
     useMemo,
     useReducer,
+    memo,
 } from "react";
 import React, {
     Modal,
     TextInput,
     View,
     Text,
-    Pressable,
     type ViewStyle,
     type StyleProp,
+    SafeAreaView,
 } from "react-native";
 import IconEvil from "react-native-vector-icons/EvilIcons";
-import CreatedPostList from "../../user-profile/pages/created-post/components/CreatedPostList";
+import CreatedPostList from "../../../user-profile/pages/created-post/components/CreatedPostList";
 import type PostResponse from "@/api/post/types/PostResponse";
-import searchServices from "../services/searchServices";
+import searchServices from "../../services/searchServices";
 import useModalHook from "@/common/components/ModalHook";
 import Filter from "./Filter";
 import { type Route, TabBar, TabView } from "react-native-tab-view";
-import {
-    POST_TYPE_RECIPE,
-    POST_TYPE_TIP,
-    SEARCH_POST_DETAILS_TITLE,
-} from "@/common/strings";
+import { POST_TYPE_RECIPE, POST_TYPE_TIP } from "@/common/strings";
 import { type PostType } from "@/api/post/types/PostResponse";
-import IconMaterial from "react-native-vector-icons/MaterialIcons";
-import InfiniteScroll from "@/pages/reel/InfiniteScrollv2";
-import { type Undefinable } from "@/types/app";
 import { suiteReducer } from "./filterReducer";
+import { type ReelParams } from "../../Search";
+import { getRequestPostType } from "@/api/post/types/RequestPostType";
+import LinearGradient from "react-native-linear-gradient";
 
 const routes: Route[] = [
     {
@@ -43,7 +41,15 @@ const routes: Route[] = [
     { key: "tip", title: POST_TYPE_TIP },
 ];
 
-const RecipeTipSearch: FC = () => {
+interface RecipeTipSearchParams {
+    setReelParams?: (value: ReelParams) => void;
+    showReel?: () => void;
+}
+
+const RecipeTipSearch: FC<RecipeTipSearchParams> = ({
+    setReelParams,
+    showReel,
+}) => {
     const [searchString, setSearchString] = useState("");
     const [recipeResults, setRecipeResults] = useState<PostResponse[]>([]);
     const [tipResults, setTipResults] = useState<PostResponse[]>([]);
@@ -55,11 +61,7 @@ const RecipeTipSearch: FC = () => {
     const [tabIndex, setTabIndex] = useState(0);
     const [recipesLoading, setRecipesLoading] = useState(false);
     const [tipsLoading, setTipsLoading] = useState(false);
-    const [reelVisible, hideReel, showReel] = useModalHook();
     // const [reelInitialIndex, setReelInitialIndex] = useState(0);
-    const [selectedItem, setSelectedItem] =
-        useState<Undefinable<PostResponse>>(undefined);
-
     useEffect(() => {
         void searchServices.getPreferences().then((suite) => {
             if (suite == null) {
@@ -130,10 +132,17 @@ const RecipeTipSearch: FC = () => {
     // );
 
     const itemPressed = useCallback(
-        (_item: PostResponse, index: number): void => {
+        (item: PostResponse, index: number): void => {
             // setReelInitialIndex(index);
-            setSelectedItem(_item);
-            showReel();
+            setReelParams?.({
+                minimalPosts: [
+                    {
+                        postId: item.id,
+                        postType: getRequestPostType(item.type),
+                    },
+                ],
+            });
+            showReel?.();
         },
         []
     );
@@ -205,7 +214,7 @@ const RecipeTipSearch: FC = () => {
                         iconProps={{
                             name: "sliders-h",
                             size: 25,
-                            color: customColors.cprimary["300"],
+                            color: customColors.cprimary["200"],
                         }}
                         buttonClassName="space-x-0 px-1"
                         buttonProps={{
@@ -224,20 +233,21 @@ const RecipeTipSearch: FC = () => {
                     onIndexChange={onTabChange}
                     renderTabBar={(tabBarProp) => (
                         <TabBar
+                            scrollEnabled={false}
                             {...tabBarProp}
                             style={{}}
                             indicatorContainerStyle={{
                                 backgroundColor: customColors.white,
                             }}
                             indicatorStyle={{
-                                backgroundColor: customColors.cprimary["300"],
+                                backgroundColor: customColors.cprimary["200"],
                             }}
                             renderLabel={(prop) => (
                                 <Text
                                     className={
                                         "text-base " +
                                         (prop.focused
-                                            ? "text-cprimary-300"
+                                            ? "text-cprimary-200"
                                             : "text-cgrey-dim")
                                     }
                                 >
@@ -262,43 +272,8 @@ const RecipeTipSearch: FC = () => {
                     />
                 )}
             </Modal>
-            <Modal
-                animationType="slide"
-                visible={reelVisible}
-                onRequestClose={hideFilter}
-            >
-                <View
-                    style={{ height: 50 }}
-                    className="flex-row justify-between items-center"
-                >
-                    <Pressable
-                        onPress={hideReel}
-                        className="px-4 py-2 rounded-lg"
-                    >
-                        <IconMaterial name="arrow-back" size={24} />
-                    </Pressable>
-                    <View className="flex-1 items-center mr-12">
-                        <Text className="text-base font-semibold">
-                            {SEARCH_POST_DETAILS_TITLE}
-                        </Text>
-                    </View>
-                </View>
-                {selectedItem != null && (
-                    <InfiniteScroll
-                        postIds={[
-                            {
-                                postId: selectedItem.id,
-                                postType:
-                                    selectedItem.type === "recipe"
-                                        ? "Recipe"
-                                        : "CulinaryTip",
-                            },
-                        ]}
-                    />
-                )}
-            </Modal>
         </>
     );
 };
 
-export default RecipeTipSearch;
+export default memo(RecipeTipSearch);

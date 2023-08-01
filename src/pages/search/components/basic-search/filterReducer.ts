@@ -1,4 +1,4 @@
-import type PreferenceSuite from "../types/PreferenceSuite";
+import type PreferenceSuite from "../../types/PreferenceSuite";
 
 export type SuiteDispatchValue =
     | {

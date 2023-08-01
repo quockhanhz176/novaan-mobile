@@ -7,15 +7,15 @@ import {
     useCallback,
 } from "react";
 import React, { View, Text, Animated } from "react-native";
-import type Preference from "../types/Preference";
 import FilterItem, {
     FILTER_ITEM_HEIGHT,
     type FilterItemDispatchValue,
 } from "./FilterItem";
-import type PreferenceCategory from "../types/PreferenceCategory";
+import type PreferenceCategory from "../../types/PreferenceCategory";
 import IconLabelButton from "@/common/components/IconLabelButton";
-import { getPreferenceProperty } from "../types/PreferenceSuite";
 import { type SuiteDispatchValue } from "./filterReducer";
+import { getPreferenceProperty } from "../../types/PreferenceSuite";
+import Preference from "../../types/Preference";
 
 interface FilterCategoryProps {
     category: PreferenceCategory;

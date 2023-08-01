@@ -37,6 +37,13 @@ export interface IconLabelButtonProps {
     style?: StyleProp<ViewStyle>;
 }
 
+const arePropsEqual = (
+    previous: IconLabelButtonProps,
+    next: IconLabelButtonProps
+): boolean =>
+    previous.buttonProps?.onPress === next.buttonProps?.onPress &&
+    JSON.stringify(previous) === JSON.stringify(next);
+
 const IconLabelButton: FC<IconLabelButtonProps> = ({
     iconPack = "Ionicons",
     iconProps,
@@ -84,7 +91,6 @@ const IconLabelButton: FC<IconLabelButtonProps> = ({
             {...buttonProps}
             style={style}
             className={`flex-row items-center space-x-1 ${buttonClassName}`}
-            activeOpacity={0.6}
         >
             <>
                 {renderIcon()}
@@ -101,4 +107,4 @@ const IconLabelButton: FC<IconLabelButtonProps> = ({
     );
 };
 
-export default memo(IconLabelButton);
+export default memo(IconLabelButton, arePropsEqual);

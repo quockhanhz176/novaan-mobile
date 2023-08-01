@@ -1,8 +1,8 @@
 import { memo, type FC, type ReactElement, useCallback } from "react";
 import React, { ScrollView, TouchableOpacity, View, Text } from "react-native";
-import type PreferenceSuite from "../types/PreferenceSuite";
+import type PreferenceSuite from "../../types/PreferenceSuite";
 import FilterCategory from "./FilterCategory";
-import type PreferenceCategory from "../types/PreferenceCategory";
+import type PreferenceCategory from "../../types/PreferenceCategory";
 import IconAnt from "react-native-vector-icons/AntDesign";
 import { FILTER_TITLE } from "@/common/strings";
 import { type SuiteDispatchValue } from "./filterReducer";

@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
-import React, { useEffect } from "react";
+import React, { type FC, useEffect } from "react";
 import { View } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -22,7 +21,7 @@ enableScreens();
 
 const DEFAULT_ORIENTATION = OrientationLock.PORTRAIT_UP;
 
-const App = () => {
+const App: FC = () => {
     const handleLockOrientation = async (): Promise<void> => {
         await lockAsync(DEFAULT_ORIENTATION);
     };
