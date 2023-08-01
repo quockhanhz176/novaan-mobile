@@ -27,7 +27,7 @@ const SaveButton = (): ReactElement => {
                             ? "Recipe"
                             : "CulinaryTip",
                 };
-                await savePost(interaction, currentPost.title);
+                await savePost(interaction, currentUserId);
             },
             1000,
             {}

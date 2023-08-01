@@ -1,9 +1,10 @@
-import { useState } from "react";
-import { useFetch } from "../baseApiHook";
+import { useEffect, useMemo, useState } from "react";
+import { useFetch, useFetchSwr } from "../baseApiHook";
 import {
     type UseProfileInfoReturn,
     type ProfileInfo,
     type MinimalUserInfo,
+    type SavedPostResponse,
 } from "./types";
 import {
     type TipResponse,
@@ -61,7 +62,7 @@ export const useProfileInfo = (): UseProfileInfoReturn => {
 };
 
 const useGetUserContent = <T,>(
-    getContentUrl: (userId: string) => Promise<string>,
+    getContentUrl: (userId: string) => string,
     userId?: string
 ): PaginationHookReturn<T> => {
     const { getReq } = useFetch({
@@ -80,7 +81,7 @@ const useGetUserContent = <T,>(
         if (userId == null) {
             userId = await getUserIdFromToken();
         }
-        const contentUrl = await getContentUrl(userId);
+        const contentUrl = getContentUrl(userId);
         const content = (await getReq(
             `${contentUrl}?Start=${start}&Limit=${limit}`
         )) as T[];
@@ -123,42 +124,104 @@ const useGetUserContent = <T,>(
     return { getNext, refresh, content, ended };
 };
 
+export const getUserRecipesUrl = (userId: string): string => {
+    return `profile/${userId}/recipes`;
+};
+
+export const getUserTipsUrl = (userId: string): string => {
+    return `profile/${userId}/tips`;
+};
+
+export const getUserFollowingUrl = (userId: string): string => {
+    return `following/${userId}`;
+};
+
+export const getUserFollowerUrl = (userId: string): string => {
+    return `followers/${userId}`;
+};
+
+export const getUserSavedUrl = (userId: string): string => {
+    return `profile/${userId}/saved`;
+};
+
 export const useUserRecipes = (
     userId?: string
 ): PaginationHookReturn<RecipeResponse> => {
-    const getContentUrl = async (userId: string): Promise<string> => {
-        return `profile/${userId}/recipes`;
-    };
-
-    return useGetUserContent<RecipeResponse>(getContentUrl, userId);
+    return useGetUserContent<RecipeResponse>(getUserRecipesUrl, userId);
 };
 
 export const useUserTips = (
     userId?: string
 ): PaginationHookReturn<TipResponse> => {
-    const getContentUrl = async (userId: string): Promise<string> => {
-        return `profile/${userId}/tips`;
-    };
-
-    return useGetUserContent<TipResponse>(getContentUrl, userId);
+    return useGetUserContent<TipResponse>(getUserTipsUrl, userId);
 };
 
 export const useUserFollowing = (
     userId?: string
 ): PaginationHookReturn<MinimalUserInfo> => {
-    const getContentUrl = async (userId: string): Promise<string> => {
-        return `following/${userId}`;
-    };
-
-    return useGetUserContent<MinimalUserInfo>(getContentUrl, userId);
+    return useGetUserContent<MinimalUserInfo>(getUserFollowingUrl, userId);
 };
 
 export const useUserFollower = (
     userId?: string
 ): PaginationHookReturn<MinimalUserInfo> => {
-    const getContentUrl = async (userId: string): Promise<string> => {
-        return `followers/${userId}`;
+    return useGetUserContent<MinimalUserInfo>(getUserFollowerUrl, userId);
+};
+
+export const useUserSavedPost = (
+    userId?: string
+): PaginationHookReturn<SavedPostResponse> => {
+    if (userId == null) {
+        return {
+            content: [],
+            ended: false,
+            getNext: () => {},
+            refresh: () => {},
+        };
+    }
+
+    const [ended, setEnded] = useState(false);
+    const [currentPage, setCurrentPage] = useState(0);
+    const [content, setContent] = useState<SavedPostResponse[]>([]);
+
+    const queryParams = useMemo(
+        () => `?Start=0&Limit=${(currentPage + 1) * PAGE_SIZE}`,
+        [currentPage]
+    );
+
+    const { data } = useFetchSwr([getUserSavedUrl(userId), queryParams], {
+        authorizationRequired: true,
+        timeout: 10000,
+    });
+
+    useEffect(() => {
+        console.log(data);
+
+        if (data == null) {
+            setEnded(true);
+            return;
+        }
+
+        if (data.length === 0 || data.length < PAGE_SIZE) {
+            setEnded(true);
+        }
+        setContent(data);
+    }, [data]);
+
+    const getNext = async (): Promise<void> => {
+        // Avoid re-fetching data
+        if (ended) {
+            return;
+        }
+        setCurrentPage((page) => page + 1);
     };
 
-    return useGetUserContent<MinimalUserInfo>(getContentUrl, userId);
+    const refresh = (): void => {
+        setEnded(false);
+        setCurrentPage(0);
+        setContent([]);
+    };
+
+    return { getNext, refresh, content, ended };
+    // return useGetUserContent<SavedPostResponse>(getUserSavedUrl, userId);
 };

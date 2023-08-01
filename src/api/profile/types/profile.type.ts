@@ -1,3 +1,4 @@
+import type PostResponse from "@/api/post/types/PostResponse";
 import { type Undefinable } from "@/types/app";
 
 export interface Followership {
@@ -28,3 +29,11 @@ export interface MinimalUserInfo {
     userId: string;
     avatar: string;
 }
+
+export interface SavedPostResponse {
+    postId: string;
+    postTitle: string;
+    postType: "Recipe" | "CulinaryTip";
+}
+
+export type MinimalPostInfo = Pick<PostResponse, "id" | "type" | "title">;

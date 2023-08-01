@@ -1,10 +1,10 @@
-import type PostResponse from "@/api/post/types/PostResponse";
+import { type MinimalPostInfo } from "@/api/profile/types";
 import React, { type ReactElement } from "react";
 import { View } from "react-native";
 import { Card } from "react-native-paper";
 
 interface CreatedPostItemProps {
-    item: PostResponse;
+    item: MinimalPostInfo;
     onItemPress: () => void;
 }
 
@@ -22,7 +22,8 @@ const CreatedPostItem = ({
             >
                 <Card.Cover
                     source={{
-                        uri: item.video,
+                        // TODO: Replace with thumbnail later
+                        uri: item.title,
                     }}
                     theme={{ roundness: 10, isV3: false }}
                 />

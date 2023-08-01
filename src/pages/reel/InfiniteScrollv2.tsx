@@ -174,7 +174,7 @@ const InfiniteScroll: FC<InfiniteScrollProps> = ({
                 })}
                 // Test improvement
                 maxToRenderPerBatch={2}
-                updateCellsBatchingPeriod={10000}
+                updateCellsBatchingPeriod={1000}
             />
         </SafeAreaView>
     );

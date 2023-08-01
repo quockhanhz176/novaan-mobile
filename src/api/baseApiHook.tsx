@@ -7,6 +7,7 @@ import { type RootStackParamList } from "@/types/navigation";
 import { responseObjectValid } from "./common/utils/ResponseUtils";
 import { type Undefinable } from "@/types/app";
 import { getPayloadFromToken } from "./common/utils/TokenUtils";
+import useSwr, { type Key, type SWRResponse } from "swr";
 
 // GLOBAL IN-MEMORY VARIABLE (DO NOT TOUCH)
 let tokenExpTimestamp: number = -1;
@@ -294,4 +295,26 @@ export const useFetch = (config?: RequestConfig): UseFetchReturn => {
     };
 
     return { getReq, postReq, putReq, deleteReq };
+};
+
+export const useFetchSwr = (
+    url: Key,
+    config?: RequestConfig
+): Pick<SWRResponse, "data" | "error" | "isLoading"> => {
+    const { getReq } = useFetch(config);
+
+    const getReqWrap = async ([url, queryParams = ""]: [
+        url: string,
+        queryParams: string
+    ]): Promise<any> => {
+        console.log("URL", url);
+        console.log("params", queryParams);
+
+        const urlWithParam = `${url}${queryParams}`;
+        return await getReq(urlWithParam);
+    };
+
+    const { data, isLoading, error } = useSwr(url, getReqWrap);
+
+    return { data, isLoading, error };
 };

@@ -24,6 +24,8 @@ import mime from "react-native-mime-types";
 import { type CommentFormInfo } from "./types/CommentInformation";
 import { responseObjectValid } from "../common/utils/ResponseUtils";
 import { getUserIdFromToken } from "../common/utils/TokenUtils";
+import { useSWRConfig } from "swr";
+import { getUserSavedUrl } from "../profile/ProfileApi";
 
 const POST_LIST_URL = "content/posts";
 
@@ -293,6 +295,8 @@ export const useReportComment = (): UseReportCommentReturn => {
 export const usePostInteract = (): UsePostSaveReturn => {
     const { postReq } = useFetch({ authorizationRequired: true });
 
+    const { mutate } = useSWRConfig();
+
     const savePost = async (
         { postId, postType, action }: PostInteraction,
         userId?: string
@@ -309,6 +313,12 @@ export const usePostInteract = (): UsePostSaveReturn => {
         if (!responseObjectValid(saveResult)) {
             return false;
         }
+
+        // Trigger revalidation for profile/saved-post when send successfully
+        const userSavedPostUrl = getUserSavedUrl(userId);
+        await mutate(
+            (key) => Array.isArray(key) && key[0] === userSavedPostUrl
+        );
 
         return true;
     };

@@ -4,14 +4,14 @@
 import React, { memo, type ReactElement } from "react";
 import { FlatList } from "react-native-gesture-handler";
 import CreatedPostItem from "./CreatedPostItem";
-import type PostResponse from "@/api/post/types/PostResponse";
 import { uuidv4 } from "react-native-compressor";
 import { type StyleProp, type ViewStyle } from "react-native";
+import { type MinimalPostInfo } from "@/api/profile/types";
 
 interface CreatedPostListProps {
-    data: PostResponse[];
+    data: MinimalPostInfo[];
     hidden: boolean;
-    handleItemPress: (item: PostResponse, index: number) => void;
+    handleItemPress: (item: MinimalPostInfo, index: number) => void;
     handleOnEndReached: () => void;
     loading: boolean;
     contentContainerStyle?: StyleProp<ViewStyle>;
