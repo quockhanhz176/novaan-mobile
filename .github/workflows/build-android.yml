@@ -25,6 +25,15 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
 
+      - name: Create temp .env
+        uses: SpicyPizza/create-envfile@v2.0
+        with:
+          file_name: .env
+          envkey_API_URL: ${{secrets.NOVAAN_API_URL}}
+          envkey_API_TIMEOUT: "5000"
+          envkey_KEYCHAIN_ID: ${{secrets.NOVAAN_KEYCHAIN_ID}}
+          envkey_GOOGLE_API_KEY: ${{secrets.NOVAAN_GG_API_KEY}}
+
       - name: Install Node dependencies
         run: npm ci
 
@@ -52,7 +61,7 @@ jobs:
         run: sdkmanager "platform-tools" "platforms;android-${{ matrix.android-version }}"
 
       - name: Create APK with EAS
-        run: API_URL=${{secrets.NOVAAN_API_URL}} API_TIMEOUT=5000 KEYCHAIN_ID=${{secrets.NOVAAN_KEYCHAIN_ID}} GOOGLE_API_KEY=${{secrets.NOVAAN_GG_API_KEY}} eas build -p android --profile production --local --output builds/novaan-mobile.apk --non-interactive
+        run: eas build -p android --profile production --local --output builds/novaan-mobile.apk --non-interactive
 
       - name: Upload APK to Firebase App Distribution
         uses: wzieba/Firebase-Distribution-Github-Action@v1
