@@ -5,6 +5,7 @@ import {
     type ProfileInfo,
     type MinimalUserInfo,
     type SavedPostResponse,
+    type UseAppPreferenceReturn,
 } from "./types";
 import {
     type TipResponse,
@@ -12,8 +13,15 @@ import {
 } from "../post/types/PostResponse";
 import { type PaginationHookReturn } from "../common/types/PaginationHook";
 import { getUserIdFromToken } from "../common/utils/TokenUtils";
+import type PreferenceSuiteResponse from "../search/types/PreferenceSuiteResponse";
+import PreferenceSuite from "@/pages/search/types/PreferenceSuite";
+import { responseObjectValid } from "../common/utils/ResponseUtils";
+import type PreferenceResponse from "../search/types/PreferenceResponse";
+import { getData, storeData } from "@/common/AsyncStorageService";
 
 const PAGE_SIZE = 4;
+
+const GET_PREFERENCES_URL = "preference/all";
 
 export const useProfileInfo = (): UseProfileInfoReturn => {
     const { getReq } = useFetch({
@@ -225,3 +233,55 @@ export const useUserSavedPost = (
     return { getNext, refresh, content, ended };
     // return useGetUserContent<SavedPostResponse>(getUserSavedUrl, userId);
 };
+
+// For getting available preferences
+export const useAppPreferences = (): UseAppPreferenceReturn => {
+    const { getReq } = useFetch({ authorizationRequired: true });
+
+    const [diets, setDiets] = useState<PreferenceResponse[]>([]);
+    const [cuisines, setCuisines] = useState<PreferenceResponse[]>([]);
+    const [allergens, setAllergens] = useState<PreferenceResponse[]>([]);
+
+    const getAllPreferenceOptions = async (): Promise<boolean> => {
+        const cachePreference = await loadCachePreference();
+        if (cachePreference != null) {
+            const { diets, cuisines, allergens } = cachePreference;
+            setDiets(diets);
+            setCuisines(cuisines);
+            setAllergens(allergens);
+            return true;
+        }
+
+        const response = await getReq(GET_PREFERENCES_URL);
+        if (!responseObjectValid(response)) {
+            return false;
+        }
+
+        const { diets, cuisines, allergens } =
+            response as PreferenceSuiteResponse;
+        setDiets(diets);
+        setCuisines(cuisines);
+        setAllergens(allergens);
+
+        await saveCachePreference(response);
+        return true;
+    };
+
+    const saveCachePreference = async (
+        data: PreferenceSuiteResponse
+    ): Promise<void> => {
+        await storeData("preferenceData", data);
+    };
+
+    const loadCachePreference =
+        async (): Promise<PreferenceSuiteResponse | null> => {
+            return await getData("preferenceData");
+        };
+
+    return { diets, cuisines, allergens, getAllPreferenceOptions };
+};
+
+// For getting + setting current user preferences
+// const useUserPreferences = () => {
+//     const {} = useFetch({ authorizationRequired: true });
+// };

@@ -1,6 +1,4 @@
 import {
-    APP_TITLE,
-    CREATE_RECIPE_NEXT_STEP_BUTTON_TITLE,
     GREET_GREET,
     GREET_GREET_APP,
     GREET_NEXT_BTN_TITLE,
@@ -21,15 +19,14 @@ interface GreetProps {
 const Greet = ({ navigation }: GreetProps): ReactElement<GreetProps> => {
     useEffect(() => {
         // Clear navigation stack to avoid user pressing back to sign in
-        navigation.reset({
-            index: 0,
-            routes: [{ name: "Greet" }],
+        navigation.addListener("beforeRemove", (e) => {
+            e.preventDefault();
         });
-    }, []);
+    }, [navigation]);
 
     const redirectToMainScreeen = (): void => {
         // Replace to avoid user navigate back
-        navigation.replace("MainScreens");
+        navigation.push("MainScreens");
     };
 
     const redirectToSetPreference = (): void => {
@@ -77,7 +74,7 @@ const Greet = ({ navigation }: GreetProps): ReactElement<GreetProps> => {
                 </TouchableOpacity>
                 <TouchableOpacity
                     className="flex-1 px-4 py-2 rounded-lg bg-cprimary-300 items-center"
-                    activeOpacity={0.8}
+                    activeOpacity={0.3}
                     onPress={redirectToSetPreference}
                 >
                     <Text className="text-base text-white">

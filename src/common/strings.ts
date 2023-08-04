@@ -273,3 +273,13 @@ export const GREET_NEXT_BTN_TITLE = "Làm ngay";
 export const GREET_SKIP_BTN_TITLE = "Để sau";
 
 // Preference
+export const SET_PREF_PREV_BTN_TITLE = "Quay lại";
+export const SET_PREF_NEXT_BTN_TITLE = "Tiếp tục";
+export const SET_PREF_DONE_BTN_TITLE = "Hoàn thành";
+
+export const SET_PREF_DIET_GUIDE =
+    "Hãy bắt đầu với việc lựa chọn những chế độ ăn mà bạn đang quan tâm hoặc mong muốn thực hiện";
+export const SET_PREF_CUISINE_GUIDE =
+    "Hãy lựa chọn những nền ẩm thực yêu thích để app có thể gợi ý các công thức tốt hơn";
+export const SET_PREF_ALLERGEN_GUIDE =
+    "Cuối cùng, hãy lựa chọn những thực phẩm có thể gây dị ứng hoặc không phù hợp với bạn để app có thể hạn chế mốt số công thức";

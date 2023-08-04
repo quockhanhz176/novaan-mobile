@@ -54,7 +54,6 @@ const SignIn = (props: SignInProps): ReactElement<SignInProps> => {
         androidClientId: GOOGLE_API_KEY,
     });
     const { refreshToken } = useRefreshToken();
-    const [token, setToken] = useState<string>("");
 
     const {
         handleSubmit,
@@ -116,21 +115,13 @@ const SignIn = (props: SignInProps): ReactElement<SignInProps> => {
                 alert(SIGN_IN_GOOGLE_ERROR_OCCURED);
                 return;
             }
-            setToken(token);
+            void handleSignInWithGoogle(token);
         }
 
         if (response?.type === "error") {
             alert(SIGN_IN_GOOGLE_ERROR_OCCURED);
         }
     }, [response]);
-
-    useEffect(() => {
-        if (token === null || token === "") {
-            return;
-        }
-
-        void handleSignInWithGoogle(token);
-    }, [token]);
 
     const handleSignIn = async (data: FormData): Promise<void> => {
         setIsLoading(true);

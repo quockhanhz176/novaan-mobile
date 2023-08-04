@@ -90,7 +90,7 @@ const PortionDificultyTime: FC<TitleDescriptionVideoProps> = (
 
     return (
         <ScrollView className="flex-1 bg-white">
-            <Text className="text-base p-5 bg-ctertiary ">
+            <Text className="text-base p-5 bg-ctertiary">
                 {CREATE_RECIPE_PDT_SUBTITLE}
             </Text>
             <View className="px-3 py-7">

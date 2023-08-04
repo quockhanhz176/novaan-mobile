@@ -15,6 +15,7 @@ import { type RootStackParamList } from "@/types/navigation";
 import { enableScreens } from "react-native-screens";
 import { OrientationLock, lockAsync } from "expo-screen-orientation";
 import Greet from "@/pages/user-profile/pages/preferences/Greet";
+import SetPreferences from "@/pages/user-profile/pages/preferences/SetPreferences";
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 
@@ -89,6 +90,15 @@ const App: FC = () => {
                                     <RootStack.Screen
                                         name="Greet"
                                         component={Greet}
+                                    />
+                                    <RootStack.Screen
+                                        name="SetPreferences"
+                                        component={SetPreferences}
+                                        options={{
+                                            title: "Lựa chọn sở thích",
+                                            animation: "slide_from_right",
+                                            headerShown: true,
+                                        }}
                                     />
                                 </RootStack.Group>
                             </RootStack.Navigator>
