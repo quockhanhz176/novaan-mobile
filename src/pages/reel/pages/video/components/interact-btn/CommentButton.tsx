@@ -5,12 +5,12 @@ import { ScrollItemContext } from "@/pages/reel/components/scroll-items/ScrollIt
 import Comments from "@/pages/reel/components/comments/Comments";
 import { View } from "react-native";
 import { REEL_COMMENTS_TITLE } from "@/common/strings";
-import useModalHook from "@/common/components/ModalHook";
+import useBooleanHook from "@/common/components/BooleanHook";
 
 const CommentButton = (): ReactElement => {
     const { pauseVideo, resumeVideo } = useContext(ScrollItemContext);
 
-    const [commentsVisible, hideComments, showComments] = useModalHook();
+    const [commentsVisible, hideComments, showComments] = useBooleanHook();
 
     useEffect(() => {
         commentsVisible ? pauseVideo() : resumeVideo();

@@ -263,3 +263,15 @@ export const FILTER_CATEGORY_ALLERGEN = "Dị ứng";
 
 // Search
 export const SEARCH_POST_DETAILS_TITLE = "Chi tiết kết quả tìm kiếm";
+export const SEARCH_BASIC_SEARCH_BUTTON = "Tìm kiếm bài viết";
+export const SEARCH_ADVANCED_SEARCH_BUTTON = "Tủ lạnh nhà bạn có gì";
+export const SEARCH_USER_SEARCH_BUTTON = "Tìm kiếm tác giả";
+
+// Advanced search
+export const ADVANCED_SEARCH_SUGGESTION_EMPTY = "Không tìm thấy nguyên liệu nào"
+export const ADVANCED_SEARCH_NO_POST = "Không tìm thấy bài viết nào"
+
+// Basic search
+export const BASIC_SEARCH_NO_POST = "Không tìm thấy bài viết nào"
+export const BASIC_SEARCH_ADVANCED_SEARCH_BUTTON = "Tìm kiếm nâng cao"
+export const BASIC_SEARCH_USER_SEARCH_BUTTON = "Tìm kiếm tác giả"

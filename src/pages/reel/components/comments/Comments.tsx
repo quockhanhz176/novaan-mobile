@@ -33,7 +33,7 @@ import {
 import type CommentInformation from "@/api/post/types/CommentInformation";
 import Toast from "react-native-toast-message";
 import { getRequestPostType } from "@/api/post/types/RequestPostType";
-import useModalHook from "@/common/components/ModalHook";
+import useBooleanHook from "@/common/components/BooleanHook";
 import CustomModal from "@/common/components/CustomModal";
 import CommentMenu from "./CommentMenu";
 import ReportMenu from "./ReportMenu";
@@ -52,11 +52,11 @@ const Comments = ({
     const { sendComment } = useSendComment();
     const { reportComment } = useReportComment();
 
-    const [addEditVisible, hideAddEdit, showAddEdit] = useModalHook();
+    const [addEditVisible, hideAddEdit, showAddEdit] = useBooleanHook();
     const [commentMenuVisible, hideCommentMenu, showCommentMenu] =
-        useModalHook();
-    const [reportMenuVisible, hideReportMenu, showReportMenu] = useModalHook();
-    const [reportFormVisible, hideReportForm, showReportForm] = useModalHook();
+        useBooleanHook();
+    const [reportMenuVisible, hideReportMenu, showReportMenu] = useBooleanHook();
+    const [reportFormVisible, hideReportForm, showReportForm] = useBooleanHook();
 
     const [selectedComment, setSelectedComment] =
         useState<Undefinable<string>>(undefined);

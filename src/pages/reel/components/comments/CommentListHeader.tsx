@@ -18,8 +18,6 @@ const CommentListHeader = ({
     showAddEdit,
     showCommentMenu,
 }: CommentListHeaderProps): ReactElement<CommentListHeaderProps> => {
-    console.log("Rendering header", userComment);
-
     if (userComment === undefined) {
         return (
             <View className="flex-1">
@@ -43,8 +41,6 @@ const CommentListHeader = ({
             </View>
         );
     }
-
-    console.log("Rendering user comment");
 
     return (
         <View className="flex-1">

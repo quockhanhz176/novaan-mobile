@@ -1,4 +1,3 @@
-
 type IngredientsReducerAction =
     | {
           type: "add" | "remove";
@@ -9,24 +8,27 @@ type IngredientsReducerAction =
       };
 
 const ingredientsReducer = (
-    ingredients: Set<string>,
+    ingredients: Set<string> | undefined,
     action: IngredientsReducerAction
-): Set<string> => {
+): Set<string> | undefined => {
     switch (action.type) {
         case "add":
+            if (ingredients == null) {
+                ingredients = new Set();
+            }
             if (ingredients.has(action.value)) {
                 return ingredients;
             }
             ingredients.add(action.value);
             return new Set(ingredients);
         case "remove":
-            if (!ingredients.has(action.value)) {
+            if (ingredients == null || !ingredients.has(action.value)) {
                 return ingredients;
             }
             ingredients.delete(action.value);
             return new Set(ingredients);
         case "reset":
-            return new Set();
+            return undefined;
     }
 };
 
