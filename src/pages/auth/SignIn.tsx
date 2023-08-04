@@ -84,7 +84,7 @@ const SignIn = (props: SignInProps): ReactElement<SignInProps> => {
 
             if (!expired) {
                 // Skip sign in
-                navigation.navigate("MainScreens");
+                handleSignInSuccessRedirect();
                 return;
             }
 
@@ -96,7 +96,7 @@ const SignIn = (props: SignInProps): ReactElement<SignInProps> => {
 
             // Save new token to secure store
             await saveKeychain(KEYCHAIN_ID, newToken);
-            navigation.navigate("MainScreens");
+            handleSignInSuccessRedirect();
         } catch (e) {
             // Continue with normal sign in
         } finally {
@@ -143,7 +143,7 @@ const SignIn = (props: SignInProps): ReactElement<SignInProps> => {
 
             // Save token to secure store
             await saveKeychain(KEYCHAIN_ID, response.token);
-            navigation.navigate("MainScreens");
+            handleSignInSuccessRedirect();
         } catch (error) {
             alert(COMMON_SERVER_CONNECTION_FAIL_ERROR);
             console.error(`fail: ${String(error)}`);
@@ -161,7 +161,7 @@ const SignIn = (props: SignInProps): ReactElement<SignInProps> => {
                 return;
             }
             await saveKeychain(KEYCHAIN_ID, response.token);
-            navigation.navigate("MainScreens");
+            handleSignInSuccessRedirect();
         } catch (error) {
             alert(COMMON_SERVER_CONNECTION_FAIL_ERROR);
             console.error(`fail: ${String(error)}`);
@@ -180,6 +180,10 @@ const SignIn = (props: SignInProps): ReactElement<SignInProps> => {
 
     const handleSignUpRedirect = (): void => {
         navigation.navigate("SignUp");
+    };
+
+    const handleSignInSuccessRedirect = (): void => {
+        navigation.navigate("Greet");
     };
 
     return (

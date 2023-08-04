@@ -7,6 +7,8 @@ export type RootStackParamList = {
     MainScreens: undefined;
     CreateTip: undefined;
     CreateRecipe: undefined;
+    Greet: undefined;
+    SetPreferences: undefined;
 };
 
 export type BottomTabParamList = {

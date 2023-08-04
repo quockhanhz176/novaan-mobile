@@ -263,3 +263,13 @@ export const FILTER_CATEGORY_ALLERGEN = "Dị ứng";
 
 // Search
 export const SEARCH_POST_DETAILS_TITLE = "Chi tiết kết quả tìm kiếm";
+
+// Greet
+export const GREET_GREET = "Chào mừng bạn đến với";
+export const GREET_GREET_APP = "Nấu và Ăn";
+export const SET_PREFERENCE_INVITE =
+    "Nâng cao trải nghiệm sử dụng app chỉ với việc lựa chọn các mục yêu thích và hạn chế!";
+export const GREET_NEXT_BTN_TITLE = "Làm ngay";
+export const GREET_SKIP_BTN_TITLE = "Để sau";
+
+// Preference

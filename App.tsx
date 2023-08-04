@@ -14,6 +14,7 @@ import Toast from "react-native-toast-message";
 import { type RootStackParamList } from "@/types/navigation";
 import { enableScreens } from "react-native-screens";
 import { OrientationLock, lockAsync } from "expo-screen-orientation";
+import Greet from "@/pages/user-profile/pages/preferences/Greet";
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 
@@ -49,37 +50,47 @@ const App: FC = () => {
                                 }}
                                 initialRouteName="SignIn"
                             >
-                                <RootStack.Screen
-                                    name="SignIn"
-                                    component={SignIn}
-                                    options={{ title: "Sign In" }}
-                                />
-                                <RootStack.Screen
-                                    name="SignUp"
-                                    component={SignUp}
-                                    options={{ title: "Sign Up" }}
-                                />
+                                <RootStack.Group>
+                                    <RootStack.Screen
+                                        name="SignIn"
+                                        component={SignIn}
+                                        options={{ title: "Sign In" }}
+                                    />
+                                    <RootStack.Screen
+                                        name="SignUp"
+                                        component={SignUp}
+                                        options={{ title: "Sign Up" }}
+                                    />
+                                </RootStack.Group>
+
                                 <RootStack.Screen
                                     name="MainScreens"
                                     component={MainScreens}
                                     options={{ title: "Main Screens" }}
                                 />
-                                <RootStack.Screen
-                                    name="CreateTip"
-                                    component={CreateTip}
-                                    options={{
+
+                                <RootStack.Group
+                                    screenOptions={{
                                         animation: "slide_from_bottom",
                                         animationDuration: 200,
                                     }}
-                                />
-                                <RootStack.Screen
-                                    name="CreateRecipe"
-                                    component={CreateRecipe}
-                                    options={{
-                                        animation: "slide_from_bottom",
-                                        animationDuration: 200,
-                                    }}
-                                />
+                                >
+                                    <RootStack.Screen
+                                        name="CreateTip"
+                                        component={CreateTip}
+                                    />
+                                    <RootStack.Screen
+                                        name="CreateRecipe"
+                                        component={CreateRecipe}
+                                    />
+                                </RootStack.Group>
+
+                                <RootStack.Group>
+                                    <RootStack.Screen
+                                        name="Greet"
+                                        component={Greet}
+                                    />
+                                </RootStack.Group>
                             </RootStack.Navigator>
                         </NavigationContainer>
                     </View>
