@@ -3,7 +3,7 @@ import React, { View, Text } from "react-native";
 import CheckBox from "@react-native-community/checkbox";
 import { customColors } from "@root/tailwind.config";
 import { type SuiteDispatchValue } from "./filterReducer";
-import Preference from "../../types/Preference";
+import type Preference from "../../types/Preference";
 
 export type FilterItemDispatchValue = Omit<
     Extract<SuiteDispatchValue, { type: "change_preference" }>,

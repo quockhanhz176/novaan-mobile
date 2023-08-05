@@ -299,5 +299,5 @@ export const SET_PREF_ALLERGEN_GUIDE =
     "Cuối cùng, hãy lựa chọn những thực phẩm có thể gây dị ứng hoặc không phù hợp với bạn để app có thể hạn chế mốt số công thức";
 
 export const SET_PREF_FAILED =
-    "Sở thích của bạn chưa được cập nhập thành công. Xin vui lòng thử lại";
+    "Cập nhập không thành công. Vui lòng thử lại sau";
 export const SET_PREF_SUCCESS = "Sở thích của bạn đã được cập nhập";

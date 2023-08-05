@@ -2,7 +2,6 @@ import type PreferenceResponse from "@/api/search/types/PreferenceResponse";
 import React, { type ReactElement } from "react";
 import { View, Text, ActivityIndicator } from "react-native";
 import PreferenceChip from "./PreferenceChip";
-import OverlayLoading from "@/common/components/OverlayLoading";
 import { customColors } from "@root/tailwind.config";
 
 interface PreferenceSectionProps {

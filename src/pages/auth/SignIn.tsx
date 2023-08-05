@@ -84,7 +84,7 @@ const SignIn = (props: SignInProps): ReactElement<SignInProps> => {
 
             if (!expired) {
                 // Skip sign in
-                handleSignInSuccessRedirect();
+                void handleSignInSuccessRedirect();
                 return;
             }
 
@@ -96,7 +96,7 @@ const SignIn = (props: SignInProps): ReactElement<SignInProps> => {
 
             // Save new token to secure store
             await saveKeychain(KEYCHAIN_ID, newToken);
-            handleSignInSuccessRedirect();
+            void handleSignInSuccessRedirect();
         } catch (e) {
             // Continue with normal sign in
         } finally {
@@ -135,7 +135,7 @@ const SignIn = (props: SignInProps): ReactElement<SignInProps> => {
 
             // Save token to secure store
             await saveKeychain(KEYCHAIN_ID, response.token);
-            handleSignInSuccessRedirect();
+            void handleSignInSuccessRedirect();
         } catch (error) {
             alert(COMMON_SERVER_CONNECTION_FAIL_ERROR);
             console.error(`fail: ${String(error)}`);
@@ -153,7 +153,7 @@ const SignIn = (props: SignInProps): ReactElement<SignInProps> => {
                 return;
             }
             await saveKeychain(KEYCHAIN_ID, response.token);
-            handleSignInSuccessRedirect();
+            void handleSignInSuccessRedirect();
         } catch (error) {
             alert(COMMON_SERVER_CONNECTION_FAIL_ERROR);
             console.error(`fail: ${String(error)}`);

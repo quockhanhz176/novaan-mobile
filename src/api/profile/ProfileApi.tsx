@@ -16,12 +16,10 @@ import {
 import { type PaginationHookReturn } from "../common/types/PaginationHook";
 import { getUserIdFromToken } from "../common/utils/TokenUtils";
 import type PreferenceSuiteResponse from "../search/types/PreferenceSuiteResponse";
-import PreferenceSuite from "@/pages/search/types/PreferenceSuite";
 import { responseObjectValid } from "../common/utils/ResponseUtils";
 import type PreferenceResponse from "../search/types/PreferenceResponse";
 import { getData, storeData } from "@/common/AsyncStorageService";
 import moment from "moment";
-import { Undefinable } from "@/types/app";
 
 const PAGE_SIZE = 4;
 
