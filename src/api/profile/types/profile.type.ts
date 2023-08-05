@@ -47,6 +47,7 @@ export interface UseUserPreferencesReturn {
     getUserPreferences: () => Promise<UserPreferences>;
     setEmptyUserPreferences: () => Promise<boolean>;
     setUserPreferences: (preferences: UserPreferences) => Promise<boolean>;
+    haveUserSetPreference: () => Promise<boolean>;
 }
 
 export interface UserPreferences {

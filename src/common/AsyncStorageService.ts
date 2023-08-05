@@ -17,6 +17,7 @@ export interface StorageKey {
     };
     preferenceData: WithExp<PreferenceSuiteResponse>;
     userPreferenceData: WithExp<UserPreferences>;
+    haveUserSetPreference: boolean;
 }
 
 export const storeData = async <T extends keyof StorageKey>(

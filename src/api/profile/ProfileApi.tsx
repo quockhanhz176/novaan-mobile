@@ -27,6 +27,7 @@ const PAGE_SIZE = 4;
 
 const GET_PREFERENCES_URL = "preference/all";
 const USER_PREFRENCES_URL = "preference/me";
+const USER_PREFRENCES_CHECK_URL = "preference/me/check";
 
 export const useProfileInfo = (): UseProfileInfoReturn => {
     const { getReq } = useFetch({
@@ -309,6 +310,15 @@ export const useAppPreferences = (): UseAppPreferenceReturn => {
 export const useUserPreferences = (): UseUserPreferencesReturn => {
     const { getReq, putReq } = useFetch({ authorizationRequired: true });
 
+    const haveUserSetPreference = async (): Promise<boolean> => {
+        const response = await getReq(USER_PREFRENCES_CHECK_URL);
+        if (!responseObjectValid(response)) {
+            throw new Error();
+        }
+
+        return response.haveSet;
+    };
+
     const getUserPreferences = async (): Promise<UserPreferences> => {
         const cacheUserPreferences = await loadUserPreference();
         if (cacheUserPreferences != null) {
@@ -375,5 +385,10 @@ export const useUserPreferences = (): UseUserPreferencesReturn => {
         };
     };
 
-    return { getUserPreferences, setEmptyUserPreferences, setUserPreferences };
+    return {
+        haveUserSetPreference,
+        getUserPreferences,
+        setEmptyUserPreferences,
+        setUserPreferences,
+    };
 };

@@ -1,3 +1,5 @@
+import { useUserPreferences } from "@/api/profile/ProfileApi";
+import { storeData } from "@/common/AsyncStorageService";
 import {
     GREET_GREET,
     GREET_GREET_APP,
@@ -17,6 +19,9 @@ interface GreetProps {
 }
 
 const Greet = ({ navigation }: GreetProps): ReactElement<GreetProps> => {
+    const { haveUserSetPreference, setEmptyUserPreferences } =
+        useUserPreferences();
+
     useEffect(() => {
         // Clear navigation stack to avoid user pressing back to sign in
         navigation.addListener("beforeRemove", (e) => {
@@ -35,9 +40,18 @@ const Greet = ({ navigation }: GreetProps): ReactElement<GreetProps> => {
 
     const handleUserSkip = async (): Promise<void> => {
         // Send request to set empty (default preference for user)
-
-        // Redirect to Main Screen
-        redirectToMainScreeen();
+        try {
+            const userHaveSetPreference = await haveUserSetPreference();
+            // Save empty to indicate that user have set their preference
+            if (!userHaveSetPreference) {
+                await setEmptyUserPreferences();
+            }
+        } catch {
+            // Ignore error and redirect to Main Screen
+        } finally {
+            await storeData("haveUserSetPreference", true);
+            redirectToMainScreeen();
+        }
     };
 
     return (

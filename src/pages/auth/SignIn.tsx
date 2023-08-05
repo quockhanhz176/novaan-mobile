@@ -36,6 +36,7 @@ import moment from "moment";
 import { useRefreshToken } from "@/api/auth/authApiHook";
 import { type TokenPayload } from "@/api/baseApiHook";
 import { getPayloadFromToken } from "@/api/common/utils/TokenUtils";
+import { getData } from "@/common/AsyncStorageService";
 
 interface SignInProps {
     navigation: NativeStackNavigationProp<RootStackParamList, "SignIn">;
@@ -173,8 +174,13 @@ const SignIn = (props: SignInProps): ReactElement<SignInProps> => {
         navigation.navigate("SignUp");
     };
 
-    const handleSignInSuccessRedirect = (): void => {
-        navigation.navigate("Greet");
+    const handleSignInSuccessRedirect = async (): Promise<void> => {
+        const notFirstTime = await getData("haveUserSetPreference");
+        if (notFirstTime == null || !notFirstTime) {
+            navigation.navigate("Greet");
+            return;
+        }
+        navigation.navigate("MainScreens");
     };
 
     return (

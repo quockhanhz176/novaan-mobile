@@ -32,6 +32,7 @@ import {
 import { Toast } from "react-native-toast-message/lib/src/Toast";
 import { type NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { type RootStackParamList } from "@/types/navigation";
+import { storeData } from "@/common/AsyncStorageService";
 
 type Preference = PreferenceResponse;
 
@@ -47,8 +48,7 @@ const SetPreferences = ({
     // Query all preferences and save to cache
     const { diets, cuisines, allergens, getAllPreferenceOptions } =
         useAppPreferences();
-    const { setEmptyUserPreferences, setUserPreferences } =
-        useUserPreferences();
+    const { setUserPreferences } = useUserPreferences();
 
     useEffect(() => {
         void getAllPreferenceOptions();
@@ -120,7 +120,8 @@ const SetPreferences = ({
             setLoading(false);
         }
 
-        // Show toast when done\
+        await storeData("haveUserSetPreference", true);
+        // Show toast when done
         Toast.show({ type: "success", text1: SET_PREF_SUCCESS });
         // Redirect to Main Screens
         navigation.push("MainScreens");
