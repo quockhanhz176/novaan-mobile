@@ -42,3 +42,15 @@ export type MinimalPostInfo = Pick<PostResponse, "id" | "type" | "title">;
 export interface UseAppPreferenceReturn extends PreferenceSuiteResponse {
     getAllPreferenceOptions: () => Promise<boolean>;
 }
+
+export interface UseUserPreferencesReturn {
+    getUserPreferences: () => Promise<UserPreferences>;
+    setEmptyUserPreferences: () => Promise<boolean>;
+    setUserPreferences: (preferences: UserPreferences) => Promise<boolean>;
+}
+
+export interface UserPreferences {
+    diets: string[];
+    cuisines: string[];
+    allergens: string[];
+}

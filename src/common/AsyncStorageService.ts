@@ -1,7 +1,9 @@
 import type PostListResponse from "@/api/post/types/PostListResponse";
+import { type UserPreferences } from "@/api/profile/types";
 import type PreferenceSuiteResponse from "@/api/search/types/PreferenceSuiteResponse";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { type Moment } from "moment";
+import { type WithExp } from "./utils";
 
 export interface StorageKey {
     reelListData: {
@@ -13,7 +15,8 @@ export interface StorageKey {
         data: PostListResponse;
         exp: number;
     };
-    preferenceData: PreferenceSuiteResponse & { exp: number };
+    preferenceData: WithExp<PreferenceSuiteResponse>;
+    userPreferenceData: WithExp<UserPreferences>;
 }
 
 export const storeData = async <T extends keyof StorageKey>(

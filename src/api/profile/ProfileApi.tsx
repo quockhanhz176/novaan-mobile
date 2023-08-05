@@ -6,6 +6,8 @@ import {
     type MinimalUserInfo,
     type SavedPostResponse,
     type UseAppPreferenceReturn,
+    type UserPreferences,
+    type UseUserPreferencesReturn,
 } from "./types";
 import {
     type TipResponse,
@@ -19,10 +21,12 @@ import { responseObjectValid } from "../common/utils/ResponseUtils";
 import type PreferenceResponse from "../search/types/PreferenceResponse";
 import { getData, storeData } from "@/common/AsyncStorageService";
 import moment from "moment";
+import { Undefinable } from "@/types/app";
 
 const PAGE_SIZE = 4;
 
 const GET_PREFERENCES_URL = "preference/all";
+const USER_PREFRENCES_URL = "preference/me";
 
 export const useProfileInfo = (): UseProfileInfoReturn => {
     const { getReq } = useFetch({
@@ -302,6 +306,74 @@ export const useAppPreferences = (): UseAppPreferenceReturn => {
 };
 
 // For getting + setting current user preferences
-// const useUserPreferences = () => {
-//     const {} = useFetch({ authorizationRequired: true });
-// };
+export const useUserPreferences = (): UseUserPreferencesReturn => {
+    const { getReq, putReq } = useFetch({ authorizationRequired: true });
+
+    const getUserPreferences = async (): Promise<UserPreferences> => {
+        const cacheUserPreferences = await loadUserPreference();
+        if (cacheUserPreferences != null) {
+            return cacheUserPreferences;
+        }
+
+        const response = await getReq(USER_PREFRENCES_URL);
+        if (!responseObjectValid(response)) {
+            throw new Error(); // For UI to handle however they like
+        }
+
+        await storeUserPreference(response);
+        return response;
+    };
+
+    // For when user skip first-time preferences setting
+    const setEmptyUserPreferences = async (): Promise<boolean> => {
+        const payload: UserPreferences = {
+            diets: [],
+            cuisines: [],
+            allergens: [],
+        };
+
+        return await setUserPreferences(payload);
+    };
+
+    // For setting/updating preferences
+    const setUserPreferences = async (
+        preferences: UserPreferences
+    ): Promise<boolean> => {
+        const response = await putReq(USER_PREFRENCES_URL, preferences);
+        if (!responseObjectValid(response)) {
+            return false;
+        }
+
+        return true;
+    };
+
+    const storeUserPreference = async (
+        preferences: UserPreferences
+    ): Promise<void> => {
+        await storeData("userPreferenceData", {
+            ...preferences,
+            exp: moment().add(12, "hours").unix(),
+        });
+    };
+
+    const loadUserPreference = async (): Promise<UserPreferences | null> => {
+        const cache = await getData("userPreferenceData");
+        if (cache == null) {
+            return null;
+        }
+
+        // Check exp
+        const isExpired = moment().diff(moment.unix(cache.exp)) >= 0;
+        if (isExpired) {
+            return null;
+        }
+
+        return {
+            diets: cache.diets,
+            cuisines: cache.cuisines,
+            allergens: cache.allergens,
+        };
+    };
+
+    return { getUserPreferences, setEmptyUserPreferences, setUserPreferences };
+};

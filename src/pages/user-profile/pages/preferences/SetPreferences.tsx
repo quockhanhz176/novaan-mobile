@@ -5,6 +5,8 @@ import {
     SET_PREF_DONE_BTN_TITLE,
     SET_PREF_CUISINE_GUIDE,
     SET_PREF_ALLERGEN_GUIDE,
+    SET_PREF_FAILED,
+    SET_PREF_SUCCESS,
 } from "@/common/strings";
 import { customColors } from "@root/tailwind.config";
 import React, {
@@ -23,16 +25,30 @@ import PreferenceSection from "./PreferenceSection";
 import type PreferenceResponse from "@/api/search/types/PreferenceResponse";
 import Swiper from "react-native-swiper";
 import { windowWidth } from "@/common/utils";
-import { useAppPreferences } from "@/api/profile/ProfileApi";
+import {
+    useAppPreferences,
+    useUserPreferences,
+} from "@/api/profile/ProfileApi";
+import { Toast } from "react-native-toast-message/lib/src/Toast";
+import { type NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { type RootStackParamList } from "@/types/navigation";
 
 type Preference = PreferenceResponse;
 
 export type PreferenceItem = PreferenceResponse | { selected: boolean };
 
-const SetPreferences = (): ReactElement => {
+interface SetPreferencesProps {
+    navigation: NativeStackNavigationProp<RootStackParamList, "SetPreferences">;
+}
+
+const SetPreferences = ({
+    navigation,
+}: SetPreferencesProps): ReactElement<SetPreferencesProps> => {
     // Query all preferences and save to cache
     const { diets, cuisines, allergens, getAllPreferenceOptions } =
         useAppPreferences();
+    const { setEmptyUserPreferences, setUserPreferences } =
+        useUserPreferences();
 
     useEffect(() => {
         void getAllPreferenceOptions();
@@ -46,6 +62,7 @@ const SetPreferences = (): ReactElement => {
     );
 
     const [index, setIndex] = useState(0);
+    const [loading, setLoading] = useState(false);
 
     const progress = useMemo(() => (index + 1) / 3, [index]);
 
@@ -88,13 +105,25 @@ const SetPreferences = (): ReactElement => {
     );
 
     const handleSubmitPreferences = async (): Promise<void> => {
+        setLoading(true);
         // Save preferences
-        console.log(selectedDiets);
-        console.log(selectedCuisines);
-        console.log(selectedAllergens);
+        try {
+            await setUserPreferences({
+                diets: selectedDiets.map((diet) => diet.id),
+                cuisines: selectedCuisines.map((cuisine) => cuisine.id),
+                allergens: selectedAllergens.map((allergen) => allergen.id),
+            });
+        } catch {
+            Toast.show({ type: "error", text1: SET_PREF_FAILED });
+            return;
+        } finally {
+            setLoading(false);
+        }
 
-        // Show toast when done
+        // Show toast when done\
+        Toast.show({ type: "success", text1: SET_PREF_SUCCESS });
         // Redirect to Main Screens
+        navigation.push("MainScreens");
     };
 
     return (
@@ -127,7 +156,7 @@ const SetPreferences = (): ReactElement => {
                     categories={allergens}
                     selectedCategories={selectedAllergens}
                     setCategories={handleSelectCategory(
-                        selectedDiets,
+                        selectedAllergens,
                         setSelectedAllergens
                     )}
                     sectionDesc={SET_PREF_ALLERGEN_GUIDE}
@@ -168,6 +197,7 @@ const SetPreferences = (): ReactElement => {
                         className="flex-1 px-4 py-2 rounded-lg bg-cprimary-300 items-center"
                         activeOpacity={0.3}
                         onPress={handleSubmitPreferences}
+                        disabled={loading}
                     >
                         <Text className="text-base text-white">
                             {SET_PREF_DONE_BTN_TITLE}
