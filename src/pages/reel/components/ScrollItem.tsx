@@ -20,7 +20,7 @@ import { type InternalPost } from "../InfiniteScroll";
 import UserProfile from "@/pages/user-profile/UserProfile";
 import CustomModal from "@/common/components/CustomModal";
 import type ScrollItemController from "../types/ScrollItemController";
-import useModalHook from "../../../common/components/ModalHook";
+import useBooleanHook from "../../../common/components/BooleanHook";
 import postApi from "@/api/post/PostApi";
 import type PostComment from "../types/PostComment";
 import reelServices from "../services/reelServices";
@@ -67,10 +67,10 @@ const ScrollItem: FC<MainScrollItemProps> = ({
         };
     };
 
-    const [reportFormVisible, hideReportForm, showReportForm] = useModalHook(
+    const [reportFormVisible, hideReportForm, showReportForm] = useBooleanHook(
         getOnModalShownChange("PostReport")
     );
-    const [commentsVisible, hideComments, showComments] = useModalHook(
+    const [commentsVisible, hideComments, showComments] = useBooleanHook(
         getOnModalShownChange("Comments")
     );
     const currentPage =

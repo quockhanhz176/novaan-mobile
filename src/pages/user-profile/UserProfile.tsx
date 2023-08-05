@@ -134,8 +134,6 @@ const UserProfile = (
 
     const { username, followersCount, followingCount } = profileInfo;
 
-    console.log("Rendering user profle", profileInfo);
-
     return (
         <View className="flex-1 bg-white">
             <View className="items-center mx-6 mt-4 flex-row">

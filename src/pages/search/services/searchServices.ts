@@ -1,5 +1,4 @@
 import postApi from "@/api/post/PostApi";
-import type PostResponse from "@/api/post/types/PostResponse";
 import searchApi from "@/api/search/SearchApi";
 import type PreferenceSuite from "../types/PreferenceSuite";
 import type PreferenceResponse from "@/api/search/types/PreferenceResponse";
@@ -8,32 +7,63 @@ import {
     FILTER_CATEGORY_CUISINE,
     FILTER_CATEGORY_DIET,
 } from "@/common/strings";
-import { type RecipeResponse } from "@/api/post/types/PostResponse";
+import {
+    type PostType,
+    type RecipeResponse,
+} from "@/api/post/types/PostResponse";
+import type SearchRequest from "@/api/search/types/SearchRequest";
+import type PreferenceCategory from "../types/PreferenceCategory";
+import { type MinimalPostInfo } from "@/api/profile/types";
 
-const searchPost = async (query: string): Promise<PostResponse[] | null> => {
+const mapCategory = (category: PreferenceCategory): string[] | undefined => {
+    const result = category.preferences.flatMap((value) =>
+        value.checked ? value.title : []
+    );
+    return result.length === 0 ? undefined : result;
+};
+
+const searchPost = async (
+    queryString: string,
+    postType: PostType,
+    suite?: PreferenceSuite,
+    start?: number,
+    limit?: number,
+    sortType?: SearchRequest["sortType"],
+    difficulty?: SearchRequest["difficulty"],
+    categories?: string[]
+): Promise<MinimalPostInfo[] | null> => {
     const minimalPostsResult = await postApi.getPostList();
     if (!minimalPostsResult.success) {
         return null;
     }
 
-    const posts: PostResponse[] = [];
+    const result = await searchApi.search(
+        {
+            queryString,
+            start,
+            limit,
+            sortType,
+            difficulty,
+            categories,
+            allergens: suite != null ? mapCategory(suite.allergens) : undefined,
+            cuisines: suite != null ? mapCategory(suite.cuisines) : undefined,
+            diets: suite != null ? mapCategory(suite.diets) : undefined,
+        },
+        postType
+    );
 
-    for (const mPost of minimalPostsResult.value) {
-        const result = await postApi.getPost(
-            mPost.postId,
-            mPost.postType === "Recipe" ? "recipe" : "tip"
-        );
-        if (result.success) {
-            posts.push(result.value);
-        }
-    }
+    const postInfos = result.success
+        ? result.value.map((value) => {
+              return { ...value, type: postType };
+          })
+        : null;
 
-    return posts;
+    return postInfos;
 };
 
 const objectMap = <UProp, U extends Record<string, UProp>, TProp>(
     obj: U,
-    func: (value: UProp, key: string, index?: number) => TProp
+    func: (value: UProp, key: keyof U, index?: number) => TProp
 ): Record<keyof U, TProp> => {
     return Object.fromEntries(
         Object.entries(obj).map(([k, v], i) => [k, func(v, k, i)])
@@ -48,22 +78,30 @@ const categoryNames: Record<keyof PreferenceSuite, string> = {
 
 const getPreferences = async (): Promise<PreferenceSuite | null> => {
     const preferenceResponse = await searchApi.getPreferences();
-
     if (!preferenceResponse.success) {
         return null;
     }
+
+    const userPreferenceResponse = await searchApi.getUserPreferences();
+    const userPreferences = userPreferenceResponse.success
+        ? userPreferenceResponse.value
+        : null;
 
     let categoryIndex = 0;
 
     const suite: PreferenceSuite = objectMap(
         preferenceResponse.value,
-        (v: PreferenceResponse[], k, i) => {
+        (preferenceResponses: PreferenceResponse[], k, _i) => {
             let preferenceIndex = 0;
             return {
                 label: categoryNames[k],
-                preferences: v.map((value) => ({
-                    ...value,
-                    checked: false,
+                preferences: preferenceResponses.map((preferenceResponse) => ({
+                    ...preferenceResponse,
+                    checked:
+                        userPreferences?.[k].find(
+                            (userPreference) =>
+                                userPreference === preferenceResponse.title
+                        ) != null,
                     index: preferenceIndex++,
                 })),
                 index: categoryIndex++,
@@ -102,10 +140,16 @@ const searchAdvanced = async (
     return posts;
 };
 
+const getIngredients = async (keyword: string): Promise<string[] | null> => {
+    const result = await searchApi.getAdvancedSearchIngredients(keyword);
+    return result.success ? result.value : null;
+};
+
 const searchServices = {
     searchPost,
     getPreferences,
     searchAdvanced,
+    getIngredients,
 };
 
 export default searchServices;

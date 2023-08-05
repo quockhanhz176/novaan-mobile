@@ -13,8 +13,7 @@
             }
         },
         "android": {
-            "package": "com.saltytuna.novaanmobile",
-            "softwareKeyboardLayoutMode": "pan"
+            "package": "com.saltytuna.novaanmobile"
         },
         "ios": {
             "bundleIdentifier": "com.saltytuna.novaanmobile"
