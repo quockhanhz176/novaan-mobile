@@ -13,7 +13,7 @@ export interface StorageKey {
         data: PostListResponse;
         exp: number;
     };
-    preferenceData: PreferenceSuiteResponse;
+    preferenceData: PreferenceSuiteResponse & { exp: number };
 }
 
 export const storeData = async <T extends keyof StorageKey>(

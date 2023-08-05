@@ -18,6 +18,7 @@ import PreferenceSuite from "@/pages/search/types/PreferenceSuite";
 import { responseObjectValid } from "../common/utils/ResponseUtils";
 import type PreferenceResponse from "../search/types/PreferenceResponse";
 import { getData, storeData } from "@/common/AsyncStorageService";
+import moment from "moment";
 
 const PAGE_SIZE = 4;
 
@@ -270,12 +271,31 @@ export const useAppPreferences = (): UseAppPreferenceReturn => {
     const saveCachePreference = async (
         data: PreferenceSuiteResponse
     ): Promise<void> => {
-        await storeData("preferenceData", data);
+        // Store data with expiration set to 1 days after current timestamp
+        await storeData("preferenceData", {
+            ...data,
+            exp: moment().add(1, "day").unix(),
+        });
     };
 
     const loadCachePreference =
         async (): Promise<PreferenceSuiteResponse | null> => {
-            return await getData("preferenceData");
+            const cache = await getData("preferenceData");
+            if (cache == null) {
+                return null;
+            }
+
+            // Check exp
+            const isExpired = moment().diff(moment.unix(cache.exp)) >= 0;
+            if (isExpired) {
+                return null;
+            }
+
+            return {
+                diets: cache.diets,
+                cuisines: cache.cuisines,
+                allergens: cache.allergens,
+            };
         };
 
     return { diets, cuisines, allergens, getAllPreferenceOptions };
