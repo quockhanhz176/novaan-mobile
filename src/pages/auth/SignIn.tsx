@@ -36,6 +36,7 @@ import moment from "moment";
 import { useRefreshToken } from "@/api/auth/authApiHook";
 import { type TokenPayload } from "@/api/baseApiHook";
 import { getPayloadFromToken } from "@/api/common/utils/TokenUtils";
+import { getData } from "@/common/AsyncStorageService";
 
 interface SignInProps {
     navigation: NativeStackNavigationProp<RootStackParamList, "SignIn">;
@@ -54,7 +55,6 @@ const SignIn = (props: SignInProps): ReactElement<SignInProps> => {
         androidClientId: GOOGLE_API_KEY,
     });
     const { refreshToken } = useRefreshToken();
-    const [token, setToken] = useState<string>("");
 
     const {
         handleSubmit,
@@ -84,7 +84,7 @@ const SignIn = (props: SignInProps): ReactElement<SignInProps> => {
 
             if (!expired) {
                 // Skip sign in
-                navigation.navigate("MainScreens");
+                void handleSignInSuccessRedirect();
                 return;
             }
 
@@ -96,7 +96,7 @@ const SignIn = (props: SignInProps): ReactElement<SignInProps> => {
 
             // Save new token to secure store
             await saveKeychain(KEYCHAIN_ID, newToken);
-            navigation.navigate("MainScreens");
+            void handleSignInSuccessRedirect();
         } catch (e) {
             // Continue with normal sign in
         } finally {
@@ -116,21 +116,13 @@ const SignIn = (props: SignInProps): ReactElement<SignInProps> => {
                 alert(SIGN_IN_GOOGLE_ERROR_OCCURED);
                 return;
             }
-            setToken(token);
+            void handleSignInWithGoogle(token);
         }
 
         if (response?.type === "error") {
             alert(SIGN_IN_GOOGLE_ERROR_OCCURED);
         }
     }, [response]);
-
-    useEffect(() => {
-        if (token === null || token === "") {
-            return;
-        }
-
-        void handleSignInWithGoogle(token);
-    }, [token]);
 
     const handleSignIn = async (data: FormData): Promise<void> => {
         setIsLoading(true);
@@ -143,7 +135,7 @@ const SignIn = (props: SignInProps): ReactElement<SignInProps> => {
 
             // Save token to secure store
             await saveKeychain(KEYCHAIN_ID, response.token);
-            navigation.navigate("MainScreens");
+            void handleSignInSuccessRedirect();
         } catch (error) {
             alert(COMMON_SERVER_CONNECTION_FAIL_ERROR);
             console.error(`fail: ${String(error)}`);
@@ -161,7 +153,7 @@ const SignIn = (props: SignInProps): ReactElement<SignInProps> => {
                 return;
             }
             await saveKeychain(KEYCHAIN_ID, response.token);
-            navigation.navigate("MainScreens");
+            void handleSignInSuccessRedirect();
         } catch (error) {
             alert(COMMON_SERVER_CONNECTION_FAIL_ERROR);
             console.error(`fail: ${String(error)}`);
@@ -180,6 +172,15 @@ const SignIn = (props: SignInProps): ReactElement<SignInProps> => {
 
     const handleSignUpRedirect = (): void => {
         navigation.navigate("SignUp");
+    };
+
+    const handleSignInSuccessRedirect = async (): Promise<void> => {
+        const notFirstTime = await getData("haveUserSetPreference");
+        if (notFirstTime == null || !notFirstTime) {
+            navigation.navigate("Greet");
+            return;
+        }
+        navigation.navigate("MainScreens");
     };
 
     return (

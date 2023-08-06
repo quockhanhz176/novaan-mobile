@@ -263,6 +263,7 @@ export const FILTER_CATEGORY_ALLERGEN = "Dị ứng";
 
 // Search
 export const SEARCH_POST_DETAILS_TITLE = "Chi tiết kết quả tìm kiếm";
+
 export const SEARCH_BASIC_SEARCH_BUTTON = "Tìm kiếm bài viết";
 export const SEARCH_ADVANCED_SEARCH_BUTTON = "Tủ lạnh nhà bạn có gì";
 export const SEARCH_USER_SEARCH_BUTTON = "Tìm kiếm tác giả";
@@ -275,3 +276,28 @@ export const ADVANCED_SEARCH_NO_POST = "Không tìm thấy bài viết nào"
 export const BASIC_SEARCH_NO_POST = "Không tìm thấy bài viết nào"
 export const BASIC_SEARCH_ADVANCED_SEARCH_BUTTON = "Tìm kiếm nâng cao"
 export const BASIC_SEARCH_USER_SEARCH_BUTTON = "Tìm kiếm tác giả"
+
+
+// Greet
+export const GREET_GREET = "Chào mừng bạn đến với";
+export const GREET_GREET_APP = "Nấu và Ăn";
+export const SET_PREFERENCE_INVITE =
+    "Nâng cao trải nghiệm sử dụng app chỉ với việc lựa chọn các mục yêu thích và hạn chế!";
+export const GREET_NEXT_BTN_TITLE = "Làm ngay";
+export const GREET_SKIP_BTN_TITLE = "Để sau";
+
+// Preference
+export const SET_PREF_PREV_BTN_TITLE = "Quay lại";
+export const SET_PREF_NEXT_BTN_TITLE = "Tiếp tục";
+export const SET_PREF_DONE_BTN_TITLE = "Hoàn thành";
+
+export const SET_PREF_DIET_GUIDE =
+    "Hãy bắt đầu với việc lựa chọn những chế độ ăn mà bạn đang quan tâm hoặc mong muốn thực hiện";
+export const SET_PREF_CUISINE_GUIDE =
+    "Hãy lựa chọn những nền ẩm thực yêu thích để app có thể gợi ý các công thức tốt hơn";
+export const SET_PREF_ALLERGEN_GUIDE =
+    "Cuối cùng, hãy lựa chọn những thực phẩm có thể gây dị ứng hoặc không phù hợp với bạn để app có thể hạn chế mốt số công thức";
+
+export const SET_PREF_FAILED =
+    "Cập nhập không thành công. Vui lòng thử lại sau";
+export const SET_PREF_SUCCESS = "Sở thích của bạn đã được cập nhập";
