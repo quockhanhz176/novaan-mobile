@@ -239,6 +239,7 @@ export const REEL_COMMENTS_DELETE_BUTTON = "Xóa";
 export const REEL_REPORT_FORM_TITLE = "Lý do báo cáo nội dung";
 export const REEL_REPORT_FORM_SORRY =
     "Chúng tôi rất tiếc khi đã có nội dung làm bạn không thoải mái. Xin vui lòng cho biết lý do để chúng tôi có thể đánh giá lại nội dung này.";
+export const REEL_FAILED_TO_LOAD = "Không thể tải bài viết";
 
 // Add comment
 export const ADD_COMMENT_TITLE = "Đánh giá";
@@ -269,14 +270,14 @@ export const SEARCH_ADVANCED_SEARCH_BUTTON = "Tủ lạnh nhà bạn có gì";
 export const SEARCH_USER_SEARCH_BUTTON = "Tìm kiếm tác giả";
 
 // Advanced search
-export const ADVANCED_SEARCH_SUGGESTION_EMPTY = "Không tìm thấy nguyên liệu nào"
-export const ADVANCED_SEARCH_NO_POST = "Không tìm thấy bài viết nào"
+export const ADVANCED_SEARCH_SUGGESTION_EMPTY =
+    "Không tìm thấy nguyên liệu nào";
+export const ADVANCED_SEARCH_NO_POST = "Không tìm thấy bài viết nào";
 
 // Basic search
-export const BASIC_SEARCH_NO_POST = "Không tìm thấy bài viết nào"
-export const BASIC_SEARCH_ADVANCED_SEARCH_BUTTON = "Tìm kiếm nâng cao"
-export const BASIC_SEARCH_USER_SEARCH_BUTTON = "Tìm kiếm tác giả"
-
+export const BASIC_SEARCH_NO_POST = "Không tìm thấy bài viết nào";
+export const BASIC_SEARCH_ADVANCED_SEARCH_BUTTON = "Tìm kiếm nâng cao";
+export const BASIC_SEARCH_USER_SEARCH_BUTTON = "Tìm kiếm tác giả";
 
 // Greet
 export const GREET_GREET = "Chào mừng bạn đến với";
