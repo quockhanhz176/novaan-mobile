@@ -1,4 +1,10 @@
-import React, { useEffect, type ReactElement, useState, useMemo } from "react";
+import React, {
+    useEffect,
+    type ReactElement,
+    useState,
+    useMemo,
+    useCallback,
+} from "react";
 import { type MinimalUserInfo } from "@/api/profile/types";
 import { Avatar } from "react-native-paper";
 import {
@@ -9,15 +15,19 @@ import {
 } from "react-native";
 import { useFetchResourceUrl } from "@/api/utils/resourceHooks";
 import { customColors } from "@root/tailwind.config";
+import followApi from "@/api/follow/FollowApi";
+import { debounce } from "lodash";
 
 interface FollowingItemProps {
     followInfo: MinimalUserInfo;
     onItemPress: (item: MinimalUserInfo) => void;
+    setFollowingCount?: (setter: (value: number) => number) => void;
 }
 
 const FollowingItem = ({
     followInfo,
     onItemPress,
+    setFollowingCount,
 }: FollowingItemProps): ReactElement<FollowingItemProps> => {
     // TODO: Implement follow/unfollow later
     const [followingPress, setFollowingPress] = useState(false);
@@ -56,9 +66,18 @@ const FollowingItem = ({
         setFollowingPress(true);
     };
 
+    const changeFollowApi = useCallback(
+        debounce((value: boolean) => {
+            void followApi.setFollow(followInfo.userId, value);
+        }, 1000),
+        [followInfo.userId]
+    );
+
     const handleFollowingPress = (): void => {
         setFollowingPress(false);
         setIsFollowing(!isFollowing);
+        changeFollowApi(!isFollowing);
+        setFollowingCount?.((value) => value + (!isFollowing ? 1 : -1));
     };
 
     const handleItemPress = (): void => {

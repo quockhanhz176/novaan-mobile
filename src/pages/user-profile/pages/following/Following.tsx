@@ -9,10 +9,12 @@ import UserProfile from "../../UserProfile";
 
 interface FollowingProps {
     userId?: string;
+    setFollowingCount?: (setter: (value: number) => number) => void;
 }
 
 const Following = ({
     userId,
+    setFollowingCount,
 }: FollowingProps): ReactElement<FollowingProps> => {
     const {
         content: following,
@@ -57,7 +59,7 @@ const Following = ({
     };
 
     return (
-        <View className="flex-1 bg-white">
+        <View className="flex-1">
             <FlatList
                 style={{ display: isEmpty ? "none" : "flex" }}
                 data={following}
@@ -68,6 +70,7 @@ const Following = ({
                     <FollowingItem
                         followInfo={item}
                         onItemPress={handleItemPress}
+                        setFollowingCount={setFollowingCount}
                     />
                 )}
                 onEndReached={handleGetMoreFollowing}

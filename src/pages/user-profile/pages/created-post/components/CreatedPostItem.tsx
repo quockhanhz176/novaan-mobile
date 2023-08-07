@@ -1,24 +1,30 @@
 import { type MinimalPostInfo } from "@/api/profile/types";
-import React, { type ReactElement } from "react";
+import React, { memo, type ReactElement } from "react";
 import { View } from "react-native";
 import { Card } from "react-native-paper";
 
 interface CreatedPostItemProps {
+    index: number;
     item: MinimalPostInfo;
-    onItemPress: () => void;
+    onItemPress: (item: MinimalPostInfo, index: number) => void;
 }
 
 const CreatedPostItem = ({
+    index,
     item,
     onItemPress,
 }: CreatedPostItemProps): ReactElement<CreatedPostItemProps> => {
+    const onPress = (): void => {
+        onItemPress(item, index);
+    };
+
     return (
         <View className="w-1/2 items-center my-2">
             <Card
                 mode="elevated"
                 className="bg-white w-5/6"
                 style={{ width: "90%" }}
-                onPress={onItemPress}
+                onPress={onPress}
             >
                 <Card.Cover
                     source={{
@@ -41,4 +47,4 @@ const CreatedPostItem = ({
     );
 };
 
-export default CreatedPostItem;
+export default memo(CreatedPostItem);

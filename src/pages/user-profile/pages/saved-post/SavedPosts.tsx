@@ -5,6 +5,7 @@ import React, {
     useMemo,
     useEffect,
     useState,
+    memo,
 } from "react";
 import { Modal, Pressable, Text, TouchableOpacity, View } from "react-native";
 import { UserProfileContext } from "../../UserProfile";
@@ -198,4 +199,4 @@ const SavedPosts = (): ReactElement => {
     );
 };
 
-export default SavedPosts;
+export default memo(SavedPosts);

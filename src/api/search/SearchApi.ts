@@ -9,11 +9,13 @@ import {
     type SearchResponseRecipe,
     type SearchResponseTip,
 } from "./types/SearchResponsePost";
+import type UserSearchResponse from "./types/UserSearchResponse";
 
 const GET_PREFERENCES_URL = "preference/all";
 const USER_PREFERENCES_URL = "preference/me";
 const RECIPE_SEARCH_URL = "search/recipes";
 const TIP_SEARCH_URL = "search/tips";
+const USER_SEARCH_URL = "search/users";
 const ADVANCED_SEARCH_URL = "search/advanced/recipes";
 const ADVANCED_SEARCH_INGREDIENT_URL = "search/advanced/ingredients";
 
@@ -89,7 +91,7 @@ const addToParams = <T>(
     params.append(name, (request[property] as any).toString());
 };
 
-const search = async <
+const searchPost = async <
     T extends PostType,
     R extends T extends "recipe" ? SearchResponseRecipe : SearchResponseTip
 >(
@@ -112,7 +114,28 @@ const search = async <
         searchParams.toString();
     return await baseApi.sendReceiveBase<R[]>(
         requestUrl,
-        "SearchApi.search",
+        "SearchApi.searchPost",
+        HttpMethod.GET
+    );
+};
+
+const searchUser = async (
+    request: SearchRequest
+): Promise<FailableResponse<UserSearchResponse[]>> => {
+    const searchParams = new URLSearchParams("");
+    addToParams(searchParams, request, "queryString", "SearchTerm");
+    addToParams(searchParams, request, "start", "Pagination.Start");
+    addToParams(searchParams, request, "limit", "Pagination.Limit");
+    addToParams(searchParams, request, "sortType");
+    addToParams(searchParams, request, "difficulty");
+    addToParams(searchParams, request, "allergens");
+    addToParams(searchParams, request, "cuisines");
+    addToParams(searchParams, request, "diets");
+    addToParams(searchParams, request, "categories");
+    const requestUrl = USER_SEARCH_URL + "?" + searchParams.toString();
+    return await baseApi.sendReceiveBase<UserSearchResponse[]>(
+        requestUrl,
+        "SearchApi.searchUser",
         HttpMethod.GET
     );
 };
@@ -122,7 +145,8 @@ const searchApi = {
     getUserPreferences,
     getAdvancedSearchResult,
     getAdvancedSearchIngredients,
-    search,
+    searchPost,
+    searchUser,
 };
 
 export default searchApi;
