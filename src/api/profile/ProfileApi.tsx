@@ -207,8 +207,6 @@ export const useUserSavedPost = (
     });
 
     useEffect(() => {
-        console.log(data);
-
         if (data == null) {
             setEnded(true);
             return;
@@ -318,17 +316,10 @@ export const useUserPreferences = (): UseUserPreferencesReturn => {
     };
 
     const getUserPreferences = async (): Promise<UserPreferences> => {
-        const cacheUserPreferences = await loadUserPreference();
-        if (cacheUserPreferences != null) {
-            return cacheUserPreferences;
-        }
-
         const response = await getReq(USER_PREFRENCES_URL);
         if (!responseObjectValid(response)) {
             throw new Error(); // For UI to handle however they like
         }
-
-        await storeUserPreference(response);
         return response;
     };
 
@@ -355,33 +346,33 @@ export const useUserPreferences = (): UseUserPreferencesReturn => {
         return true;
     };
 
-    const storeUserPreference = async (
-        preferences: UserPreferences
-    ): Promise<void> => {
-        await storeData("userPreferenceData", {
-            ...preferences,
-            exp: moment().add(12, "hours").unix(),
-        });
-    };
+    // const storeUserPreference = async (
+    //     preferences: UserPreferences
+    // ): Promise<void> => {
+    //     await storeData("userPreferenceData", {
+    //         ...preferences,
+    //         exp: moment().add(12, "hours").unix(),
+    //     });
+    // };
 
-    const loadUserPreference = async (): Promise<UserPreferences | null> => {
-        const cache = await getData("userPreferenceData");
-        if (cache == null) {
-            return null;
-        }
+    // const loadUserPreference = async (): Promise<UserPreferences | null> => {
+    //     const cache = await getData("userPreferenceData");
+    //     if (cache == null) {
+    //         return null;
+    //     }
 
-        // Check exp
-        const isExpired = moment().diff(moment.unix(cache.exp)) >= 0;
-        if (isExpired) {
-            return null;
-        }
+    //     // Check exp
+    //     const isExpired = moment().diff(moment.unix(cache.exp)) >= 0;
+    //     if (isExpired) {
+    //         return null;
+    //     }
 
-        return {
-            diets: cache.diets,
-            cuisines: cache.cuisines,
-            allergens: cache.allergens,
-        };
-    };
+    //     return {
+    //         diets: cache.diets,
+    //         cuisines: cache.cuisines,
+    //         allergens: cache.allergens,
+    //     };
+    // };
 
     return {
         haveUserSetPreference,

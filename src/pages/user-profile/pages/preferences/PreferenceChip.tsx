@@ -5,7 +5,7 @@ import { Tooltip } from "react-native-paper";
 
 interface PreferenceChipProps {
     item: PreferenceResponse;
-    selectedCategories: PreferenceResponse[];
+    selectedCategories: string[];
     onPress: () => void;
 }
 
@@ -18,7 +18,7 @@ const PreferenceChip = ({
 
     const selected = useMemo(
         () =>
-            selectedCategories.find((category) => category.id === item.id) !=
+            selectedCategories.find((categoryId) => categoryId === item.id) !=
             null,
         [selectedCategories]
     );

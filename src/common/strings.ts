@@ -207,6 +207,8 @@ export const PROFILE_EMPTY_RECIPE = "Oops, phần này chưa có công thức n�
 export const PROFILE_EMPTY_TIPS = "Oops, phần này chưa có mẹo vặt nào cả";
 export const PROFILE_EMPTY_FOLLOWING = "Oops, bạn chưa theo dõi ai cả";
 export const PROFILE_PAGE_LABEL = "Trang cá nhân";
+export const PROFILE_UPDATE_PREF = "Cập nhập sở thích";
+export const PROFILE_LOGOUT = "Đăng xuất";
 
 // Reel screen
 export const REEL_DETAILS_RATING = "đánh giá";

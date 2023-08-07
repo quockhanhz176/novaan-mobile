@@ -8,7 +8,7 @@ export type RootStackParamList = {
     CreateTip: undefined;
     CreateRecipe: undefined;
     Greet: undefined;
-    SetPreferences: undefined;
+    SetPreferences: { firstTime: boolean };
 };
 
 export type BottomTabParamList = {

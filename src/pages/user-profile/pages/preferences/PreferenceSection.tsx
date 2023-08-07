@@ -6,7 +6,7 @@ import { customColors } from "@root/tailwind.config";
 
 interface PreferenceSectionProps {
     categories: PreferenceResponse[];
-    selectedCategories: PreferenceResponse[];
+    selectedCategories: string[];
     setCategories: (category: PreferenceResponse) => void;
     sectionDesc: string;
 }
