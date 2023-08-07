@@ -13,7 +13,7 @@ const SettingMenu = (): ReactElement => {
 
     const handleOpenSetPreferences = (): void => {
         // Go to set preferences page
-        rootNavigation.navigate("SetPreferences");
+        rootNavigation.push("SetPreferences", { firstTime: false });
     };
 
     const handleLogout = (): void => {

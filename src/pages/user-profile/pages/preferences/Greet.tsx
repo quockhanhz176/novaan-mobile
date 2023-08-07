@@ -31,11 +31,11 @@ const Greet = ({ navigation }: GreetProps): ReactElement<GreetProps> => {
 
     const redirectToMainScreeen = (): void => {
         // Replace to avoid user navigate back
-        navigation.push("MainScreens");
+        navigation.navigate("MainScreens");
     };
 
     const redirectToSetPreference = (): void => {
-        navigation.push("SetPreferences");
+        navigation.navigate("SetPreferences", { firstTime: true });
     };
 
     const handleUserSkip = async (): Promise<void> => {

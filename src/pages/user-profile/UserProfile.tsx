@@ -181,39 +181,6 @@ const UserProfile = ({
                                 <SettingMenu />
                             </CustomModal>
                         </>
-                        // <Menu
-                        //     visible={profileSettingOpen}
-                        //     onDismiss={hideProfileSetting}
-                        //     style={{
-                        //         backgroundColor: "#FFF",
-                        //         marginRight: 12,
-                        //     }}
-                        //     contentStyle={{ backgroundColor: "#FFF" }}
-                        //     statusBarHeight={0}
-                        //     anchorPosition="bottom"
-                        //     anchor={
-                        //         <TouchableOpacity
-                        //             onPress={showProfileSetting}
-                        //             className="py-2 rounded-lg"
-                        //             hitSlop={5}
-                        //             delayPressIn={0}
-                        //         >
-                        //             <IonIcon
-                        //                 name="ellipsis-vertical"
-                        //                 size={18}
-                        //             />
-                        //         </TouchableOpacity>
-                        //     }
-                        // >
-                        //     <Menu.Item
-                        //         title="Cập nhập sở thích"
-                        //         onPress={handleSetPreferences}
-                        //     />
-                        //     <Menu.Item
-                        //         title="Đăng xuất"
-                        //         onPress={handleLogout}
-                        //     />
-                        // </Menu>
                     )}
                 </View>
             </View>

@@ -40,26 +40,22 @@ export type PreferenceItem = PreferenceResponse | { selected: boolean };
 
 interface SetPreferencesProps {
     navigation: NativeStackNavigationProp<RootStackParamList, "SetPreferences">;
+    firstTime: boolean;
 }
 
 const SetPreferences = ({
     navigation,
+    firstTime,
 }: SetPreferencesProps): ReactElement<SetPreferencesProps> => {
     // Query all preferences and save to cache
     const { diets, cuisines, allergens, getAllPreferenceOptions } =
         useAppPreferences();
-    const { setUserPreferences } = useUserPreferences();
-
-    useEffect(() => {
-        void getAllPreferenceOptions();
-    }, []);
+    const { getUserPreferences, setUserPreferences } = useUserPreferences();
 
     // Store selected preferences
-    const [selectedDiets, setSelectedDiets] = useState<Preference[]>([]);
-    const [selectedCuisines, setSelectedCuisines] = useState<Preference[]>([]);
-    const [selectedAllergens, setSelectedAllergens] = useState<Preference[]>(
-        []
-    );
+    const [selectedDiets, setSelectedDiets] = useState<string[]>([]);
+    const [selectedCuisines, setSelectedCuisines] = useState<string[]>([]);
+    const [selectedAllergens, setSelectedAllergens] = useState<string[]>([]);
 
     const [index, setIndex] = useState(0);
     const [loading, setLoading] = useState(false);
@@ -67,6 +63,23 @@ const SetPreferences = ({
     const progress = useMemo(() => (index + 1) / 3, [index]);
 
     const swiperRef = useRef<Swiper>(null);
+
+    const fetchUserPreferences = async (): Promise<void> => {
+        const { diets, cuisines, allergens } = await getUserPreferences();
+        setSelectedDiets(diets);
+        setSelectedCuisines(cuisines);
+        setSelectedAllergens(allergens);
+    };
+
+    useEffect(() => {
+        void getAllPreferenceOptions();
+        if (firstTime) {
+            return;
+        }
+
+        // Fetch current user preferences
+        void fetchUserPreferences();
+    }, []);
 
     const handleNextPage = useCallback((): void => {
         // Reached the end
@@ -87,17 +100,12 @@ const SetPreferences = ({
     }, [index]);
 
     const handleSelectCategory = useCallback(
-        (
-                state: Preference[],
-                setState: Dispatch<SetStateAction<Preference[]>>
-            ) =>
+        (state: string[], setState: Dispatch<SetStateAction<string[]>>) =>
             (category: Preference) => {
                 // Filter to see if this is a unselect
-                const newState = state.filter(
-                    (item) => item.id !== category.id
-                );
+                const newState = state.filter((item) => item !== category.id);
                 if (newState.length >= state.length) {
-                    newState.push(category);
+                    newState.push(category.id);
                 }
                 setState(newState);
             },
@@ -109,9 +117,9 @@ const SetPreferences = ({
         // Save preferences
         try {
             await setUserPreferences({
-                diets: selectedDiets.map((diet) => diet.id),
-                cuisines: selectedCuisines.map((cuisine) => cuisine.id),
-                allergens: selectedAllergens.map((allergen) => allergen.id),
+                diets: selectedDiets,
+                cuisines: selectedCuisines,
+                allergens: selectedAllergens,
             });
         } catch {
             Toast.show({ type: "error", text1: SET_PREF_FAILED });
@@ -124,7 +132,12 @@ const SetPreferences = ({
         // Show toast when done
         Toast.show({ type: "success", text1: SET_PREF_SUCCESS });
         // Redirect to Main Screens
-        navigation.push("MainScreens");
+
+        if (firstTime) {
+            navigation.push("MainScreens");
+        } else {
+            navigation.goBack();
+        }
     };
 
     return (

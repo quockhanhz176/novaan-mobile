@@ -45,3 +45,13 @@ export const getData = async <T extends keyof StorageKey>(
         return null;
     }
 };
+
+export const invalidateData = async <T extends keyof StorageKey>(
+    key: T
+): Promise<void> => {
+    try {
+        await AsyncStorage.removeItem(key);
+    } catch {
+        // Ignore error
+    }
+};
