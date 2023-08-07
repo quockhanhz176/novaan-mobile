@@ -19,13 +19,13 @@ const CreatedPostItem = ({
     item,
     onItemPress,
 }: CreatedPostItemProps): ReactElement<CreatedPostItemProps> => {
-
     const [imageFailed, setImageFailed] = useState(false);
 
     const handleError = (
         e: NativeSyntheticEvent<ImageErrorEventData>
     ): void => {
         setImageFailed(true);
+    };
 
     const onPress = (): void => {
         onItemPress(item, index);

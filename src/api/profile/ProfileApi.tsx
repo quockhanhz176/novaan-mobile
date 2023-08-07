@@ -18,11 +18,7 @@ import { getUserIdFromToken } from "../common/utils/TokenUtils";
 import type PreferenceSuiteResponse from "../search/types/PreferenceSuiteResponse";
 import { responseObjectValid } from "../common/utils/ResponseUtils";
 import type PreferenceResponse from "../search/types/PreferenceResponse";
-import {
-    getData,
-    invalidateData,
-    storeData,
-} from "@/common/AsyncStorageService";
+import { getData, storeData } from "@/common/AsyncStorageService";
 import moment from "moment";
 
 const PAGE_SIZE = 4;
