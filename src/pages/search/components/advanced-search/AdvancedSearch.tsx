@@ -25,19 +25,30 @@ import type PostResponse from "@/api/post/types/PostResponse";
 import { getRequestPostType } from "@/api/post/types/RequestPostType";
 import LinearGradient from "react-native-linear-gradient";
 import IconMaterial from "react-native-vector-icons/MaterialIcons";
+import IconFA5 from "react-native-vector-icons/FontAwesome5";
 import { FlatList, ScrollView } from "react-native-gesture-handler";
 import SuggestedIngredientItem from "./SuggestedIngredientItem";
 import {
+    ADVANCED_SEARCH_BRIEF_1,
+    ADVANCED_SEARCH_BRIEF_2,
     ADVANCED_SEARCH_NO_POST,
     ADVANCED_SEARCH_SUGGESTION_EMPTY,
+    ADVANCED_SEARCH_TITLE,
 } from "@/common/strings";
 import OverlayLoading from "@/common/components/OverlayLoading";
 import AutoComplete from "../Autocomplete";
+import usePagingHook from "@/common/components/PagingHook";
+import type PreferenceSuite from "../../types/PreferenceSuite";
 
 interface AdvancedSearchParams {
     setReelParams?: (value: ReelParams) => void;
     showReel?: () => void;
     navigateBack?: () => void;
+}
+
+interface SearchParams {
+    ingredients?: string[];
+    preferenceSuite?: PreferenceSuite;
 }
 
 const styles = StyleSheet.create({
@@ -48,7 +59,6 @@ const styles = StyleSheet.create({
     },
 });
 
-// TODO: Change this to 10 when backend pagination starts working
 const SEARCH_BATCH_SIZE = 10000;
 
 const AdvancedSearch: FC<AdvancedSearchParams> = ({
@@ -67,16 +77,40 @@ const AdvancedSearch: FC<AdvancedSearchParams> = ({
         ])
     );
     const [ingredientString, setIngredientString] = useState("");
-    const [searchResults, setSearchResults] = useState<RecipeResponse[]>();
-    const [searchLoading, setSearchLoading] = useState(false);
-    const offset = useRef(0);
+
+    const fetchData = useCallback(
+        async (
+            start: number,
+            size: number,
+            params: SearchParams
+        ): Promise<RecipeResponse[] | null> => {
+            if (params.ingredients == null) {
+                return null;
+            }
+
+            const results = await searchServices.searchAdvanced(
+                params.ingredients,
+                start,
+                size
+            );
+            return results;
+        },
+        [ingredients]
+    );
+
+    const [searchResults, fetchNextReset, , resetResults, searchLoading] =
+        usePagingHook<RecipeResponse, SearchParams>(
+            fetchData,
+            SEARCH_BATCH_SIZE,
+            1
+        );
     const inputWrapperRef = useRef<View>(null);
     const [suggestedIngredients, setSuggestedIngredients] =
         useState<string[]>();
 
     const onResetPressed = useCallback((): void => {
         dispatchIngredients({ type: "reset" });
-        setSearchResults(undefined);
+        resetResults();
     }, []);
 
     const onDeletePressed = useCallback(
@@ -98,41 +132,6 @@ const AdvancedSearch: FC<AdvancedSearchParams> = ({
         },
         [onDeletePressed]
     );
-
-    const onSearchPressed = useCallback(async (): Promise<void> => {
-        if (ingredients == null) {
-            return;
-        }
-
-        setSearchLoading(true);
-        const results = await searchServices.searchAdvanced(
-            Array.from(ingredients),
-            0,
-            SEARCH_BATCH_SIZE
-        );
-        setSearchLoading(false);
-
-        if (results == null) {
-            return;
-        }
-
-        setSearchResults(results);
-        offset.current = SEARCH_BATCH_SIZE;
-    }, [ingredients]);
-
-    const onEndReached = useCallback(async () => {
-        // TODO: Uncomment when backend pagination starts working
-        // const results = await searchServices.searchAdvanced(
-        //     Array.from(ingredients),
-        //     offset.current + 1,
-        //     SEARCH_BATCH_SIZE
-        // );
-        // if (results == null || results.length === 0) {
-        //     return;
-        // }
-        // setSearchResults([...searchResults, ...results]);
-        // offset.current += SEARCH_BATCH_SIZE;
-    }, [searchResults]);
 
     const searchResultItem = useCallback(
         (item: PostResponse, _index: number): void => {
@@ -193,6 +192,15 @@ const AdvancedSearch: FC<AdvancedSearchParams> = ({
         []
     );
 
+    const onEndReach = useCallback(() => {}, []);
+
+    const onSearch = (): void => {
+        void fetchNextReset({
+            ingredients:
+                ingredients != null ? Array.from(ingredients) : undefined,
+        });
+    };
+
     return (
         <View className="flex-1 bg-white">
             <View className="h-[55] flex-row px-1 items-center border-cgrey-platinum p-3">
@@ -203,7 +211,9 @@ const AdvancedSearch: FC<AdvancedSearchParams> = ({
                 >
                     <IconMaterial name="arrow-back" size={24} color="#000" />
                 </TouchableOpacity>
-                <Text className="text-lg font-medium">Tìm kiếm nâng cao</Text>
+                <Text className="text-lg font-medium">
+                    {ADVANCED_SEARCH_TITLE}
+                </Text>
             </View>
             <View className="flex-1">
                 <View className="w-full flex-row items-center px-3">
@@ -243,7 +253,7 @@ const AdvancedSearch: FC<AdvancedSearchParams> = ({
                         }}
                         buttonClassName="space-x-0 px-1"
                         buttonProps={{
-                            onPress: onSearchPressed,
+                            onPress: onSearch,
                         }}
                     />
                     <IconLabelButton
@@ -278,24 +288,39 @@ const AdvancedSearch: FC<AdvancedSearchParams> = ({
                     />
                     {searchLoading ? (
                         <OverlayLoading />
-                    ) : (
-                        searchResults != null &&
-                        (searchResults.length > 0 ? (
+                    ) : searchResults != null ? (
+                        searchResults.length > 0 ? (
                             <CreatedPostList
                                 data={searchResults}
                                 hidden={false}
                                 loading={false}
-                                handleOnEndReached={onEndReached}
+                                handleOnEndReached={onEndReach}
                                 handleItemPress={searchResultItem}
                                 contentContainerStyle={styles.createdPostList}
                             />
                         ) : (
                             <View className="flex-1 justify-center items-center">
-                                <Text className="">
+                                <Text className="text-cgrey-battleship">
                                     {ADVANCED_SEARCH_NO_POST}
                                 </Text>
                             </View>
-                        ))
+                        )
+                    ) : (
+                        <View className="flex-1 px-10 justify-center items-center">
+                            <IconFA5
+                                name="search-plus"
+                                color={customColors.cgrey.battleship}
+                                size={100}
+                            />
+                            <Text className="text-cgrey-battleship mt-5 text-base text-center">
+                                {ADVANCED_SEARCH_BRIEF_1}
+                                <IconFA5
+                                    name="search"
+                                    color={customColors.cgrey.battleship}
+                                />
+                                {ADVANCED_SEARCH_BRIEF_2}
+                            </Text>
+                        </View>
                     )}
                     {searchLoading && <OverlayLoading />}
                 </View>

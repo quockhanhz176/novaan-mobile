@@ -80,16 +80,26 @@ const UserProfile = ({
     const { profileInfo, fetchPersonalProfile, fetchUserProfile } =
         useProfileInfo();
 
+    const [followingCount, setFollowingCount] = useState<number>(
+        profileInfo?.followingCount ?? 0
+    );
+
     useEffect(() => {
         void handleFetchProfile();
     }, [userId]);
+
+    useEffect(() => {
+        setFollowingCount(profileInfo?.followingCount ?? 0);
+    }, [profileInfo?.followingCount]);
 
     const renderScene = useMemo(() => {
         if (isUserProfile) {
             return SceneMap({
                 created: CreatedPosts,
                 saved: SavedPosts,
-                following: Following,
+                following: () => (
+                    <Following setFollowingCount={setFollowingCount} />
+                ),
             });
         }
 
@@ -135,11 +145,16 @@ const UserProfile = ({
         }
     };
 
+    const userProfileContextValue = useMemo(
+        () => ({ userInfo: profileInfo }),
+        [profileInfo]
+    );
+
     if (profileInfo == null) {
         return <OverlayLoading />;
     }
 
-    const { username, followersCount, followingCount } = profileInfo;
+    const { username, followersCount } = profileInfo;
 
     return (
         <View className="flex-1 bg-white">
@@ -216,7 +231,7 @@ const UserProfile = ({
                     value={followingCount ?? 0}
                 />
             </View>
-            <UserProfileContext.Provider value={{ userInfo: profileInfo }}>
+            <UserProfileContext.Provider value={userProfileContextValue}>
                 <TabView
                     className="flex-1 mt-4"
                     navigationState={{ index, routes }}

@@ -269,17 +269,30 @@ export const SEARCH_POST_DETAILS_TITLE = "Chi tiết kết quả tìm kiếm";
 
 export const SEARCH_BASIC_SEARCH_BUTTON = "Tìm kiếm bài viết";
 export const SEARCH_ADVANCED_SEARCH_BUTTON = "Tủ lạnh nhà bạn có gì";
-export const SEARCH_USER_SEARCH_BUTTON = "Tìm kiếm tác giả";
+export const SEARCH_USER_SEARCH_BUTTON = "Tìm kiếm người dùng";
 
 // Advanced search
+export const ADVANCED_SEARCH_TITLE = "Tìm kiếm nâng cao";
 export const ADVANCED_SEARCH_SUGGESTION_EMPTY =
     "Không tìm thấy nguyên liệu nào";
-export const ADVANCED_SEARCH_NO_POST = "Không tìm thấy bài viết nào";
+export const ADVANCED_SEARCH_NO_POST = "Không tìm thấy công thức nào";
+export const ADVANCED_SEARCH_BRIEF_1 =
+    "Thêm một vài nguyên liệu nấu ăn bạn có và bấm ";
+export const ADVANCED_SEARCH_BRIEF_2 =
+    " để tìm những công thức chỉ sử dụng các nguyên liệu này";
 
 // Basic search
 export const BASIC_SEARCH_NO_POST = "Không tìm thấy bài viết nào";
 export const BASIC_SEARCH_ADVANCED_SEARCH_BUTTON = "Tìm kiếm nâng cao";
 export const BASIC_SEARCH_USER_SEARCH_BUTTON = "Tìm kiếm tác giả";
+
+// User search
+export const USER_SEARCH_TITLE = "Tìm kiếm người dùng";
+export const USER_SEARCH_NO_USER = "Không tìm thấy người dùng nào";
+export const USER_SEARCH_FOLLOWER_COUNT_LABEL = "người theo dõi";
+export const USER_SEARCH_POST_COUNT_LABEL = "bài viết";
+export const USER_SEARCH_FOLLOW_BUTTON_FOLLOW = "Theo dõi";
+export const USER_SEARCH_FOLLOW_BUTTON_FOLLOWED = "Đã theo dõi";
 
 // Greet
 export const GREET_GREET = "Chào mừng bạn đến với";

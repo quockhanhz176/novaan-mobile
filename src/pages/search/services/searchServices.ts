@@ -14,6 +14,9 @@ import {
 import type SearchRequest from "@/api/search/types/SearchRequest";
 import type PreferenceCategory from "../types/PreferenceCategory";
 import { type MinimalPostInfo } from "@/api/profile/types";
+import type UserSearchResult from "../types/UserSearchResult";
+import followApi from "@/api/follow/FollowApi";
+import { getUserIdFromToken } from "@/api/common/utils/TokenUtils";
 
 const mapCategory = (category: PreferenceCategory): string[] | undefined => {
     const result = category.preferences.flatMap((value) =>
@@ -37,7 +40,7 @@ const searchPost = async (
         return null;
     }
 
-    const result = await searchApi.search(
+    const result = await searchApi.searchPost(
         {
             queryString,
             start,
@@ -77,14 +80,16 @@ const categoryNames: Record<keyof PreferenceSuite, string> = {
 };
 
 const getPreferences = async (): Promise<PreferenceSuite | null> => {
+    const userPreferencePromise = searchApi.getUserPreferences();
     const preferenceResponse = await searchApi.getPreferences();
     if (!preferenceResponse.success) {
         return null;
     }
 
-    const userPreferenceResponse = await searchApi.getUserPreferences();
+    const userPreferenceResponse = await userPreferencePromise;
+    // remove cuisines as they are not detrimental criterias
     const userPreferences = userPreferenceResponse.success
-        ? userPreferenceResponse.value
+        ? { ...userPreferenceResponse.value, cuisines: [] as string[] }
         : null;
 
     let categoryIndex = 0;
@@ -145,11 +150,60 @@ const getIngredients = async (keyword: string): Promise<string[] | null> => {
     return result.success ? result.value : null;
 };
 
+const searchUser = async (
+    queryString: string,
+    suite?: PreferenceSuite,
+    start?: number,
+    limit?: number,
+    sortType?: SearchRequest["sortType"],
+    difficulty?: SearchRequest["difficulty"],
+    categories?: string[]
+): Promise<UserSearchResult[] | null> => {
+    const minimalPostsResult = await postApi.getPostList();
+    if (!minimalPostsResult.success) {
+        return null;
+    }
+
+    const userId = await getUserIdFromToken();
+    const followingsPromise = followApi.getFollowings(userId);
+
+    const result = await searchApi.searchUser({
+        queryString,
+        start,
+        limit,
+        sortType,
+        difficulty,
+        categories,
+        allergens: suite != null ? mapCategory(suite.allergens) : undefined,
+        cuisines: suite != null ? mapCategory(suite.cuisines) : undefined,
+        diets: suite != null ? mapCategory(suite.diets) : undefined,
+    });
+
+    const followingsResult = await followingsPromise;
+    const followings = followingsResult.success
+        ? followingsResult.value
+        : undefined;
+
+    return result.success
+        ? result.value.map((value) => ({
+              ...value,
+              followed:
+                  followings?.find((item) => item.userId === value.id) != null,
+          }))
+        : null;
+};
+
+const setFollow = async (userId: string, value: boolean): Promise<void> => {
+    await followApi.setFollow(userId, value);
+};
+
 const searchServices = {
     searchPost,
     getPreferences,
     searchAdvanced,
     getIngredients,
+    searchUser,
+    setFollow,
 };
 
 export default searchServices;

@@ -4,7 +4,6 @@
 import React, { memo, type ReactElement } from "react";
 import { FlatList } from "react-native-gesture-handler";
 import CreatedPostItem from "./CreatedPostItem";
-import { uuidv4 } from "react-native-compressor";
 import { type StyleProp, type ViewStyle } from "react-native";
 import { type MinimalPostInfo } from "@/api/profile/types";
 
@@ -25,13 +24,9 @@ const CreatedPostList = ({
     handleOnEndReached,
     contentContainerStyle,
 }: CreatedPostListProps): ReactElement<CreatedPostListProps> => {
-    // Generate listKey to avoid nested FlatList error
-    const uniqueListKey = uuidv4();
-
     // Render as hidden when needed to avoid rendering the whole list again
     return (
         <FlatList
-            key={uniqueListKey}
             style={{ display: hidden ? "none" : "flex" }}
             data={data}
             className="w-full"
@@ -40,10 +35,9 @@ const CreatedPostList = ({
             contentContainerStyle={[{ marginTop: 8 }, contentContainerStyle]}
             renderItem={({ item, index }) => (
                 <CreatedPostItem
+                    index={index}
                     item={item}
-                    onItemPress={() => {
-                        handleItemPress(item, index);
-                    }}
+                    onItemPress={handleItemPress}
                 />
             )}
             onEndReached={handleOnEndReached}

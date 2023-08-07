@@ -9,20 +9,26 @@ import { Card } from "react-native-paper";
 import MaterialCIcon from "react-native-vector-icons/MaterialCommunityIcons";
 
 interface CreatedPostItemProps {
+    index: number;
     item: MinimalPostInfo;
-    onItemPress: () => void;
+    onItemPress: (item: MinimalPostInfo, index: number) => void;
 }
 
 const CreatedPostItem = ({
+    index,
     item,
     onItemPress,
 }: CreatedPostItemProps): ReactElement<CreatedPostItemProps> => {
+
     const [imageFailed, setImageFailed] = useState(false);
 
     const handleError = (
         e: NativeSyntheticEvent<ImageErrorEventData>
     ): void => {
         setImageFailed(true);
+
+    const onPress = (): void => {
+        onItemPress(item, index);
     };
 
     return (
@@ -31,7 +37,7 @@ const CreatedPostItem = ({
                 mode="elevated"
                 className="bg-white w-5/6"
                 style={{ width: "90%" }}
-                onPress={onItemPress}
+                onPress={onPress}
             >
                 {!imageFailed ? (
                     <Card.Cover
@@ -67,4 +73,4 @@ const CreatedPostItem = ({
     );
 };
 
-export default memo(CreatedPostItem, (prev, next) => prev.item === next.item);
+export default memo(CreatedPostItem);

@@ -42,6 +42,8 @@ import OverlayLoading from "@/common/components/OverlayLoading";
 import AutoComplete from "../Autocomplete";
 import IconCommunity from "react-native-vector-icons/MaterialCommunityIcons";
 import IconFA5 from "react-native-vector-icons/FontAwesome5";
+import usePagingHook from "@/common/components/PagingHook";
+import type PreferenceSuite from "../../types/PreferenceSuite";
 
 const routes: Route[] = [
     {
@@ -58,6 +60,13 @@ interface RecipeTipSearchParams {
     showUserSearch?: () => void;
 }
 
+interface SearchParams {
+    searchString: string;
+    preferenceSuite?: PreferenceSuite;
+}
+
+const SEARCH_BATCH_SIZE = 10;
+
 const RecipeTipSearch: FC<RecipeTipSearchParams> = ({
     setReelParams,
     showReel,
@@ -65,22 +74,79 @@ const RecipeTipSearch: FC<RecipeTipSearchParams> = ({
     showUserSearch,
 }) => {
     const [searchString, setSearchString] = useState("");
-    const [recipeResults, setRecipeResults] = useState<MinimalPostInfo[]>();
-    const [tipResults, setTipResults] = useState<MinimalPostInfo[]>();
     const [preferenceSuite, dispatchSuite] = useReducer(
         suiteReducer,
         undefined
     );
+
+    const search = useCallback(
+        async (
+            postType: PostType,
+            start: number,
+            size: number,
+            params?: SearchParams
+        ): Promise<MinimalPostInfo[] | null> => {
+            if (params == null || params.searchString === "") {
+                return null;
+            }
+
+            const result = await searchServices.searchPost(
+                params.searchString,
+                postType,
+                params.preferenceSuite,
+                start,
+                size
+            );
+            return result;
+        },
+        []
+    );
+
+    const searchRecipes = useCallback(
+        async (start: number, size: number, params: SearchParams) =>
+            await search("recipe", start, size, params),
+        [search]
+    );
+
+    const searchTips = useCallback(
+        async (start: number, size: number, params: SearchParams) =>
+            await search("tip", start, size, params),
+        [search]
+    );
+
+    const [
+        recipeResults,
+        getRecipesReset,
+        getRecipes,
+        resetRecipes,
+        recipesLoading,
+    ] = usePagingHook<MinimalPostInfo, SearchParams>(
+        searchRecipes,
+        SEARCH_BATCH_SIZE
+    );
+    const [tipResults, getTipsReset, getTips, resetTips, tipsLoading] =
+        usePagingHook<MinimalPostInfo, SearchParams>(
+            searchTips,
+            SEARCH_BATCH_SIZE
+        );
     const [filterVisible, hideFilter, showFilter] = useBooleanHook();
-    const [tabIndex, setTabIndex] = useState(0);
-    const [recipesLoading, setRecipesLoading] = useState(false);
-    const [tipsLoading, setTipsLoading] = useState(false);
+    const tabIndexRef = useRef(0);
     const searchBarRef = useRef<View>(null);
-    const [inputFocus, setInputFocusFalse, setInputFocusTrue] = useBooleanHook();
+    const [inputFocus, setInputFocusFalse, setInputFocusTrue] =
+        useBooleanHook();
     const inputRef = useRef<TextInput>(null);
     // const [reelInitialIndex, setReelInitialIndex] = useState(0);
 
     useEffect(() => {
+        // fetch preferences
+        void searchServices.getPreferences().then((suite) => {
+            if (suite == null) {
+                return;
+            }
+            dispatchSuite({ type: "new_value", value: suite });
+        });
+
+        // setup input
         const keyboardDidHideSubscription = Keyboard.addListener(
             "keyboardDidHide",
             () => {
@@ -93,85 +159,32 @@ const RecipeTipSearch: FC<RecipeTipSearchParams> = ({
         };
     }, []);
 
-    useEffect(() => {
-        void searchServices.getPreferences().then((suite) => {
-            if (suite == null) {
-                return;
-            }
-            dispatchSuite({ type: "new_value", value: suite });
-        });
-    }, []);
-
     const getCurrentPostType = (): PostType => {
-        if (routes[tabIndex].key === "recipe") {
-            return "recipe";
-        }
-
-        return "tip";
-    };
-
-    const setResults = (
-        results: MinimalPostInfo[] | undefined,
-        postType: PostType
-    ): void => {
-        if (postType === "recipe") {
-            setRecipeResults(results);
-            return;
-        }
-        setTipResults(results);
-    };
-
-    const search = async (postType: PostType): Promise<void> => {
-        if (searchString === "") {
-            setResults(undefined, postType);
-            return;
-        }
-
-        const setLoading =
-            postType === "recipe" ? setRecipesLoading : setTipsLoading;
-        setLoading(true);
-        const result = await searchServices.searchPost(
-            searchString,
-            postType,
-            preferenceSuite
-        );
-        setResults(result ?? [], postType);
-        setLoading(false);
+        return routes[tabIndexRef.current].key === "recipe" ? "recipe" : "tip";
     };
 
     const clear = (): void => {
         setSearchString("");
-        setResults(undefined, getCurrentPostType());
+        const reset =
+            getCurrentPostType() === "recipe" ? resetRecipes : resetTips;
+        reset();
     };
 
     const onSubmitEditing = (): void => {
-        void search(getCurrentPostType());
+        const getReset =
+            getCurrentPostType() === "recipe" ? getRecipesReset : getTipsReset;
+        void getReset({ searchString, preferenceSuite });
     };
 
     const onTabChange = (value: number): void => {
-        setTabIndex(value);
-        if (routes[value].key === "recipe") {
-            void search("recipe");
-            return;
-        }
-        void search("tip");
+        tabIndexRef.current = value;
+        const getReset =
+            routes[value].key === "recipe" ? getRecipesReset : getTipsReset;
+        void getReset({ searchString, preferenceSuite });
     };
 
-    // const reelPostGetter = useCallback(
-    //     async (index: number): Promise<Post | null> => {
-    //         const list =
-    //             getCurrentPostType() === "recipe" ? recipeResults : tipResults;
-    //         if (index !== reelInitialIndex || index > list.length - 1) {
-    //             return null;
-    //         }
-    //         return await reelServices.toPost(list[index]);
-    //     },
-    //     [recipeResults, tipResults, reelInitialIndex]
-    // );
-
     const itemPressed = useCallback(
-        (item: MinimalPostInfo, index: number): void => {
-            // setReelInitialIndex(index);
+        (item: MinimalPostInfo, _index: number): void => {
             setReelParams?.({
                 minimalPosts: [
                     {
@@ -185,7 +198,7 @@ const RecipeTipSearch: FC<RecipeTipSearchParams> = ({
         []
     );
 
-    const onEndReached = useCallback(() => {}, []);
+    // const onEndReached = useCallback(() => {}, []);
 
     const resultContentContainerStyle = useMemo(
         (): StyleProp<ViewStyle> => ({
@@ -197,8 +210,11 @@ const RecipeTipSearch: FC<RecipeTipSearchParams> = ({
     );
 
     const renderResults = (type: PostType): JSX.Element => {
-        const results = type === "recipe" ? recipeResults : tipResults;
-        const loading = type === "recipe" ? recipesLoading : tipsLoading;
+        const [results, loading, getNext] =
+            type === "recipe"
+                ? [recipeResults, recipesLoading, getRecipes]
+                : [tipResults, tipsLoading, getTips];
+
         return (
             <View className="h-full w-full">
                 {(() => {
@@ -212,7 +228,7 @@ const RecipeTipSearch: FC<RecipeTipSearchParams> = ({
                                 data={results}
                                 hidden={false}
                                 loading={false}
-                                handleOnEndReached={onEndReached}
+                                handleOnEndReached={getNext}
                                 handleItemPress={itemPressed}
                                 contentContainerStyle={
                                     resultContentContainerStyle
@@ -222,7 +238,7 @@ const RecipeTipSearch: FC<RecipeTipSearchParams> = ({
 
                     return (
                         <View className="flex-1 justify-center items-center">
-                            <Text>{BASIC_SEARCH_NO_POST}</Text>
+                            <Text className="text-cgrey-battleship">{BASIC_SEARCH_NO_POST}</Text>
                         </View>
                     );
                 })()}
@@ -281,7 +297,7 @@ const RecipeTipSearch: FC<RecipeTipSearchParams> = ({
                 </View>
                 <TabView
                     className="flex-1 mt-1"
-                    navigationState={{ index: tabIndex, routes }}
+                    navigationState={{ index: tabIndexRef.current, routes }}
                     renderScene={(prop) => {
                         return renderResults(
                             prop.route.key === "recipe" ? "recipe" : "tip"
@@ -322,8 +338,8 @@ const RecipeTipSearch: FC<RecipeTipSearchParams> = ({
                         onPress={showAdvancedSearch}
                     >
                         <>
-                            <IconCommunity
-                                name="chef-hat"
+                            <IconFA5
+                                name="search-plus"
                                 size={15}
                                 color={customColors.cgrey.dim}
                             />
@@ -337,8 +353,8 @@ const RecipeTipSearch: FC<RecipeTipSearchParams> = ({
                         onPress={showUserSearch}
                     >
                         <>
-                            <IconFA5
-                                name="search-plus"
+                            <IconCommunity
+                                name="chef-hat"
                                 size={15}
                                 color={customColors.cgrey.dim}
                             />

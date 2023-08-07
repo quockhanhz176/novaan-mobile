@@ -7,6 +7,7 @@ import { SEARCH_POST_DETAILS_TITLE } from "@/common/strings";
 import { type MinimalPost } from "@/api/post/types/PostListResponse";
 import AdvancedSearch from "./components/advanced-search/AdvancedSearch";
 import RecipeTipSearch from "./components/basic-search/RecipeTipSearch";
+import UserSearch from "./components/user-search/UserSearch";
 
 export interface ReelParams {
     minimalPosts: MinimalPost[];
@@ -15,17 +16,20 @@ export interface ReelParams {
 const Search: FC = () => {
     const [advancedSearchVisible, hideAdvancedSearch, showAdvancedSearch] =
         useBooleanHook();
+    const [userSearchVisible, hideUserSearch, showUserSearch] =
+        useBooleanHook();
     const [reelVisible, hideReel, showReel] = useBooleanHook();
     const [reelParams, setReelParams] = useState<ReelParams>({
         minimalPosts: [],
     });
-    
+
     return (
         <>
             <RecipeTipSearch
                 showReel={showReel}
                 setReelParams={setReelParams}
                 showAdvancedSearch={showAdvancedSearch}
+                showUserSearch={showUserSearch}
             />
             <Modal
                 animationType="slide"
@@ -64,6 +68,14 @@ const Search: FC = () => {
                     setReelParams={setReelParams}
                     navigateBack={hideAdvancedSearch}
                 />
+            </Modal>
+            <Modal
+                animationType="slide"
+                visible={userSearchVisible}
+                onRequestClose={hideUserSearch}
+                onDismiss={hideUserSearch}
+            >
+                <UserSearch navigateBack={hideUserSearch} />
             </Modal>
         </>
     );
