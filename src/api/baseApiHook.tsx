@@ -246,6 +246,7 @@ export const useFetch = (config?: RequestConfig): UseFetchReturn => {
     const handleServerError = (error: Error): boolean => {
         // Return to sign in page if unauthorized
         if (error instanceof UnauthorizedError) {
+            console.log(error);
             navigation.navigate("SignIn");
             return true;
         }
