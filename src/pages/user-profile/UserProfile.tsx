@@ -6,7 +6,7 @@ import React, {
     useMemo,
     memo,
 } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, Text, TouchableOpacity, View } from "react-native";
 import CreatedPosts from "./pages/created-post/CreatedPosts";
 import SavedPosts from "./pages/saved-post/SavedPosts";
 import { type BottomTabNavProp } from "@/types/navigation";
@@ -26,8 +26,11 @@ import ProfileStatItem from "./components/ProfileStatItem";
 import { type ProfileInfo } from "@/api/profile/types";
 import Following from "./pages/following/Following";
 import ProfileTabIcon from "./components/ProfileTabIcon";
-import MaterialIcon from "react-native-vector-icons/MaterialIcons";
+import MaterialCIcon from "react-native-vector-icons/MaterialCommunityIcons";
 import { SceneMap, TabBar, TabView } from "react-native-tab-view";
+import useBooleanHook from "@/common/components/BooleanHook";
+import CustomModal from "@/common/components/CustomModal";
+import SettingMenu from "./pages/created-post/components/SettingMenu";
 
 interface UserProfileProps {
     navigation?: BottomTabNavProp;
@@ -52,15 +55,19 @@ const userProfileRoute = [
 
 const peopleProfileRoute = [{ key: "created" }];
 
-const UserProfile = (
-    props: UserProfileProps
-): ReactElement<UserProfileProps> => {
-    const { navigation, userId, showBackButton = true, onClose } = props;
-
+const UserProfile = ({
+    navigation,
+    userId,
+    showBackButton = true,
+    onClose,
+}: UserProfileProps): ReactElement<UserProfileProps> => {
     const isUserProfile = useMemo(() => userId == null, [userId]);
 
     const [index, setIndex] = useState(0);
     const [routes, setRoutes] = useState<Array<{ key: string }>>([]);
+
+    const [profileSettingOpen, hideProfileSetting, showProfileSetting] =
+        useBooleanHook();
 
     useEffect(() => {
         if (isUserProfile) {
@@ -143,14 +150,71 @@ const UserProfile = (
                             onPress={onClose}
                             className="pr-2 py-2 rounded-lg"
                         >
-                            <MaterialIcon name="arrow-back" size={24} />
+                            <MaterialCIcon name="arrow-back" size={24} />
                         </Pressable>
                     )}
                 </View>
-                <View className="items-center">
+                <View className="flex-row justify-start">
                     <Text className="text-cprimary-300 text-lg font-semibold">
                         {isUserProfile ? PROFILE_PAGE_LABEL : username}
                     </Text>
+                </View>
+                <View className="flex-1 items-end">
+                    {isUserProfile && (
+                        <>
+                            <TouchableOpacity
+                                onPress={showProfileSetting}
+                                className="rounded-lg"
+                                hitSlop={5}
+                                delayPressIn={0}
+                            >
+                                <MaterialCIcon
+                                    name="hamburger"
+                                    size={24}
+                                    color={customColors.cprimary["300"]}
+                                />
+                            </TouchableOpacity>
+                            <CustomModal
+                                visible={profileSettingOpen}
+                                onDismiss={hideProfileSetting}
+                            >
+                                <SettingMenu />
+                            </CustomModal>
+                        </>
+                        // <Menu
+                        //     visible={profileSettingOpen}
+                        //     onDismiss={hideProfileSetting}
+                        //     style={{
+                        //         backgroundColor: "#FFF",
+                        //         marginRight: 12,
+                        //     }}
+                        //     contentStyle={{ backgroundColor: "#FFF" }}
+                        //     statusBarHeight={0}
+                        //     anchorPosition="bottom"
+                        //     anchor={
+                        //         <TouchableOpacity
+                        //             onPress={showProfileSetting}
+                        //             className="py-2 rounded-lg"
+                        //             hitSlop={5}
+                        //             delayPressIn={0}
+                        //         >
+                        //             <IonIcon
+                        //                 name="ellipsis-vertical"
+                        //                 size={18}
+                        //             />
+                        //         </TouchableOpacity>
+                        //     }
+                        // >
+                        //     <Menu.Item
+                        //         title="Cập nhập sở thích"
+                        //         onPress={handleSetPreferences}
+                        //     />
+                        //     <Menu.Item
+                        //         title="Đăng xuất"
+                        //         onPress={handleLogout}
+                        //     />
+                        // </Menu>
+                    )}
                 </View>
             </View>
             <View className="mx-6 mt-6 flex-row items-center justify-between">
@@ -191,6 +255,8 @@ const UserProfile = (
                     navigationState={{ index, routes }}
                     renderScene={renderScene}
                     onIndexChange={setIndex}
+                    lazy={true}
+                    renderLazyPlaceholder={() => <OverlayLoading />}
                     renderTabBar={(tabBarProp) => (
                         <TabBar
                             {...tabBarProp}

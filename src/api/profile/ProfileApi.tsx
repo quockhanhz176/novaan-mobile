@@ -207,8 +207,6 @@ export const useUserSavedPost = (
     });
 
     useEffect(() => {
-        console.log(data);
-
         if (data == null) {
             setEnded(true);
             return;
