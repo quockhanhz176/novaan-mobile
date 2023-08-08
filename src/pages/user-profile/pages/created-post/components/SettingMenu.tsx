@@ -4,11 +4,7 @@ import { deleteKeychainValue } from "@/common/keychainService";
 import { PROFILE_LOGOUT, PROFILE_UPDATE_PREF } from "@/common/strings";
 import { type RootStackParamList } from "@/types/navigation";
 import { KEYCHAIN_ID } from "@env";
-import {
-    CommonActions,
-    StackActions,
-    useNavigation,
-} from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 import { type NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { customColors } from "@root/tailwind.config";
 import React, { type ReactElement } from "react";
