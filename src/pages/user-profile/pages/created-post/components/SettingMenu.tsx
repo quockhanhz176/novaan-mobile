@@ -4,22 +4,36 @@ import { deleteKeychainValue } from "@/common/keychainService";
 import { PROFILE_LOGOUT, PROFILE_UPDATE_PREF } from "@/common/strings";
 import { type RootStackParamList } from "@/types/navigation";
 import { KEYCHAIN_ID } from "@env";
-import { useNavigation } from "@react-navigation/native";
+import {
+    CommonActions,
+    StackActions,
+    useNavigation,
+} from "@react-navigation/native";
 import { type NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { customColors } from "@root/tailwind.config";
 import React, { type ReactElement } from "react";
 import { View } from "react-native";
 
-const SettingMenu = (): ReactElement => {
+interface SettingMenuProps {
+    onDimiss: () => void;
+}
+
+const SettingMenu = ({
+    onDimiss,
+}: SettingMenuProps): ReactElement<SettingMenuProps> => {
     const rootNavigation =
         useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
     const handleOpenSetPreferences = (): void => {
+        onDimiss();
+
         // Go to set preferences page
         rootNavigation.push("SetPreferences", { firstTime: false });
     };
 
     const handleLogout = async (): Promise<void> => {
+        onDimiss();
+
         // Clear current user cache data
         await invalidateData("reelsData");
         await invalidateData("userPreferenceData");
@@ -29,7 +43,10 @@ const SettingMenu = (): ReactElement => {
         await deleteKeychainValue(KEYCHAIN_ID);
 
         // To login
-        rootNavigation.popToTop();
+        rootNavigation.reset({ index: 0, routes: [{ name: "SignIn" }] });
+        rootNavigation.push("SignIn");
+
+        console.log("Logging out");
 
         // Send optimistic request to server to handle token invalidation
     };

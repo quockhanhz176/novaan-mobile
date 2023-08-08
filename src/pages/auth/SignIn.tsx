@@ -48,6 +48,7 @@ import { useRefreshToken } from "@/api/auth/authApiHook";
 import { type TokenPayload } from "@/api/baseApiHook";
 import { getPayloadFromToken } from "@/api/common/utils/TokenUtils";
 import { getData } from "@/common/AsyncStorageService";
+import { useUserPreferences } from "@/api/profile/ProfileApi";
 
 interface SignInProps {
     navigation: NativeStackNavigationProp<RootStackParamList, "SignIn">;
@@ -67,6 +68,8 @@ const SignIn = (props: SignInProps): ReactElement<SignInProps> => {
     });
     const { refreshToken } = useRefreshToken();
 
+    const { haveUserSetPreference } = useUserPreferences();
+
     const {
         handleSubmit,
         control,
@@ -80,29 +83,32 @@ const SignIn = (props: SignInProps): ReactElement<SignInProps> => {
     });
 
     useEffect(() => {
-        BackHandler.addEventListener("hardwareBackPress", () => {
-            Alert.alert(COMMON_EXIT_APP_TITLE, COMMON_EXIT_APP_MSG, [
-                {
-                    text: COMMON_EXIT_APP_NO,
-                    style: "cancel",
-                    onPress: () => {},
-                },
-                {
-                    text: COMMON_EXIT_APP_YES,
-                    style: "destructive",
-                    // If the user confirmed, then we dispatch the action we blocked earlier
-                    // This will continue the action that had triggered the removal of the screen
-                    onPress: () => {
-                        BackHandler.exitApp();
+        const backHandler = BackHandler.addEventListener(
+            "hardwareBackPress",
+            () => {
+                Alert.alert(COMMON_EXIT_APP_TITLE, COMMON_EXIT_APP_MSG, [
+                    {
+                        text: COMMON_EXIT_APP_NO,
+                        style: "cancel",
+                        onPress: () => {},
                     },
-                },
-            ]);
+                    {
+                        text: COMMON_EXIT_APP_YES,
+                        style: "destructive",
+                        // If the user confirmed, then we dispatch the action we blocked earlier
+                        // This will continue the action that had triggered the removal of the screen
+                        onPress: () => {
+                            BackHandler.exitApp();
+                        },
+                    },
+                ]);
 
-            return true;
-        });
+                return true;
+            }
+        );
 
         return () => {
-            navigation.removeListener("beforeRemove", () => {});
+            backHandler.remove();
         };
     }, [navigation]);
 
@@ -213,11 +219,18 @@ const SignIn = (props: SignInProps): ReactElement<SignInProps> => {
     };
 
     const handleSignInSuccessRedirect = async (): Promise<void> => {
-        const notFirstTime = await getData("haveUserSetPreference");
-        if (notFirstTime == null || !notFirstTime) {
+        // Load data from cache (if possbile)
+        // If not, load data from API
+        let notFirstTime = await getData("haveUserSetPreference");
+        if (notFirstTime == null) {
+            notFirstTime = await haveUserSetPreference();
+        }
+
+        if (!notFirstTime) {
             navigation.navigate("Greet");
             return;
         }
+
         navigation.navigate("MainScreens");
     };
 
