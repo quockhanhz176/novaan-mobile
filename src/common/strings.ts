@@ -9,10 +9,15 @@ export const PORTION_PIECE = "miếng";
 export const PORTION_SERVING = "phần ăn";
 export const POST_TYPE_RECIPE = "Công thức";
 export const POST_TYPE_TIP = "Mẹo vặt";
+
 // Common messages
 export const COMMON_SERVER_CONNECTION_FAIL_ERROR =
     "Hiện đang không thể kết nối được với server, xin vui lòng thử lại sau";
 export const COMMON_UNKNOWN_ERROR = "Đã có lỗi xảy ra, vui lòng thử lại sau.";
+export const COMMON_EXIT_APP_TITLE = "Thoát ứng dụng";
+export const COMMON_EXIT_APP_MSG = "Bạn có muốn thoát ứng dụng?";
+export const COMMON_EXIT_APP_NO = "Ở lại";
+export const COMMON_EXIT_APP_YES = "Có";
 
 // Authentication message
 export const AUTH_EMAIL_INVALID = "*Email không hợp lệ";
