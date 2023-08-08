@@ -193,7 +193,7 @@ const UserProfile = ({
                                 visible={profileSettingOpen}
                                 onDismiss={hideProfileSetting}
                             >
-                                <SettingMenu />
+                                <SettingMenu onDimiss={hideProfileSetting} />
                             </CustomModal>
                         </>
                     )}

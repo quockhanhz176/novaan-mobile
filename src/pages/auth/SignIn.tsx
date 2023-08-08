@@ -1,5 +1,12 @@
 import React, { useState, type ReactElement, useEffect } from "react";
-import { Text, TextInput, View, TouchableOpacity } from "react-native";
+import {
+    Text,
+    TextInput,
+    View,
+    TouchableOpacity,
+    Alert,
+    BackHandler,
+} from "react-native";
 import { type NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useForm, Controller } from "react-hook-form";
 
@@ -21,6 +28,10 @@ import {
     AUTH_PASSWORD_TOO_SHORT,
     SIGN_IN_GREETING,
     SIGN_IN_GOOGLE_ERROR_OCCURED,
+    COMMON_EXIT_APP_TITLE,
+    COMMON_EXIT_APP_MSG,
+    COMMON_EXIT_APP_NO,
+    COMMON_EXIT_APP_YES,
 } from "@/common/strings";
 import authApi from "@/api/auth/AuthApi";
 import OverlayLoading from "@/common/components/OverlayLoading";
@@ -37,6 +48,7 @@ import { useRefreshToken } from "@/api/auth/authApiHook";
 import { type TokenPayload } from "@/api/baseApiHook";
 import { getPayloadFromToken } from "@/api/common/utils/TokenUtils";
 import { getData } from "@/common/AsyncStorageService";
+import { useUserPreferences } from "@/api/profile/ProfileApi";
 
 interface SignInProps {
     navigation: NativeStackNavigationProp<RootStackParamList, "SignIn">;
@@ -56,6 +68,8 @@ const SignIn = (props: SignInProps): ReactElement<SignInProps> => {
     });
     const { refreshToken } = useRefreshToken();
 
+    const { haveUserSetPreference } = useUserPreferences();
+
     const {
         handleSubmit,
         control,
@@ -67,6 +81,36 @@ const SignIn = (props: SignInProps): ReactElement<SignInProps> => {
         },
         mode: "all",
     });
+
+    useEffect(() => {
+        const backHandler = BackHandler.addEventListener(
+            "hardwareBackPress",
+            () => {
+                Alert.alert(COMMON_EXIT_APP_TITLE, COMMON_EXIT_APP_MSG, [
+                    {
+                        text: COMMON_EXIT_APP_NO,
+                        style: "cancel",
+                        onPress: () => {},
+                    },
+                    {
+                        text: COMMON_EXIT_APP_YES,
+                        style: "destructive",
+                        // If the user confirmed, then we dispatch the action we blocked earlier
+                        // This will continue the action that had triggered the removal of the screen
+                        onPress: () => {
+                            BackHandler.exitApp();
+                        },
+                    },
+                ]);
+
+                return true;
+            }
+        );
+
+        return () => {
+            backHandler.remove();
+        };
+    }, [navigation]);
 
     const handlePersistentSignIn = async (): Promise<void> => {
         setIsLoading(true);
@@ -175,11 +219,18 @@ const SignIn = (props: SignInProps): ReactElement<SignInProps> => {
     };
 
     const handleSignInSuccessRedirect = async (): Promise<void> => {
-        const notFirstTime = await getData("haveUserSetPreference");
-        if (notFirstTime == null || !notFirstTime) {
+        // Load data from cache (if possbile)
+        // If not, load data from API
+        let notFirstTime = await getData("haveUserSetPreference");
+        if (notFirstTime == null) {
+            notFirstTime = await haveUserSetPreference();
+        }
+
+        if (!notFirstTime) {
             navigation.navigate("Greet");
             return;
         }
+
         navigation.navigate("MainScreens");
     };
 
