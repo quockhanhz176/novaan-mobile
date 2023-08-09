@@ -7,7 +7,7 @@ import React, {
     useMemo,
     memo,
 } from "react";
-import { Modal, View, Pressable, Text } from "react-native";
+import { Modal, View, Text, TouchableOpacity } from "react-native";
 import InfiniteScroll from "@/pages/reel/InfiniteScrollv2";
 import MaterialIcon from "react-native-vector-icons/MaterialIcons";
 import IonIcon from "react-native-vector-icons/Ionicons";
@@ -23,6 +23,12 @@ import CreatedPostList from "./components/CreatedPostList";
 import EmptyCreatedPost from "./components/EmptyCreatedPost";
 import type PostResponse from "@/api/post/types/PostResponse";
 import { type Undefinable } from "@/types/app";
+import CustomModal from "@/common/components/CustomModal";
+import useBooleanHook from "@/common/components/BooleanHook";
+import PostSettingMenu from "./components/PostSettingMenu";
+import { useNavigation } from "@react-navigation/native";
+import { type RootStackParamList } from "@/types/navigation";
+import { type NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 type ViewCategory = "recipe" | "tips";
 
@@ -46,8 +52,14 @@ const CreatedPosts = (): ReactElement => {
     const [viewCategory, setViewCategory] = useState<ViewCategory>("recipe");
     const [fetching, setFetching] = useState(false);
 
+    const [postSettingOpen, hidePostSetting, showPostSetting] =
+        useBooleanHook();
+
     const recipesEmpty = useMemo(() => recipes.length === 0, [recipes]);
     const tipsEmpty = useMemo(() => tips.length === 0, [tips]);
+
+    const rootNavigation =
+        useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
     // Fetch data if it is currently empty
     useEffect(() => {
@@ -130,6 +142,28 @@ const CreatedPosts = (): ReactElement => {
         setViewCategory(value);
     };
 
+    const handleEditPost = (): void => {
+        if (viewItem == null) {
+            return;
+        }
+
+        if (viewCategory === "recipe") {
+            hidePostSetting();
+            rootNavigation.navigate("CreateRecipe", { postId: viewItem.id });
+        } else {
+            hidePostSetting();
+            rootNavigation.push("CreateTip", { postId: viewItem.id });
+        }
+
+        setViewingItem(false);
+        setViewItem(undefined);
+    };
+
+    const handleDeletePost = (): void => {
+        console.log("Post delete");
+        hidePostSetting();
+    };
+
     if (userProfileContext.userInfo == null) {
         return <View></View>;
     }
@@ -138,61 +172,74 @@ const CreatedPosts = (): ReactElement => {
         <View className="flex-1 bg-white">
             <ToggleButton.Row
                 style={{
-                    borderRadius: 8,
                     marginTop: 16,
-                    marginLeft: 8,
+                    paddingHorizontal: 8,
                 }}
                 onValueChange={handleChangeViewCategory}
                 value={viewCategory}
             >
                 <CustomToggleButton
+                    style={{
+                        flex: 1,
+                        marginRight: 6,
+                        borderRadius: 8,
+                        borderWidth: viewCategory === "recipe" ? 0 : 1,
+                    }}
                     label="Recipe"
                     value="recipe"
                     isChecked={viewCategory === "recipe"}
                 />
                 <CustomToggleButton
+                    style={{
+                        flex: 1,
+                        marginLeft: 6,
+                        borderRadius: 8,
+                        borderWidth: viewCategory === "tips" ? 0 : 1,
+                    }}
                     label="Tips"
                     value="tips"
                     isChecked={viewCategory === "tips"}
                 />
             </ToggleButton.Row>
-            {recipesEmpty ? (
-                <EmptyCreatedPost
-                    isShown={viewCategory === "recipe"}
-                    label={PROFILE_EMPTY_RECIPE}
-                />
-            ) : (
-                <CreatedPostList
-                    hidden={viewCategory !== "recipe"}
-                    data={recipes}
-                    loading={fetching}
-                    handleItemPress={handleItemPress}
-                    handleOnEndReached={fetchMorePost}
-                />
-            )}
-            {tipsEmpty ? (
-                <EmptyCreatedPost
-                    isShown={viewCategory === "tips"}
-                    label={PROFILE_EMPTY_TIPS}
-                />
-            ) : (
-                <CreatedPostList
-                    hidden={viewCategory !== "tips"}
-                    data={tips}
-                    loading={fetching}
-                    handleItemPress={handleItemPress}
-                    handleOnEndReached={fetchMorePost}
-                />
-            )}
+            <View className="mt-2">
+                {recipesEmpty ? (
+                    <EmptyCreatedPost
+                        isShown={viewCategory === "recipe"}
+                        label={PROFILE_EMPTY_RECIPE}
+                    />
+                ) : (
+                    <CreatedPostList
+                        hidden={viewCategory !== "recipe"}
+                        data={recipes}
+                        loading={fetching}
+                        handleItemPress={handleItemPress}
+                        handleOnEndReached={fetchMorePost}
+                    />
+                )}
+                {tipsEmpty ? (
+                    <EmptyCreatedPost
+                        isShown={viewCategory === "tips"}
+                        label={PROFILE_EMPTY_TIPS}
+                    />
+                ) : (
+                    <CreatedPostList
+                        hidden={viewCategory !== "tips"}
+                        data={tips}
+                        loading={fetching}
+                        handleItemPress={handleItemPress}
+                        handleOnEndReached={fetchMorePost}
+                    />
+                )}
+            </View>
             <Modal animationType="slide" visible={viewingItem}>
                 <View style={{ height: 50 }} className="flex-row">
                     <View className="flex-1 justify-center items-start">
-                        <Pressable
+                        <TouchableOpacity
                             onPress={handleCloseItemView}
                             className="px-4 py-2 rounded-lg"
                         >
                             <MaterialIcon name="arrow-back" size={24} />
-                        </Pressable>
+                        </TouchableOpacity>
                     </View>
                     <View className="flex-1 justify-center items-center">
                         <Text className="text-base">
@@ -200,13 +247,15 @@ const CreatedPosts = (): ReactElement => {
                         </Text>
                     </View>
                     <View className="flex-1 justify-center items-end">
-                        {/* TODO: Add delete + edit post options here */}
-                        <Pressable className="px-4 py-2 rounded-lg">
+                        <TouchableOpacity
+                            className="px-4 py-2 rounded-lg"
+                            onPress={showPostSetting}
+                        >
                             <IonIcon
                                 name="ios-ellipsis-vertical-sharp"
                                 size={18}
                             />
-                        </Pressable>
+                        </TouchableOpacity>
                     </View>
                 </View>
                 {viewItem != null && (
@@ -224,6 +273,12 @@ const CreatedPosts = (): ReactElement => {
                     />
                 )}
             </Modal>
+            <CustomModal visible={postSettingOpen} onDismiss={hidePostSetting}>
+                <PostSettingMenu
+                    onEditPost={handleEditPost}
+                    onDeletePost={handleDeletePost}
+                />
+            </CustomModal>
         </View>
     );
 };

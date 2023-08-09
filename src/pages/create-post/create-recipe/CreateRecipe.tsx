@@ -1,19 +1,23 @@
 import { type NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { type ReactElement, useState, useMemo } from "react";
+import { type ReactElement, useState, useMemo, useEffect } from "react";
 import { Bar } from "react-native-progress";
 import React, { Text, TouchableOpacity, View } from "react-native";
 import IconEvill from "react-native-vector-icons/EvilIcons";
 import IconAnt from "react-native-vector-icons/AntDesign";
 import {
+    CREATE_RECIPE_FINISH_BUTTON_TITLE,
     CREATE_RECIPE_NEXT_STEP_BUTTON_TITLE,
     CREATE_RECIPE_PREVIOUS_STEP_BUTTON_TITLE,
     CREATE_RECIPE_SUBMIT,
     CREATE_RECIPE_TITLE,
+    EDIT_RECIPE_SUBMIT,
+    EDIT_RECIPE_TITLE,
 } from "@/common/strings";
 import { customColors } from "@root/tailwind.config";
 import TitleDescriptionVideo from "../common/components/TitleDescriptionVideo";
 import {
     NavigationContainer,
+    type RouteProp,
     createNavigationContainerRef,
 } from "@react-navigation/native";
 import { type Asset } from "react-native-image-picker";
@@ -22,7 +26,10 @@ import {
     recipeInformationContext,
 } from "./types/RecipeParams";
 import PortionDificultyTime from "./components/PortionDifficultyTime";
-import { handleRecipeSubmission } from "./services/createRecipeService";
+import {
+    handleRecipeEdit,
+    handleRecipeSubmission,
+} from "./services/createRecipeService";
 import {
     type RootStackParamList,
     type RecipeTabParamList,
@@ -30,9 +37,15 @@ import {
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import ViewIngredients from "./components/ingredients/pages/ViewIngredient";
 import ViewInstruction from "./components/instructions/pages/ViewInstruction";
+import { usePostInfo } from "@/api/post/PostApiHook";
+import { useSWRConfig } from "swr";
+import { useResourceUrl } from "@/api/utils/resourceHooks";
+import type Instruction from "./types/Instruction";
+import { getUserRecipesUrl } from "@/api/profile/ProfileApi";
 
 interface CreateRecipeProps {
     navigation: NativeStackNavigationProp<RootStackParamList, "CreateTip">;
+    route: RouteProp<RootStackParamList, "CreateTip">;
 }
 
 const RecipeTab = createMaterialTopTabNavigator<RecipeTabParamList>();
@@ -42,6 +55,7 @@ const recipeTabRef = createNavigationContainerRef<RecipeTabParamList>();
 
 const CreateRecipe = ({
     navigation: rootNavigation,
+    route,
 }: CreateRecipeProps): ReactElement<CreateRecipeProps> => {
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
@@ -58,6 +72,86 @@ const CreateRecipe = ({
         []
     );
     const [currentScreen, setCurrentScreen] = useState(0);
+
+    const { postInfo, fetchPostInfo } = usePostInfo();
+    const { fetchUrl } = useResourceUrl();
+
+    const { mutate } = useSWRConfig();
+
+    const isEditing: boolean = useMemo(
+        () => route.params?.postId == null,
+        [route.params]
+    );
+
+    useEffect(() => {
+        if (route.params?.postId == null) {
+            return;
+        }
+
+        void fetchPostInfo(
+            { postId: route.params.postId, postType: "Recipe" },
+            false
+        );
+    }, []);
+
+    const setEditPost = async (): Promise<void> => {
+        if (postInfo === undefined) {
+            return;
+        }
+
+        if (postInfo.type === "tip") {
+            return;
+        }
+
+        const {
+            title,
+            description,
+            difficulty,
+            portionType,
+            portionQuantity,
+            prepTime,
+            cookTime,
+            instructions,
+            ingredients,
+        } = postInfo;
+
+        setTitle(title);
+        setDescription(description);
+        setDifficulty(difficulty);
+        setPortionType(portionType);
+        setPortionQuantity(portionQuantity);
+        setPrepTime(prepTime);
+        setCookTime(cookTime);
+
+        setIngredients(
+            ingredients.map((ingre, index) => ({ ...ingre, id: index }))
+        );
+
+        const formattedInstruction = await Promise.all(
+            instructions.map(
+                async (instruction, index): Promise<Instruction> => {
+                    if (instruction.image == null) {
+                        return {
+                            ...instruction,
+                            id: index,
+                        };
+                    }
+                    const resourceUrl = await fetchUrl(instruction.image);
+                    return {
+                        ...instruction,
+                        imageUri: resourceUrl,
+                        id: index,
+                    };
+                }
+            )
+        );
+
+        setInstructions(formattedInstruction);
+    };
+
+    useEffect(() => {
+        void setEditPost();
+    }, [postInfo]);
 
     const paramList: RecipeTabParamList = {
         TitleDescriptionVideo: { labelType: "recipeParams" },
@@ -76,24 +170,57 @@ const CreateRecipe = ({
         [currentScreen]
     );
 
+    const navigateBack = (): void => {
+        rootNavigation.goBack();
+    };
+
     const submitRecipe = async (): Promise<void> => {
-        await handleRecipeSubmission(
-            {
-                title,
-                description,
-                video,
-                difficulty,
-                portionQuantity,
-                portionType,
-                prepTime,
-                cookTime,
-                ingredients,
-                instructions,
-            },
-            () => {
-                rootNavigation.pop();
-            }
+        if (route.params?.postId == null) {
+            await handleRecipeSubmission(
+                {
+                    title,
+                    description,
+                    video,
+                    difficulty,
+                    portionQuantity,
+                    portionType,
+                    prepTime,
+                    cookTime,
+                    ingredients,
+                    instructions,
+                },
+                () => {
+                    navigateBack();
+                }
+            );
+            return;
+        }
+
+        if (postInfo == null) {
+            return;
+        }
+
+        await handleRecipeEdit(postInfo.id, postInfo.video, {
+            title,
+            description,
+            video,
+            difficulty,
+            portionQuantity,
+            portionType,
+            prepTime,
+            cookTime,
+            ingredients,
+            instructions,
+        });
+
+        // Revalidate data and navigate back
+        await mutate(
+            // Only creator can edit their own post so it's safe to assume currentUserId === postInfo.creator.userId
+            (key) =>
+                Array.isArray(key) &&
+                key[0] === getUserRecipesUrl(postInfo.creator.userId)
         );
+        navigateBack();
     };
 
     const goNextScreen = (): void => {
@@ -126,7 +253,7 @@ const CreateRecipe = ({
                         <IconEvill name="close" size={25} color="#000" />
                     </TouchableOpacity>
                     <Text className="text-xl font-medium">
-                        {CREATE_RECIPE_TITLE}
+                        {isEditing ? CREATE_RECIPE_TITLE : EDIT_RECIPE_TITLE}
                     </Text>
                 </View>
                 <TouchableOpacity
@@ -141,7 +268,7 @@ const CreateRecipe = ({
                         size={18}
                     />
                     <Text className="text-sm font-semibold text-cprimary-500">
-                        {CREATE_RECIPE_SUBMIT}
+                        {isEditing ? CREATE_RECIPE_SUBMIT : EDIT_RECIPE_SUBMIT}
                     </Text>
                 </TouchableOpacity>
             </View>
@@ -156,6 +283,7 @@ const CreateRecipe = ({
             />
             <recipeInformationContext.Provider
                 value={{
+                    isEditing,
                     title,
                     setTitle,
                     description,
@@ -229,15 +357,30 @@ const CreateRecipe = ({
                         {CREATE_RECIPE_PREVIOUS_STEP_BUTTON_TITLE}
                     </Text>
                 </TouchableOpacity>
-                <TouchableOpacity
-                    className={bottomNavButtonClassName + " bg-cprimary-500"}
-                    onPress={goNextScreen}
-                >
-                    <Text className="text-sm text-white">
-                        {CREATE_RECIPE_NEXT_STEP_BUTTON_TITLE}
-                    </Text>
-                    <IconAnt name="arrowright" color="white" size={18} />
-                </TouchableOpacity>
+                {currentScreen < screens.length - 1 ? (
+                    <TouchableOpacity
+                        className={
+                            bottomNavButtonClassName + " bg-cprimary-500"
+                        }
+                        onPress={goNextScreen}
+                    >
+                        <Text className="text-sm text-white">
+                            {CREATE_RECIPE_NEXT_STEP_BUTTON_TITLE}
+                        </Text>
+                        <IconAnt name="arrowright" color="white" size={18} />
+                    </TouchableOpacity>
+                ) : (
+                    <TouchableOpacity
+                        className={
+                            bottomNavButtonClassName + " bg-cprimary-300"
+                        }
+                        onPress={submitRecipe}
+                    >
+                        <Text className="text-sm text-white">
+                            {CREATE_RECIPE_FINISH_BUTTON_TITLE}
+                        </Text>
+                    </TouchableOpacity>
+                )}
             </View>
         </View>
     );

@@ -136,72 +136,20 @@ const useGetUserContent = <T,>(
     return { getNext, refresh, content, ended };
 };
 
-export const getUserRecipesUrl = (userId: string): string => {
-    return `profile/${userId}/recipes`;
-};
-
-export const getUserTipsUrl = (userId: string): string => {
-    return `profile/${userId}/tips`;
-};
-
-export const getUserFollowingUrl = (userId: string): string => {
-    return `following/${userId}`;
-};
-
-export const getUserFollowerUrl = (userId: string): string => {
-    return `followers/${userId}`;
-};
-
-export const getUserSavedUrl = (userId: string): string => {
-    return `profile/${userId}/saved`;
-};
-
-export const useUserRecipes = (
+const useGetUserContentSwr = <T,>(
+    getContentUrl: (userId?: string) => string,
     userId?: string
-): PaginationHookReturn<RecipeResponse> => {
-    return useGetUserContent<RecipeResponse>(getUserRecipesUrl, userId);
-};
-
-export const useUserTips = (
-    userId?: string
-): PaginationHookReturn<TipResponse> => {
-    return useGetUserContent<TipResponse>(getUserTipsUrl, userId);
-};
-
-export const useUserFollowing = (
-    userId?: string
-): PaginationHookReturn<MinimalUserInfo> => {
-    return useGetUserContent<MinimalUserInfo>(getUserFollowingUrl, userId);
-};
-
-export const useUserFollower = (
-    userId?: string
-): PaginationHookReturn<MinimalUserInfo> => {
-    return useGetUserContent<MinimalUserInfo>(getUserFollowerUrl, userId);
-};
-
-export const useUserSavedPost = (
-    userId?: string
-): PaginationHookReturn<SavedPostResponse> => {
-    if (userId == null) {
-        return {
-            content: [],
-            ended: false,
-            getNext: () => {},
-            refresh: () => {},
-        };
-    }
-
+): PaginationHookReturn<T> => {
     const [ended, setEnded] = useState(false);
     const [currentPage, setCurrentPage] = useState(0);
-    const [content, setContent] = useState<SavedPostResponse[]>([]);
+    const [content, setContent] = useState<T[]>([]);
 
     const queryParams = useMemo(
         () => `?Start=0&Limit=${(currentPage + 1) * PAGE_SIZE}`,
         [currentPage]
     );
 
-    const { data } = useFetchSwr([getUserSavedUrl(userId), queryParams], {
+    const { data } = useFetchSwr([getContentUrl(userId), queryParams], {
         authorizationRequired: true,
         timeout: 10000,
     });
@@ -233,7 +181,56 @@ export const useUserSavedPost = (
     };
 
     return { getNext, refresh, content, ended };
-    // return useGetUserContent<SavedPostResponse>(getUserSavedUrl, userId);
+};
+
+export const getUserRecipesUrl = (userId: string): string => {
+    return `profile/${userId}/recipes`;
+};
+
+export const getUserTipsUrl = (userId: string): string => {
+    return `profile/${userId}/tips`;
+};
+
+export const getUserFollowingUrl = (userId: string): string => {
+    return `following/${userId}`;
+};
+
+export const getUserFollowerUrl = (userId: string): string => {
+    return `followers/${userId}`;
+};
+
+export const getUserSavedUrl = (userId: string): string => {
+    return `profile/${userId}/saved`;
+};
+
+export const useUserRecipes = (
+    userId?: string
+): PaginationHookReturn<RecipeResponse> => {
+    return useGetUserContentSwr<RecipeResponse>(getUserRecipesUrl, userId);
+};
+
+export const useUserTips = (
+    userId?: string
+): PaginationHookReturn<TipResponse> => {
+    return useGetUserContentSwr<TipResponse>(getUserTipsUrl, userId);
+};
+
+export const useUserFollowing = (
+    userId?: string
+): PaginationHookReturn<MinimalUserInfo> => {
+    return useGetUserContent<MinimalUserInfo>(getUserFollowingUrl, userId);
+};
+
+export const useUserFollower = (
+    userId?: string
+): PaginationHookReturn<MinimalUserInfo> => {
+    return useGetUserContent<MinimalUserInfo>(getUserFollowerUrl, userId);
+};
+
+export const useUserSavedPost = (
+    userId?: string
+): PaginationHookReturn<SavedPostResponse> => {
+    return useGetUserContentSwr(getUserSavedUrl, userId);
 };
 
 // For getting available preferences

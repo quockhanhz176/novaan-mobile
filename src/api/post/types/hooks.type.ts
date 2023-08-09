@@ -3,7 +3,12 @@ import { type MinimalComment, type MinimalPost } from "./PostListResponse";
 import type PostComment from "@/pages/reel/types/PostComment";
 import type Post from "@/pages/reel/types/Post";
 import { type CommentFormInfo } from "./CommentInformation";
-import { type PostInteraction } from "../PostApiHook";
+
+export interface PostInteraction {
+    postId: string;
+    postType: "Recipe" | "CulinaryTip";
+    action: boolean;
+}
 
 export interface UsePostListReturn {
     postList: MinimalPost[];
@@ -12,7 +17,10 @@ export interface UsePostListReturn {
 
 export interface UsePostInfoReturn {
     postInfo: Undefinable<Post>;
-    fetchPostInfo: (info: MinimalPost) => Promise<Undefinable<Post>>;
+    fetchPostInfo: (
+        info: MinimalPost,
+        fromCache?: boolean
+    ) => Promise<Undefinable<Post>>;
 }
 
 export interface UsePostCommentsReturn {

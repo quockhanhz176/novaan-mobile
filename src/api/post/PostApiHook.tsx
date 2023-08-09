@@ -14,6 +14,7 @@ import {
     type UsePostSaveReturn,
     type UsePostReportReturn,
     type UseReportCommentReturn,
+    type PostInteraction,
 } from "./types/hooks.type";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import type PostComment from "@/pages/reel/types/PostComment";
@@ -42,12 +43,6 @@ const INTERACT_REPORT = "content/interaction/report";
 
 const REELS_DATA_EXP = 24 * 60 * 60 * 1000; // 1 day in milliseconds
 const POSTS_DATA_EXP = 60 * 60 * 1000; // 1 hour in milliseconds
-
-export interface PostInteraction {
-    postId: string;
-    postType: "Recipe" | "CulinaryTip";
-    action: boolean;
-}
 
 // For getting reel's data
 export const usePostList = (): UsePostListReturn => {
@@ -101,12 +96,15 @@ export const usePostInfo = (): UsePostInfoReturn => {
     const [postInfo, setPostInfo] = useState<Undefinable<Post>>(undefined);
 
     const fetchPostInfo = async (
-        info: MinimalPost
+        info: MinimalPost,
+        fromCache = true
     ): Promise<Undefinable<Post>> => {
-        const cacheData = await getCacheData(info);
-        if (cacheData != null) {
-            setPostInfo(cacheData);
-            return cacheData;
+        if (fromCache) {
+            const cacheData = await getCacheData(info);
+            if (cacheData != null) {
+                setPostInfo(cacheData);
+                return cacheData;
+            }
         }
 
         const requestUrl =

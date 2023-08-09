@@ -16,7 +16,6 @@ import {
     PROFILE_CONTENT_COUNT_TITLE,
     PROFILE_FOLLOWER_COUNT_TITLE,
     PROFILE_FOLLOWING_COUNT_TITLE,
-    PROFILE_EMPTY_BIO,
     PROFILE_PAGE_LABEL,
 } from "@/common/strings";
 import { customColors } from "@root/tailwind.config";
@@ -30,7 +29,7 @@ import MaterialCIcon from "react-native-vector-icons/MaterialCommunityIcons";
 import { SceneMap, TabBar, TabView } from "react-native-tab-view";
 import useBooleanHook from "@/common/components/BooleanHook";
 import CustomModal from "@/common/components/CustomModal";
-import SettingMenu from "./pages/created-post/components/SettingMenu";
+import SettingMenu from "./components/SettingMenu";
 
 interface UserProfileProps {
     navigation?: BottomTabNavProp;
@@ -199,7 +198,7 @@ const UserProfile = ({
                     )}
                 </View>
             </View>
-            <View className="mx-6 mt-6 flex-row items-center justify-between">
+            <View className="mx-6 mt-6 flex-row items-start justify-start">
                 <Avatar.Text
                     size={64}
                     style={{
@@ -207,16 +206,13 @@ const UserProfile = ({
                     }}
                     label="XD"
                 />
-                <View className="flex-1 mx-3">
+                <View className="flex-1 items-start mx-4">
                     <Text className="text-lg font-semibold text-cprimary-300">
                         {username}
                     </Text>
-                    <Text className="text-gray-400 italic">
-                        {PROFILE_EMPTY_BIO}
-                    </Text>
                 </View>
             </View>
-            <View className="mx-6 mt-4 flex-row justify-between">
+            <View className="mx-6 mt-6 flex-row justify-between">
                 {/* TODO: Add approved content count here (postCount) */}
                 <ProfileStatItem
                     label={PROFILE_CONTENT_COUNT_TITLE}

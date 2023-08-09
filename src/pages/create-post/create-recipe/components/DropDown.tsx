@@ -1,8 +1,9 @@
-import React, { useState, type FC } from "react";
+import React, { useState, type FC, useEffect } from "react";
 import type { StyleProp, TextStyle, ViewStyle } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
 
 interface DropDownProps {
+    selectValue: string;
     items: Array<{ label: string; value: string }>;
     onValueChange?: (value: string | null) => void;
     placeholder?: string;
@@ -13,6 +14,7 @@ interface DropDownProps {
 }
 
 const DropDown: FC<DropDownProps> = ({
+    selectValue,
     items,
     onValueChange,
     style,
@@ -22,8 +24,12 @@ const DropDown: FC<DropDownProps> = ({
     listItemContainerStyle,
 }: DropDownProps) => {
     const [open, setOpen] = useState(false);
-    const [value, setValue] = useState(null);
+    const [item, setItem] = useState(selectValue);
     const [itemList, setItemList] = useState(items);
+
+    useEffect(() => {
+        setItem(selectValue);
+    }, [selectValue]);
 
     return (
         <DropDownPicker
@@ -33,12 +39,13 @@ const DropDown: FC<DropDownProps> = ({
             textStyle={textStyle}
             style={style}
             open={open}
-            value={value}
+            value={item}
+            setValue={setItem}
             items={itemList}
             setOpen={setOpen}
-            setValue={setValue}
             setItems={setItemList}
             onChangeValue={onValueChange}
+            listMode="SCROLLVIEW"
         />
     );
 };

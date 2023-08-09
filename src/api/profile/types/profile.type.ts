@@ -37,7 +37,10 @@ export interface SavedPostResponse {
     postType: "Recipe" | "CulinaryTip";
 }
 
-export type MinimalPostInfo = Pick<PostResponse, "id" | "type" | "title">;
+export type MinimalPostInfo = Pick<
+    PostResponse,
+    "id" | "type" | "title" | "status"
+>;
 
 export interface UseAppPreferenceReturn extends PreferenceSuiteResponse {
     getAllPreferenceOptions: () => Promise<boolean>;

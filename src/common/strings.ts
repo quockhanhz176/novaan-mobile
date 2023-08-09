@@ -107,6 +107,7 @@ export const CREATE_TIP_FAILED_SECONDARY = "Xin vui lòng thử lại sau";
 
 // Create recipe screen
 export const CREATE_RECIPE_TITLE = "Tạo công thức";
+export const EDIT_RECIPE_TITLE = "Chỉnh sửa công thức";
 export const CREATE_RECIPE_THANKS =
     "Chúng tôi rất vui khi bạn quyết định chia sẻ công thức nấu ăn của mình với cộng đồng!";
 export const CREATE_RECIPE_TITLE_LABEL = "Tiêu đề";
@@ -119,8 +120,10 @@ export const CREATE_RECIPE_DESCRIPTION_PLACEHOLDER =
     "E.g. Đậu lướt ván ăn kèm với rau kinh giới";
 export const CREATE_RECIPE_PREVIEW_BEFORE_SUBMIT = "Xem trước khi đăng";
 export const CREATE_RECIPE_SUBMIT = "Đăng bài";
+export const EDIT_RECIPE_SUBMIT = "Chỉnh sửa";
 export const CREATE_RECIPE_NEXT_STEP_BUTTON_TITLE = "Tiếp theo";
 export const CREATE_RECIPE_PREVIOUS_STEP_BUTTON_TITLE = "Quay lại";
+export const CREATE_RECIPE_FINISH_BUTTON_TITLE = "Hoàn thành";
 export const CREATE_RECIPE_PDT_SUBTITLE = "Hãy thêm một vài chi tiết...";
 export const CREATE_RECIPE_PORTION_TITLE = "Khẩu phần";
 export const CREATE_RECIPE_PORTION_TYPE_PLACEHOLDER = "khẩu phần";
@@ -172,6 +175,10 @@ export const CREATE_RECIPE_SUCCESS =
     "Công thức nấu ăn của bạn đã được đăng tải";
 export const CREATE_RECIPE_FAILED =
     "Đã có lỗi xảy ra khi đăng tải công thức nấu ăn";
+export const EDIT_RECIPE_PENDING = "Công thức của bạn đang được cập nhập";
+export const EDIT_RECIPE_SUCCESS = "Công thức nấu ăn của bạn đã được chỉnh sửa";
+export const EDIT_RECIPE_FAILED =
+    "Đã có lỗi xảy ra khi chỉnh sửa công thức nấu ăn";
 export const CREATE_RECIPE_FAILED_SECONDARY = "Xin vui lòng thử lại sau";
 
 // Add ingredient screen
@@ -214,6 +221,8 @@ export const PROFILE_EMPTY_FOLLOWING = "Oops, bạn chưa theo dõi ai cả";
 export const PROFILE_PAGE_LABEL = "Trang cá nhân";
 export const PROFILE_UPDATE_PREF = "Cập nhập sở thích";
 export const PROFILE_LOGOUT = "Đăng xuất";
+export const PROFILE_EDIT_POST = "Chỉnh sửa bài viết";
+export const PROFILE_DELETE_POST = "Xóa bài viết";
 
 // Reel screen
 export const REEL_DETAILS_RATING = "đánh giá";

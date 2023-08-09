@@ -7,6 +7,7 @@ import {
 } from "react-native";
 import { Card } from "react-native-paper";
 import MaterialCIcon from "react-native-vector-icons/MaterialCommunityIcons";
+import PostItemStatusOverlay from "./PostItemStatusOverlay";
 
 interface CreatedPostItemProps {
     index: number;
@@ -36,18 +37,21 @@ const CreatedPostItem = ({
             <Card
                 mode="elevated"
                 className="bg-white w-5/6"
-                style={{ width: "90%" }}
+                style={{ width: "90%", position: "relative" }}
                 onPress={onPress}
             >
+                <PostItemStatusOverlay status={item.status} />
                 {!imageFailed ? (
-                    <Card.Cover
-                        source={{
-                            // TODO: Replace with thumbnail later
-                            uri: item.title,
-                        }}
-                        onError={handleError}
-                        theme={{ roundness: 10, isV3: false }}
-                    />
+                    <>
+                        <Card.Cover
+                            source={{
+                                // TODO: Replace with thumbnail later
+                                uri: item.title,
+                            }}
+                            onError={handleError}
+                            theme={{ roundness: 4 }}
+                        />
+                    </>
                 ) : (
                     <View
                         className="flex-1 justify-center items-center bg-gray-200 rounded-t-lg"

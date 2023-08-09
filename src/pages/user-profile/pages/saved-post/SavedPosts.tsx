@@ -117,44 +117,58 @@ const SavedPosts = (): ReactElement => {
                 value={viewCategory}
             >
                 <CustomToggleButton
+                    style={{
+                        flex: 1,
+                        marginRight: 6,
+                        borderRadius: 8,
+                        borderWidth: viewCategory === "recipe" ? 0 : 1,
+                    }}
                     label="Recipe"
                     value="recipe"
                     isChecked={viewCategory === "recipe"}
                 />
                 <CustomToggleButton
+                    style={{
+                        flex: 1,
+                        marginRight: 6,
+                        borderRadius: 8,
+                        borderWidth: viewCategory === "tips" ? 0 : 1,
+                    }}
                     label="Tips"
                     value="tips"
                     isChecked={viewCategory === "tips"}
                 />
             </ToggleButton.Row>
-            {recipesEmpty ? (
-                <EmptyCreatedPost
-                    isShown={viewCategory === "recipe"}
-                    label={PROFILE_EMPTY_RECIPE}
-                />
-            ) : (
-                <CreatedPostList
-                    hidden={viewCategory !== "recipe"}
-                    data={savedRecipes}
-                    loading={fetching}
-                    handleItemPress={handleItemPress}
-                    handleOnEndReached={fetchMorePost}
-                />
-            )}
-            {tipsEmpty ? (
-                <EmptyCreatedPost
-                    isShown={viewCategory === "tips"}
-                    label={PROFILE_EMPTY_TIPS}
-                />
-            ) : (
-                <CreatedPostList
-                    hidden={viewCategory !== "tips"}
-                    data={savedTips}
-                    loading={fetching}
-                    handleItemPress={handleItemPress}
-                    handleOnEndReached={fetchMorePost}
-                />
-            )}
+            <View className="mt-2">
+                {recipesEmpty ? (
+                    <EmptyCreatedPost
+                        isShown={viewCategory === "recipe"}
+                        label={PROFILE_EMPTY_RECIPE}
+                    />
+                ) : (
+                    <CreatedPostList
+                        hidden={viewCategory !== "recipe"}
+                        data={savedRecipes}
+                        loading={fetching}
+                        handleItemPress={handleItemPress}
+                        handleOnEndReached={fetchMorePost}
+                    />
+                )}
+                {tipsEmpty ? (
+                    <EmptyCreatedPost
+                        isShown={viewCategory === "tips"}
+                        label={PROFILE_EMPTY_TIPS}
+                    />
+                ) : (
+                    <CreatedPostList
+                        hidden={viewCategory !== "tips"}
+                        data={savedTips}
+                        loading={fetching}
+                        handleItemPress={handleItemPress}
+                        handleOnEndReached={fetchMorePost}
+                    />
+                )}
+            </View>
             <Modal animationType="slide" visible={viewingItem}>
                 <View style={{ height: 50 }} className="flex-row">
                     <View className="flex-1 justify-center items-start">

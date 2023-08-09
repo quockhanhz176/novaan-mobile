@@ -32,9 +32,10 @@ export interface AdditionalRecipeInformation {
 
 export type RecipeStates = TDVStates &
     AdditionalRecipeInformation &
-    Setter<AdditionalRecipeInformation>;
+    Setter<AdditionalRecipeInformation> & { isEditing: boolean };
 
 export const recipeInformationContext = React.createContext<RecipeStates>({
+    isEditing: false,
     title: "",
     setTitle: () => {},
     description: "",

@@ -12,6 +12,11 @@ export default interface UploadRecipeInformation {
     ingredients: IngredientInformation[];
 }
 
+export interface EditRecipeInformation
+    extends Omit<UploadRecipeInformation, "videoExtension"> {
+    videoExtension?: string;
+}
+
 export interface InstructionInformation {
     step: number;
     description: string;
