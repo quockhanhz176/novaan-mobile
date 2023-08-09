@@ -5,8 +5,10 @@ export type RootStackParamList = {
     SignIn: undefined;
     SignUp: undefined;
     MainScreens: undefined;
-    CreateTip: undefined;
-    CreateRecipe: undefined;
+    CreateTip: { postId?: string } | undefined;
+    CreateRecipe: { postId?: string } | undefined;
+    Greet: undefined;
+    SetPreferences: { firstTime: boolean };
 };
 
 export type BottomTabParamList = {

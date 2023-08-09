@@ -1,4 +1,4 @@
-import React, { type ReactElement } from "react";
+import React, { memo, type ReactElement } from "react";
 import { View, Text } from "react-native";
 
 interface ProfileStatItemProps {
@@ -19,4 +19,4 @@ const ProfileStatItem = (
     );
 };
 
-export default ProfileStatItem;
+export default memo(ProfileStatItem);

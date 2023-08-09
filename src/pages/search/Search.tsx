@@ -1,30 +1,36 @@
 import React, { useState, type FC } from "react";
 import { Modal, View, Text, TouchableOpacity } from "react-native";
-import useModalHook from "@/common/components/ModalHook";
+import useBooleanHook from "@/common/components/BooleanHook";
 import IconMaterial from "react-native-vector-icons/MaterialIcons";
 import InfiniteScroll from "@/pages/reel/InfiniteScrollv2";
 import { SEARCH_POST_DETAILS_TITLE } from "@/common/strings";
 import { type MinimalPost } from "@/api/post/types/PostListResponse";
-import SearchSwiper from "./components/SearchSwiper";
+import AdvancedSearch from "./components/advanced-search/AdvancedSearch";
+import RecipeTipSearch from "./components/basic-search/RecipeTipSearch";
+import UserSearch from "./components/user-search/UserSearch";
 
 export interface ReelParams {
     minimalPosts: MinimalPost[];
 }
 
 const Search: FC = () => {
-    const [reelVisible, hideReel, showReel] = useModalHook();
+    const [advancedSearchVisible, hideAdvancedSearch, showAdvancedSearch] =
+        useBooleanHook();
+    const [userSearchVisible, hideUserSearch, showUserSearch] =
+        useBooleanHook();
+    const [reelVisible, hideReel, showReel] = useBooleanHook();
     const [reelParams, setReelParams] = useState<ReelParams>({
         minimalPosts: [],
     });
 
     return (
         <>
-            <View className="flex-1">
-                <SearchSwiper
-                    setReelParams={setReelParams}
-                    showReel={showReel}
-                />
-            </View>
+            <RecipeTipSearch
+                showReel={showReel}
+                setReelParams={setReelParams}
+                showAdvancedSearch={showAdvancedSearch}
+                showUserSearch={showUserSearch}
+            />
             <Modal
                 animationType="slide"
                 visible={reelVisible}
@@ -50,6 +56,26 @@ const Search: FC = () => {
                 {reelParams != null && (
                     <InfiniteScroll postIds={reelParams.minimalPosts} />
                 )}
+            </Modal>
+            <Modal
+                animationType="slide"
+                visible={advancedSearchVisible}
+                onRequestClose={hideAdvancedSearch}
+                onDismiss={hideAdvancedSearch}
+            >
+                <AdvancedSearch
+                    showReel={showReel}
+                    setReelParams={setReelParams}
+                    navigateBack={hideAdvancedSearch}
+                />
+            </Modal>
+            <Modal
+                animationType="slide"
+                visible={userSearchVisible}
+                onRequestClose={hideUserSearch}
+                onDismiss={hideUserSearch}
+            >
+                <UserSearch navigateBack={hideUserSearch} />
             </Modal>
         </>
     );

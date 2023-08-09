@@ -29,6 +29,9 @@ const PortionDificultyTime: FC<TitleDescriptionVideoProps> = (
     const {
         cookTime,
         prepTime,
+        portionQuantity,
+        portionType,
+        difficulty,
         setPortionType,
         setPortionQuantity,
         setDifficulty,
@@ -56,6 +59,9 @@ const PortionDificultyTime: FC<TitleDescriptionVideoProps> = (
 
     const labelClassName = "text-base font-medium uppercase";
     const setQuantity = (value: string): void => {
+        if (value === "") {
+            value = "0";
+        }
         setPortionQuantity(parseFloat(value));
     };
     const setCookHour = (value: number): void => {
@@ -90,7 +96,7 @@ const PortionDificultyTime: FC<TitleDescriptionVideoProps> = (
 
     return (
         <ScrollView className="flex-1 bg-white">
-            <Text className="text-base p-5 bg-ctertiary ">
+            <Text className="text-base p-5 bg-ctertiary">
                 {CREATE_RECIPE_PDT_SUBTITLE}
             </Text>
             <View className="px-3 py-7">
@@ -100,18 +106,17 @@ const PortionDificultyTime: FC<TitleDescriptionVideoProps> = (
                 </Text>
                 <View className="z-[4000] flex-row space-x-2 justify-center mt-2 px-20">
                     <TextInput
+                        value={String(portionQuantity)}
                         keyboardType="decimal-pad"
                         textAlign={"center"}
-                        className="text-base flex-1 py-2 border-cgrey-platinum bg-cgrey-seasalt rounded-md"
-                        // classname doesn't work
-                        // style={{ borderBottomWidth: 1 }}
+                        className="text-base flex-1 py-2 border-cgrey-platinum bg-cgrey-seasalt rounded-md border-b"
                         onChangeText={setQuantity}
                     />
                     <View className="flex-2">
                         <DropDown
                             placeholder={CREATE_RECIPE_PORTION_TYPE_PLACEHOLDER}
                             items={portionDropdownItems}
-                            onValueChange={onPortionTypeChange}
+                            selectValue={portionType.toString()}
                             style={{
                                 borderWidth: 0,
                                 justifyContent: "center",
@@ -136,6 +141,7 @@ const PortionDificultyTime: FC<TitleDescriptionVideoProps> = (
                             listItemContainerStyle={{
                                 backgroundColor: customColors.cgrey.seasalt,
                             }}
+                            onValueChange={onPortionTypeChange}
                         />
                     </View>
                 </View>
@@ -145,6 +151,7 @@ const PortionDificultyTime: FC<TitleDescriptionVideoProps> = (
                 </Text>
                 <View className="mt-5 z-[3000] px-20">
                     <DropDown
+                        selectValue={difficulty.toString()}
                         placeholder={
                             CREATE_RECIPE_PORTION_DIFFICULTY_PLACEHOLDER
                         }
@@ -182,6 +189,7 @@ const PortionDificultyTime: FC<TitleDescriptionVideoProps> = (
                         <WarningAsterisk />
                     </Text>
                     <RecipeTimeInput
+                        value={prepTime}
                         onHourChange={setPrepHour}
                         onMinuteChange={setPrepMinute}
                     />
@@ -192,6 +200,7 @@ const PortionDificultyTime: FC<TitleDescriptionVideoProps> = (
                         <WarningAsterisk />
                     </Text>
                     <RecipeTimeInput
+                        value={cookTime}
                         onHourChange={setCookHour}
                         onMinuteChange={setCookMinute}
                     />

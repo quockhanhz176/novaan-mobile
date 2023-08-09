@@ -9,10 +9,15 @@ export const PORTION_PIECE = "miếng";
 export const PORTION_SERVING = "phần ăn";
 export const POST_TYPE_RECIPE = "Công thức";
 export const POST_TYPE_TIP = "Mẹo vặt";
+
 // Common messages
 export const COMMON_SERVER_CONNECTION_FAIL_ERROR =
     "Hiện đang không thể kết nối được với server, xin vui lòng thử lại sau";
 export const COMMON_UNKNOWN_ERROR = "Đã có lỗi xảy ra, vui lòng thử lại sau.";
+export const COMMON_EXIT_APP_TITLE = "Thoát ứng dụng";
+export const COMMON_EXIT_APP_MSG = "Bạn có muốn thoát ứng dụng?";
+export const COMMON_EXIT_APP_NO = "Ở lại";
+export const COMMON_EXIT_APP_YES = "Có";
 
 // Authentication message
 export const AUTH_EMAIL_INVALID = "*Email không hợp lệ";
@@ -102,6 +107,7 @@ export const CREATE_TIP_FAILED_SECONDARY = "Xin vui lòng thử lại sau";
 
 // Create recipe screen
 export const CREATE_RECIPE_TITLE = "Tạo công thức";
+export const EDIT_RECIPE_TITLE = "Chỉnh sửa công thức";
 export const CREATE_RECIPE_THANKS =
     "Chúng tôi rất vui khi bạn quyết định chia sẻ công thức nấu ăn của mình với cộng đồng!";
 export const CREATE_RECIPE_TITLE_LABEL = "Tiêu đề";
@@ -114,8 +120,10 @@ export const CREATE_RECIPE_DESCRIPTION_PLACEHOLDER =
     "E.g. Đậu lướt ván ăn kèm với rau kinh giới";
 export const CREATE_RECIPE_PREVIEW_BEFORE_SUBMIT = "Xem trước khi đăng";
 export const CREATE_RECIPE_SUBMIT = "Đăng bài";
+export const EDIT_RECIPE_SUBMIT = "Chỉnh sửa";
 export const CREATE_RECIPE_NEXT_STEP_BUTTON_TITLE = "Tiếp theo";
 export const CREATE_RECIPE_PREVIOUS_STEP_BUTTON_TITLE = "Quay lại";
+export const CREATE_RECIPE_FINISH_BUTTON_TITLE = "Hoàn thành";
 export const CREATE_RECIPE_PDT_SUBTITLE = "Hãy thêm một vài chi tiết...";
 export const CREATE_RECIPE_PORTION_TITLE = "Khẩu phần";
 export const CREATE_RECIPE_PORTION_TYPE_PLACEHOLDER = "khẩu phần";
@@ -167,6 +175,10 @@ export const CREATE_RECIPE_SUCCESS =
     "Công thức nấu ăn của bạn đã được đăng tải";
 export const CREATE_RECIPE_FAILED =
     "Đã có lỗi xảy ra khi đăng tải công thức nấu ăn";
+export const EDIT_RECIPE_PENDING = "Công thức của bạn đang được cập nhập";
+export const EDIT_RECIPE_SUCCESS = "Công thức nấu ăn của bạn đã được chỉnh sửa";
+export const EDIT_RECIPE_FAILED =
+    "Đã có lỗi xảy ra khi chỉnh sửa công thức nấu ăn";
 export const CREATE_RECIPE_FAILED_SECONDARY = "Xin vui lòng thử lại sau";
 
 // Add ingredient screen
@@ -207,6 +219,10 @@ export const PROFILE_EMPTY_RECIPE = "Oops, phần này chưa có công thức n�
 export const PROFILE_EMPTY_TIPS = "Oops, phần này chưa có mẹo vặt nào cả";
 export const PROFILE_EMPTY_FOLLOWING = "Oops, bạn chưa theo dõi ai cả";
 export const PROFILE_PAGE_LABEL = "Trang cá nhân";
+export const PROFILE_UPDATE_PREF = "Cập nhập sở thích";
+export const PROFILE_LOGOUT = "Đăng xuất";
+export const PROFILE_EDIT_POST = "Chỉnh sửa bài viết";
+export const PROFILE_DELETE_POST = "Xóa bài viết";
 
 // Reel screen
 export const REEL_DETAILS_RATING = "đánh giá";
@@ -239,6 +255,7 @@ export const REEL_COMMENTS_DELETE_BUTTON = "Xóa";
 export const REEL_REPORT_FORM_TITLE = "Lý do báo cáo nội dung";
 export const REEL_REPORT_FORM_SORRY =
     "Chúng tôi rất tiếc khi đã có nội dung làm bạn không thoải mái. Xin vui lòng cho biết lý do để chúng tôi có thể đánh giá lại nội dung này.";
+export const REEL_FAILED_TO_LOAD = "Không thể tải bài viết";
 
 // Add comment
 export const ADD_COMMENT_TITLE = "Đánh giá";
@@ -263,3 +280,54 @@ export const FILTER_CATEGORY_ALLERGEN = "Dị ứng";
 
 // Search
 export const SEARCH_POST_DETAILS_TITLE = "Chi tiết kết quả tìm kiếm";
+
+export const SEARCH_BASIC_SEARCH_BUTTON = "Tìm kiếm bài viết";
+export const SEARCH_ADVANCED_SEARCH_BUTTON = "Tủ lạnh nhà bạn có gì";
+export const SEARCH_USER_SEARCH_BUTTON = "Tìm kiếm người dùng";
+
+// Advanced search
+export const ADVANCED_SEARCH_TITLE = "Tìm kiếm nâng cao";
+export const ADVANCED_SEARCH_SUGGESTION_EMPTY =
+    "Không tìm thấy nguyên liệu nào";
+export const ADVANCED_SEARCH_NO_POST = "Không tìm thấy công thức nào";
+export const ADVANCED_SEARCH_BRIEF_1 =
+    "Thêm một vài nguyên liệu nấu ăn bạn có và bấm ";
+export const ADVANCED_SEARCH_BRIEF_2 =
+    " để tìm những công thức chỉ sử dụng các nguyên liệu này";
+
+// Basic search
+export const BASIC_SEARCH_NO_POST = "Không tìm thấy bài viết nào";
+export const BASIC_SEARCH_ADVANCED_SEARCH_BUTTON = "Tìm kiếm nâng cao";
+export const BASIC_SEARCH_USER_SEARCH_BUTTON = "Tìm kiếm tác giả";
+
+// User search
+export const USER_SEARCH_TITLE = "Tìm kiếm người dùng";
+export const USER_SEARCH_NO_USER = "Không tìm thấy người dùng nào";
+export const USER_SEARCH_FOLLOWER_COUNT_LABEL = "người theo dõi";
+export const USER_SEARCH_POST_COUNT_LABEL = "bài viết";
+export const USER_SEARCH_FOLLOW_BUTTON_FOLLOW = "Theo dõi";
+export const USER_SEARCH_FOLLOW_BUTTON_FOLLOWED = "Đã theo dõi";
+
+// Greet
+export const GREET_GREET = "Chào mừng bạn đến với";
+export const GREET_GREET_APP = "Nấu và Ăn";
+export const SET_PREFERENCE_INVITE =
+    "Nâng cao trải nghiệm sử dụng app chỉ với việc lựa chọn các mục yêu thích và hạn chế!";
+export const GREET_NEXT_BTN_TITLE = "Làm ngay";
+export const GREET_SKIP_BTN_TITLE = "Để sau";
+
+// Preference
+export const SET_PREF_PREV_BTN_TITLE = "Quay lại";
+export const SET_PREF_NEXT_BTN_TITLE = "Tiếp tục";
+export const SET_PREF_DONE_BTN_TITLE = "Hoàn thành";
+
+export const SET_PREF_DIET_GUIDE =
+    "Hãy bắt đầu với việc lựa chọn những chế độ ăn mà bạn đang quan tâm hoặc mong muốn thực hiện";
+export const SET_PREF_CUISINE_GUIDE =
+    "Hãy lựa chọn những nền ẩm thực yêu thích để app có thể gợi ý các công thức tốt hơn";
+export const SET_PREF_ALLERGEN_GUIDE =
+    "Cuối cùng, hãy lựa chọn những thực phẩm có thể gây dị ứng hoặc không phù hợp với bạn để app có thể hạn chế mốt số công thức";
+
+export const SET_PREF_FAILED =
+    "Cập nhập không thành công. Vui lòng thử lại sau";
+export const SET_PREF_SUCCESS = "Sở thích của bạn đã được cập nhập";

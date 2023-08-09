@@ -12,6 +12,7 @@ import {
     Text,
     type NativeScrollEvent,
     type NativeSyntheticEvent,
+    ActivityIndicator,
 } from "react-native";
 import Swiper from "react-native-swiper";
 import { type SwiperInternals } from "react-native-swiper";
@@ -29,6 +30,8 @@ import {
 } from "./item.type";
 import UserProfileTab from "./UserProfileTab";
 import { getUserIdFromToken } from "@/api/common/utils/TokenUtils";
+import { MD2Colors } from "react-native-paper";
+import { REEL_FAILED_TO_LOAD } from "@/common/strings";
 
 export type Page =
     | "Profile"
@@ -183,10 +186,13 @@ const ScrollItem = ({
 
     if (isFailed) {
         return (
-            <View className="flex-1 bg-black items-center justify-center">
-                <Text className="text-base text-white">
-                    Không thể tải bài viết
-                </Text>
+            <View
+                style={{ height: SCROLL_ITEM_HEIGHT }}
+                className="w-full bg-black"
+            >
+                <View className="flex-1 justify-center items-center">
+                    <Text className="text-white">{REEL_FAILED_TO_LOAD}</Text>
+                </View>
             </View>
         );
     }
@@ -197,7 +203,16 @@ const ScrollItem = ({
         currentUserId === "" ||
         postInfo == null
     ) {
-        return <View></View>;
+        return (
+            <View style={{ height: SCROLL_ITEM_HEIGHT }}>
+                <ActivityIndicator
+                    animating={true}
+                    color={MD2Colors.red400}
+                    size={100}
+                    className="absolute top-0 bottom-0 right-0 left-0 opacity-75 bg-black"
+                />
+            </View>
+        );
     }
 
     return (

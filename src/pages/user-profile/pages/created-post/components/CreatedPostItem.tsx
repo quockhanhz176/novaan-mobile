@@ -1,32 +1,68 @@
 import { type MinimalPostInfo } from "@/api/profile/types";
-import React, { type ReactElement } from "react";
-import { View } from "react-native";
+import React, { memo, useState, type ReactElement } from "react";
+import {
+    type ImageErrorEventData,
+    type NativeSyntheticEvent,
+    View,
+} from "react-native";
 import { Card } from "react-native-paper";
+import MaterialCIcon from "react-native-vector-icons/MaterialCommunityIcons";
+import PostItemStatusOverlay from "./PostItemStatusOverlay";
 
 interface CreatedPostItemProps {
+    index: number;
     item: MinimalPostInfo;
-    onItemPress: () => void;
+    onItemPress: (item: MinimalPostInfo, index: number) => void;
 }
 
 const CreatedPostItem = ({
+    index,
     item,
     onItemPress,
 }: CreatedPostItemProps): ReactElement<CreatedPostItemProps> => {
+    const [imageFailed, setImageFailed] = useState(false);
+
+    const handleError = (
+        e: NativeSyntheticEvent<ImageErrorEventData>
+    ): void => {
+        setImageFailed(true);
+    };
+
+    const onPress = (): void => {
+        onItemPress(item, index);
+    };
+
     return (
         <View className="w-1/2 items-center my-2">
             <Card
                 mode="elevated"
                 className="bg-white w-5/6"
-                style={{ width: "90%" }}
-                onPress={onItemPress}
+                style={{ width: "90%", position: "relative" }}
+                onPress={onPress}
             >
-                <Card.Cover
-                    source={{
-                        // TODO: Replace with thumbnail later
-                        uri: item.title,
-                    }}
-                    theme={{ roundness: 10, isV3: false }}
-                />
+                <PostItemStatusOverlay status={item.status} />
+                {!imageFailed ? (
+                    <>
+                        <Card.Cover
+                            source={{
+                                // TODO: Replace with thumbnail later
+                                uri: item.title,
+                            }}
+                            onError={handleError}
+                            theme={{ roundness: 4 }}
+                        />
+                    </>
+                ) : (
+                    <View
+                        className="flex-1 justify-center items-center bg-gray-200 rounded-t-lg"
+                        style={{ height: 195 }}
+                    >
+                        <MaterialCIcon
+                            name="file-image-remove-outline"
+                            size={24}
+                        />
+                    </View>
+                )}
                 <Card.Title
                     title={item.title}
                     className="p-2 mt-1"
@@ -41,4 +77,4 @@ const CreatedPostItem = ({
     );
 };
 
-export default CreatedPostItem;
+export default memo(CreatedPostItem);

@@ -15,7 +15,7 @@ import type PreferenceCategory from "../../types/PreferenceCategory";
 import IconLabelButton from "@/common/components/IconLabelButton";
 import { type SuiteDispatchValue } from "./filterReducer";
 import { getPreferenceProperty } from "../../types/PreferenceSuite";
-import Preference from "../../types/Preference";
+import type Preference from "../../types/Preference";
 
 interface FilterCategoryProps {
     category: PreferenceCategory;

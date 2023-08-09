@@ -31,8 +31,12 @@ const InstructionItem: FC<InstructionItemProps> = ({
                 <View className="justify-center items-center overflow-hidden rounded">
                     {instruction.imageUri != null ? (
                         <Image
-                            source={{ uri: instruction.imageUri }}
-                            className="w-full h-full"
+                            source={{
+                                uri: instruction.imageUri,
+                                width: 30,
+                                height: 30,
+                            }}
+                            resizeMode="cover"
                         />
                     ) : (
                         <IconEntypo name="image" size={30} />

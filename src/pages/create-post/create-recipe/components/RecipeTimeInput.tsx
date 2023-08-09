@@ -1,9 +1,11 @@
 import { CREATE_RECIPE_HOUR, CREATE_RECIPE_MINUTE } from "@/common/strings";
 import { customColors } from "@root/tailwind.config";
-import { useState, type FC } from "react";
+import { useState, type FC, useEffect } from "react";
 import React, { Text, TextInput, View } from "react-native";
+import type RecipeTime from "../types/RecipeTime";
 
 interface RecipeTimeInputProps {
+    value?: RecipeTime;
     onHourChange?: (value: number) => void;
     onMinuteChange?: (value: number) => void;
 }
@@ -11,11 +13,21 @@ const MAX_HOUR = 72;
 const MAX_MINUTE = 59;
 
 const RecipeTimeInput: FC<RecipeTimeInputProps> = ({
+    value,
     onHourChange,
     onMinuteChange,
 }: RecipeTimeInputProps) => {
     const [hour, setHour] = useState("");
     const [minute, setMinute] = useState("");
+
+    useEffect(() => {
+        if (value == null) {
+            return;
+        }
+
+        setHour(value.hour.toString());
+        setMinute(value.minute.toString());
+    }, [value]);
 
     const checkNumberInput = (
         text: string,
@@ -57,7 +69,7 @@ const RecipeTimeInput: FC<RecipeTimeInputProps> = ({
                 value={hour}
                 placeholderTextColor={customColors.cgrey.battleship}
                 onChangeText={onHourTextChange}
-                className="text-base py-2 border-cgrey-platinum w-[50] bg-cgrey-seasalt rounded-md text-cgrey-battleship"
+                className="text-base py-2 border-cgrey-platinum w-[50] bg-cgrey-seasalt rounded-md"
             />
             <Text>{CREATE_RECIPE_HOUR}</Text>
             <TextInput
@@ -67,7 +79,7 @@ const RecipeTimeInput: FC<RecipeTimeInputProps> = ({
                 value={minute}
                 placeholderTextColor={customColors.cgrey.battleship}
                 onChangeText={onMinuteTextChange}
-                className="text-base py-2 border-cgrey-platinum w-[50] bg-cgrey-seasalt rounded-md text-cgrey-battleship"
+                className="text-base py-2 border-cgrey-platinum w-[50] bg-cgrey-seasalt rounded-md"
             />
             <Text>{CREATE_RECIPE_MINUTE}</Text>
         </View>

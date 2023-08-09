@@ -62,6 +62,7 @@ const TitleDescriptionVideo: FC<TitleDescriptionVideoProps> = (
                     <WarningAsterisk />
                 </Text>
                 <TextInput
+                    value={title}
                     onChangeText={onTitleChange}
                     maxLength={55}
                     className="text-xl py-2 border-cgrey-platinum"
@@ -79,6 +80,7 @@ const TitleDescriptionVideo: FC<TitleDescriptionVideoProps> = (
                     <WarningAsterisk />
                 </Text>
                 <TextInput
+                    value={description}
                     onChangeText={onDescriptionChange}
                     textAlignVertical="top"
                     multiline

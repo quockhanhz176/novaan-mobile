@@ -98,6 +98,7 @@ const MainScreens: FC<MainScreensProps> = ({
                     name="UserProfile"
                     component={UserProfile}
                     options={{
+                        unmountOnBlur: true,
                         tabBarLabel: "Cá nhân",
                         tabBarIcon: ({ color }) => (
                             <Icon name="user" size={24} color={color} />

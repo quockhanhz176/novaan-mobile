@@ -12,6 +12,7 @@ import React, {
     type ReactElement,
 } from "react";
 import { StyleSheet, TouchableOpacity, View, Text } from "react-native";
+import { FlatList } from "react-native-gesture-handler";
 
 interface AState {
     a: number;
@@ -45,8 +46,11 @@ const Home: FC = () => {
                     </TouchableOpacity>
                     <Component1 outer={outer} />
                 </View>
-                <View className="justify-center items-center ml-10">
+                <View className="justify-center items-center ml-3">
                     <Component4 />
+                </View>
+                <View className="justify-center items-center ml-3">
+                    <Component6 />
                 </View>
             </View>
         </AContext.Provider>
@@ -166,5 +170,45 @@ const Component5: FC<Component5Props> = memo(function Component5({
         </View>
     );
 });
+
+const Component6: FC = () => {
+    const [data, setData] = useState([0, 1, 2, 3, ]);
+    const increase = useCallback(() => {
+        setData([...data, data.length]);
+    }, [data]);
+    return (
+        <View className="p-3 bg-[#DAD7CD] items-center">
+            <TouchableOpacity onPress={increase}>
+                <Text>Increase</Text>
+            </TouchableOpacity>
+            <Component7 data={data} />
+        </View>
+    );
+};
+
+interface Component7Props {
+    data: number[];
+}
+
+const Component7: FC<Component7Props> = ({ data }) => {
+    const [d, setD] = useState([0, 1, 2, 3, 4, 5, 6, 7, 8]);
+    const increase = useCallback(() => {
+        setD([...d, d.length]);
+    }, [d]);
+    return (
+        <View className="h-[200] bg-[#A3B18A] p-3">
+            <TouchableOpacity className="p-2" onPress={increase}>
+                <Text>Increase</Text>
+            </TouchableOpacity>
+
+            <FlatList
+                data={data}
+                renderItem={({ item }) => (
+                    <Text className="p-3 bg-2 bg-[#588157]">{item}</Text>
+                )}
+            />
+        </View>
+    );
+};
 
 export default Home;

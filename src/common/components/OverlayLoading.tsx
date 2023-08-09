@@ -7,7 +7,7 @@ const OverlayLoading = (): ReactElement => {
             animating={true}
             color={MD2Colors.red400}
             size={100}
-            className="absolute top-0 bottom-0 right-0 left-0 w-screen h-screen bg-gray-200 opacity-75"
+            className="absolute top-0 bottom-0 right-0 left-0 bg-gray-200 opacity-75"
         />
     );
 };

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import IconLabelButton from "@/common/components/IconLabelButton";
 import { customColors } from "@root/tailwind.config";
 import {
@@ -9,6 +8,7 @@ import {
     useMemo,
     useReducer,
     memo,
+    useRef,
 } from "react";
 import React, {
     Modal,
@@ -17,21 +17,33 @@ import React, {
     Text,
     type ViewStyle,
     type StyleProp,
-    SafeAreaView,
+    TouchableOpacity,
+    Keyboard,
 } from "react-native";
 import IconEvil from "react-native-vector-icons/EvilIcons";
 import CreatedPostList from "../../../user-profile/pages/created-post/components/CreatedPostList";
-import type PostResponse from "@/api/post/types/PostResponse";
 import searchServices from "../../services/searchServices";
-import useModalHook from "@/common/components/ModalHook";
+import useBooleanHook from "@/common/components/BooleanHook";
 import Filter from "./Filter";
 import { type Route, TabBar, TabView } from "react-native-tab-view";
-import { POST_TYPE_RECIPE, POST_TYPE_TIP } from "@/common/strings";
+import {
+    BASIC_SEARCH_ADVANCED_SEARCH_BUTTON,
+    BASIC_SEARCH_NO_POST,
+    BASIC_SEARCH_USER_SEARCH_BUTTON,
+    POST_TYPE_RECIPE,
+    POST_TYPE_TIP,
+} from "@/common/strings";
 import { type PostType } from "@/api/post/types/PostResponse";
 import { suiteReducer } from "./filterReducer";
 import { type ReelParams } from "../../Search";
 import { getRequestPostType } from "@/api/post/types/RequestPostType";
-import LinearGradient from "react-native-linear-gradient";
+import { type MinimalPostInfo } from "@/api/profile/types";
+import OverlayLoading from "@/common/components/OverlayLoading";
+import AutoComplete from "../Autocomplete";
+import IconCommunity from "react-native-vector-icons/MaterialCommunityIcons";
+import IconFA5 from "react-native-vector-icons/FontAwesome5";
+import usePagingHook from "@/common/components/PagingHook";
+import type PreferenceSuite from "../../types/PreferenceSuite";
 
 const routes: Route[] = [
     {
@@ -44,96 +56,135 @@ const routes: Route[] = [
 interface RecipeTipSearchParams {
     setReelParams?: (value: ReelParams) => void;
     showReel?: () => void;
+    showAdvancedSearch?: () => void;
+    showUserSearch?: () => void;
 }
+
+interface SearchParams {
+    searchString: string;
+    preferenceSuite?: PreferenceSuite;
+}
+
+const SEARCH_BATCH_SIZE = 10;
 
 const RecipeTipSearch: FC<RecipeTipSearchParams> = ({
     setReelParams,
     showReel,
+    showAdvancedSearch,
+    showUserSearch,
 }) => {
     const [searchString, setSearchString] = useState("");
-    const [recipeResults, setRecipeResults] = useState<PostResponse[]>([]);
-    const [tipResults, setTipResults] = useState<PostResponse[]>([]);
     const [preferenceSuite, dispatchSuite] = useReducer(
         suiteReducer,
         undefined
     );
-    const [filterVisible, hideFilter, showFilter] = useModalHook();
-    const [tabIndex, setTabIndex] = useState(0);
-    const [recipesLoading, setRecipesLoading] = useState(false);
-    const [tipsLoading, setTipsLoading] = useState(false);
+
+    const search = useCallback(
+        async (
+            postType: PostType,
+            start: number,
+            size: number,
+            params?: SearchParams
+        ): Promise<MinimalPostInfo[] | null> => {
+            if (params == null || params.searchString === "") {
+                return null;
+            }
+
+            const result = await searchServices.searchPost(
+                params.searchString,
+                postType,
+                params.preferenceSuite,
+                start,
+                size
+            );
+            return result;
+        },
+        []
+    );
+
+    const searchRecipes = useCallback(
+        async (start: number, size: number, params: SearchParams) =>
+            await search("recipe", start, size, params),
+        [search]
+    );
+
+    const searchTips = useCallback(
+        async (start: number, size: number, params: SearchParams) =>
+            await search("tip", start, size, params),
+        [search]
+    );
+
+    const [
+        recipeResults,
+        getRecipesReset,
+        getRecipes,
+        resetRecipes,
+        recipesLoading,
+    ] = usePagingHook<MinimalPostInfo, SearchParams>(
+        searchRecipes,
+        SEARCH_BATCH_SIZE
+    );
+    const [tipResults, getTipsReset, getTips, resetTips, tipsLoading] =
+        usePagingHook<MinimalPostInfo, SearchParams>(
+            searchTips,
+            SEARCH_BATCH_SIZE
+        );
+    const [filterVisible, hideFilter, showFilter] = useBooleanHook();
+    const tabIndexRef = useRef(0);
+    const searchBarRef = useRef<View>(null);
+    const [inputFocus, setInputFocusFalse, setInputFocusTrue] =
+        useBooleanHook();
+    const inputRef = useRef<TextInput>(null);
     // const [reelInitialIndex, setReelInitialIndex] = useState(0);
+
     useEffect(() => {
+        // fetch preferences
         void searchServices.getPreferences().then((suite) => {
             if (suite == null) {
                 return;
             }
             dispatchSuite({ type: "new_value", value: suite });
         });
+
+        // setup input
+        const keyboardDidHideSubscription = Keyboard.addListener(
+            "keyboardDidHide",
+            () => {
+                inputRef.current?.blur();
+            }
+        );
+
+        return () => {
+            keyboardDidHideSubscription?.remove();
+        };
     }, []);
 
     const getCurrentPostType = (): PostType => {
-        if (routes[tabIndex].key === "recipe") {
-            return "recipe";
-        }
-
-        return "tip";
-    };
-
-    const setResults = (results: PostResponse[], postType: PostType): void => {
-        if (postType === "recipe") {
-            setRecipeResults(results);
-            return;
-        }
-        setTipResults(results);
-    };
-
-    const search = async (postType: PostType): Promise<void> => {
-        if (searchString === "") {
-            setResults([], postType);
-            return;
-        }
-
-        const setLoading =
-            postType === "recipe" ? setRecipesLoading : setTipsLoading;
-        setLoading(true);
-        const result = await searchServices.searchPost(searchString);
-        setResults(result ?? [], postType);
-        setLoading(false);
+        return routes[tabIndexRef.current].key === "recipe" ? "recipe" : "tip";
     };
 
     const clear = (): void => {
         setSearchString("");
-        setResults([], getCurrentPostType());
+        const reset =
+            getCurrentPostType() === "recipe" ? resetRecipes : resetTips;
+        reset();
     };
 
     const onSubmitEditing = (): void => {
-        void search(getCurrentPostType());
+        const getReset =
+            getCurrentPostType() === "recipe" ? getRecipesReset : getTipsReset;
+        void getReset({ searchString, preferenceSuite });
     };
 
     const onTabChange = (value: number): void => {
-        setTabIndex(value);
-        if (routes[value].key === "recipe") {
-            void search("recipe");
-            return;
-        }
-        void search("tip");
+        tabIndexRef.current = value;
+        const getReset =
+            routes[value].key === "recipe" ? getRecipesReset : getTipsReset;
+        void getReset({ searchString, preferenceSuite });
     };
 
-    // const reelPostGetter = useCallback(
-    //     async (index: number): Promise<Post | null> => {
-    //         const list =
-    //             getCurrentPostType() === "recipe" ? recipeResults : tipResults;
-    //         if (index !== reelInitialIndex || index > list.length - 1) {
-    //             return null;
-    //         }
-    //         return await reelServices.toPost(list[index]);
-    //     },
-    //     [recipeResults, tipResults, reelInitialIndex]
-    // );
-
     const itemPressed = useCallback(
-        (item: PostResponse, index: number): void => {
-            // setReelInitialIndex(index);
+        (item: MinimalPostInfo, _index: number): void => {
             setReelParams?.({
                 minimalPosts: [
                     {
@@ -147,32 +198,50 @@ const RecipeTipSearch: FC<RecipeTipSearchParams> = ({
         []
     );
 
-    const onEndReached = useCallback(() => {}, []);
+    // const onEndReached = useCallback(() => {}, []);
 
     const resultContentContainerStyle = useMemo(
         (): StyleProp<ViewStyle> => ({
             paddingBottom: 100,
-            paddingTop: 0,
+            paddingTop: 16,
             marginTop: 0,
         }),
         []
     );
 
     const renderResults = (type: PostType): JSX.Element => {
-        const results = type === "recipe" ? recipeResults : tipResults;
-        const loading = type === "recipe" ? recipesLoading : tipsLoading;
+        const [results, loading, getNext] =
+            type === "recipe"
+                ? [recipeResults, recipesLoading, getRecipes]
+                : [tipResults, tipsLoading, getTips];
+
         return (
-            <View className="mt-4">
-                {results.length > 0 && (
-                    <CreatedPostList
-                        data={results}
-                        hidden={false}
-                        loading={loading}
-                        handleOnEndReached={onEndReached}
-                        handleItemPress={itemPressed}
-                        contentContainerStyle={resultContentContainerStyle}
-                    />
-                )}
+            <View className="h-full w-full">
+                {(() => {
+                    if (loading) return <OverlayLoading />;
+
+                    if (results == null) return;
+
+                    if (results.length > 0)
+                        return (
+                            <CreatedPostList
+                                data={results}
+                                hidden={false}
+                                loading={false}
+                                handleOnEndReached={getNext}
+                                handleItemPress={itemPressed}
+                                contentContainerStyle={
+                                    resultContentContainerStyle
+                                }
+                            />
+                        );
+
+                    return (
+                        <View className="flex-1 justify-center items-center">
+                            <Text className="text-cgrey-battleship">{BASIC_SEARCH_NO_POST}</Text>
+                        </View>
+                    );
+                })()}
             </View>
         );
     };
@@ -182,8 +251,9 @@ const RecipeTipSearch: FC<RecipeTipSearchParams> = ({
             <View className=" bg-white flex-1">
                 <View className="p-3 pb-0 flex-row space-x-3 items-center mt-1">
                     <View
-                        className="rounded-xl overflow-hidden border-cgrey-platinum p-2 flex-row flex-1 items-center h-[50] space-x-2"
-                        style={{ borderWidth: 1 }}
+                        className="rounded-xl overflow-hidden border-cgrey-platinum p-2
+                        flex-row flex-1 items-center h-[50] space-x-2 border"
+                        ref={searchBarRef}
                     >
                         <IconEvil
                             name="search"
@@ -191,7 +261,10 @@ const RecipeTipSearch: FC<RecipeTipSearchParams> = ({
                             color={customColors.cgrey.dim}
                         />
                         <TextInput
-                            className="flex-1"
+                            ref={inputRef}
+                            onBlur={setInputFocusFalse}
+                            onFocus={setInputFocusTrue}
+                            className="flex-1 text-base"
                             returnKeyType="search"
                             onChangeText={setSearchString}
                             value={searchString}
@@ -224,7 +297,7 @@ const RecipeTipSearch: FC<RecipeTipSearchParams> = ({
                 </View>
                 <TabView
                     className="flex-1 mt-1"
-                    navigationState={{ index: tabIndex, routes }}
+                    navigationState={{ index: tabIndexRef.current, routes }}
                     renderScene={(prop) => {
                         return renderResults(
                             prop.route.key === "recipe" ? "recipe" : "tip"
@@ -258,6 +331,40 @@ const RecipeTipSearch: FC<RecipeTipSearchParams> = ({
                     )}
                 />
             </View>
+            <AutoComplete searchBarRef={searchBarRef} showing={inputFocus}>
+                <View className="rounded-xl border border-cgrey-platinum bg-white overflow-hidden mt-1 py-1">
+                    <TouchableOpacity
+                        className="px-4 py-2 flex-row items-center"
+                        onPress={showAdvancedSearch}
+                    >
+                        <>
+                            <IconFA5
+                                name="search-plus"
+                                size={15}
+                                color={customColors.cgrey.dim}
+                            />
+                            <Text className="text-base ml-3 text-cgrey-dim">
+                                {BASIC_SEARCH_ADVANCED_SEARCH_BUTTON}
+                            </Text>
+                        </>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        className="px-4 py-2 flex-row items-center"
+                        onPress={showUserSearch}
+                    >
+                        <>
+                            <IconCommunity
+                                name="chef-hat"
+                                size={15}
+                                color={customColors.cgrey.dim}
+                            />
+                            <Text className="text-base ml-3 text-cgrey-dim">
+                                {BASIC_SEARCH_USER_SEARCH_BUTTON}
+                            </Text>
+                        </>
+                    </TouchableOpacity>
+                </View>
+            </AutoComplete>
             <Modal
                 onDismiss={hideFilter}
                 visible={filterVisible}

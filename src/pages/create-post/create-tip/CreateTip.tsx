@@ -1,4 +1,4 @@
-import React, { useState, type FC } from "react";
+import React, { useState, type FC, useEffect } from "react";
 import {
     View,
     Text,
@@ -25,24 +25,63 @@ import {
 } from "@/common/strings";
 import { customColors } from "@root/tailwind.config";
 import { type NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { handleTipSubmission } from "./services/createTipService";
+import {
+    handleTipEdit,
+    handleTipSubmission,
+} from "./services/createTipService";
 import { pickVideoAndThumbnail } from "../common/commonServices";
 import { type RootStackParamList } from "@/types/navigation";
+import { usePostInfo } from "@/api/post/PostApiHook";
+import { type RouteProp } from "@react-navigation/native";
+import { useSWRConfig } from "swr";
+import { getUserTipsUrl } from "@/api/profile/ProfileApi";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const defaultThumbnail = require("@root/assets/default-video.png");
 
 interface CreateTipProps {
     navigation: NativeStackNavigationProp<RootStackParamList, "CreateTip">;
+    route: RouteProp<RootStackParamList, "CreateTip">;
 }
 
-const CreateTip: FC<CreateTipProps> = (props: CreateTipProps) => {
-    const { navigation } = props;
+const CreateTip: FC<CreateTipProps> = ({
+    navigation,
+    route,
+}: CreateTipProps) => {
     const labelClassName = "text-base font-medium uppercase";
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [video, setVideo] = useState<ImagePicker.Asset | null>();
     const [thumbnailUri, setThumbnailUri] = useState<string | null>();
+
+    const { postInfo, fetchPostInfo } = usePostInfo();
+    // const { resourceUrl, fetchUrl } = useFetchResourceUrl();
+
+    const { mutate } = useSWRConfig();
+
+    useEffect(() => {
+        // Fetch initial data if editing
+        if (route.params?.postId == null) {
+            return;
+        }
+
+        void fetchPostInfo({
+            postId: route.params.postId,
+            postType: "CulinaryTip",
+        });
+    }, []);
+
+    useEffect(() => {
+        if (postInfo === undefined) {
+            return;
+        }
+
+        setTitle(postInfo.title);
+        setDescription(postInfo.description);
+
+        // Pull thumbnail into thumbnailUri
+        // void fetchUrl(postInfo.thumbnail)
+    }, [postInfo]);
 
     const onTitleChange = (text: string): void => {
         setTitle(text);
@@ -61,9 +100,31 @@ const CreateTip: FC<CreateTipProps> = (props: CreateTipProps) => {
     };
 
     const submit = async (): Promise<void> => {
-        void handleTipSubmission({ title, description, video }, () => {
-            navigateBack();
+        if (route.params?.postId == null) {
+            await handleTipSubmission({ title, description, video }, () => {
+                navigateBack();
+            });
+            return;
+        }
+
+        if (postInfo == null) {
+            return;
+        }
+
+        await handleTipEdit(postInfo.id, postInfo.video, {
+            title,
+            description,
+            video,
         });
+
+        // Revalidate user profile created tips
+        await mutate(
+            // Only creator can edit their own post so it's safe to assume currentUserId === postInfo.creator.userId
+            (key) =>
+                Array.isArray(key) &&
+                key[0] === getUserTipsUrl(postInfo.creator.userId)
+        );
+        navigateBack();
     };
 
     return (
@@ -93,10 +154,9 @@ const CreateTip: FC<CreateTipProps> = (props: CreateTipProps) => {
                     </Text>
                     <TextInput
                         onChangeText={onTitleChange}
+                        value={title}
                         maxLength={55}
-                        className="text-xl py-2 border-cgrey-platinum"
-                        // classname doesn't work
-                        style={{ borderBottomWidth: 1 }}
+                        className="text-xl py-2 border-cgrey-platinum border-b"
                         placeholder={CREATE_TIP_TITLE_PLACEHOLDER}
                     />
                     <View className="items-end mt-2">
@@ -109,14 +169,13 @@ const CreateTip: FC<CreateTipProps> = (props: CreateTipProps) => {
                         <WarningAsterisk />
                     </Text>
                     <TextInput
+                        value={description}
                         onChangeText={onDescriptionChange}
                         textAlignVertical="top"
                         multiline
                         numberOfLines={4}
                         maxLength={500}
-                        className="text-base py-2 first-line:border-cgrey-platinum"
-                        // classname doesn't work
-                        style={{ borderBottomWidth: 1 }}
+                        className="text-base py-2 first-line:border-cgrey-platinum border-b"
                         placeholder={CREATE_TIP_DESCRIPTION_PLACEHOLDER}
                     />
                     <View className="items-end">
@@ -173,7 +232,9 @@ const CreateTip: FC<CreateTipProps> = (props: CreateTipProps) => {
                     onPress={submit}
                 >
                     <Text className="text-sm text-white">
-                        {CREATE_TIP_SUBMIT}
+                        {route.params?.postId == null
+                            ? CREATE_TIP_SUBMIT
+                            : "Chỉnh sửa bài viết"}
                     </Text>
                     {/* change to eyeo for previewing */}
                     <IconAnt name="upload" color="white" size={18} />
