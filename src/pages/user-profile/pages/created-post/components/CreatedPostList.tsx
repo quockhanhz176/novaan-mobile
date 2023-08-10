@@ -13,14 +13,14 @@ interface CreatedPostListProps {
     hidden: boolean;
     handleItemPress: (item: MinimalPostInfo, index: number) => void;
     handleOnEndReached: () => void;
-    loading: boolean;
+    loading?: boolean;
     contentContainerStyle?: StyleProp<ViewStyle>;
 }
 
 const CreatedPostList = ({
     data,
     hidden,
-    loading,
+    loading = false,
     handleItemPress,
     handleOnEndReached,
     contentContainerStyle,

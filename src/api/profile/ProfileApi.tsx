@@ -160,6 +160,12 @@ const useGetUserContentSwr = <T,>(
             return;
         }
 
+        // Something is wrong...
+        if (!Array.isArray(data)) {
+            setContent([]);
+            return;
+        }
+
         if (data.length === 0 || data.length < PAGE_SIZE) {
             setEnded(true);
         }

@@ -33,6 +33,7 @@ import { Toast } from "react-native-toast-message/lib/src/Toast";
 import { type NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { type RootStackParamList } from "@/types/navigation";
 import { storeData } from "@/common/AsyncStorageService";
+import { type RouteProp } from "@react-navigation/native";
 
 type Preference = PreferenceResponse;
 
@@ -40,12 +41,12 @@ export type PreferenceItem = PreferenceResponse | { selected: boolean };
 
 interface SetPreferencesProps {
     navigation: NativeStackNavigationProp<RootStackParamList, "SetPreferences">;
-    firstTime: boolean;
+    route: RouteProp<RootStackParamList, "SetPreferences">;
 }
 
 const SetPreferences = ({
     navigation,
-    firstTime,
+    route,
 }: SetPreferencesProps): ReactElement<SetPreferencesProps> => {
     // Query all preferences and save to cache
     const { diets, cuisines, allergens, getAllPreferenceOptions } =
@@ -63,6 +64,8 @@ const SetPreferences = ({
     const progress = useMemo(() => (index + 1) / 3, [index]);
 
     const swiperRef = useRef<Swiper>(null);
+
+    const firstTime = useMemo(() => route.params.firstTime, [route]);
 
     const fetchUserPreferences = async (): Promise<void> => {
         const { diets, cuisines, allergens } = await getUserPreferences();

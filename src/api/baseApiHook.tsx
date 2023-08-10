@@ -11,7 +11,6 @@ import useSwr, { type Key, type SWRResponse } from "swr";
 
 // GLOBAL IN-MEMORY VARIABLE (DO NOT TOUCH)
 let tokenExpTimestamp: number = -1;
-let currentToken = "";
 
 interface RequestConfig {
     timeout?: number;
@@ -81,13 +80,7 @@ export const sendBaseRequest = async (
             config?.authorizationRequired != null &&
             config.authorizationRequired
         ) {
-            if (currentToken === "") {
-                currentToken = await getKeychainValue(KEYCHAIN_ID);
-                if (currentToken == null) {
-                    throw new Error("Access token not found");
-                }
-            }
-
+            let currentToken = await getKeychainValue(KEYCHAIN_ID);
             currentToken = await getNewTokenIfExpired(currentToken);
 
             headers.append("Authorization", `Bearer ${currentToken}`);
