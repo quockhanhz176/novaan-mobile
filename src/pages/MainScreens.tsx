@@ -45,12 +45,13 @@ const MainScreens: FC<MainScreensProps> = ({
                     },
                     headerShown: false,
                 }}
-                initialRouteName="Reel"
+                // initialRouteName="Reel"
             >
                 <BottomTab.Screen
                     name="Home"
                     component={Home}
                     options={{
+                        unmountOnBlur: true,
                         tabBarLabel: "Trang chủ",
                         tabBarIcon: ({ color }) => (
                             <Icon name="home" size={24} color={color} />
@@ -93,6 +94,7 @@ const MainScreens: FC<MainScreensProps> = ({
                             <Icon name="search" size={24} color={color} />
                         ),
                     }}
+                    initialParams={{ advancedSearchShown: false }}
                 />
                 <BottomTab.Screen
                     name="UserProfile"

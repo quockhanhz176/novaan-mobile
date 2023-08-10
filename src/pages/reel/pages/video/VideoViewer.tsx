@@ -19,13 +19,13 @@ import PlayPause from "./components/PlayPause";
 import Seeker from "./components/Seeker";
 import { useFetchResourceUrl } from "@/api/utils/resourceHooks";
 import ButtonColumn from "./components/interact-btn/ButtonColumn";
-import ResourceImage from "@/common/components/ResourceImage";
 import IconFeather from "react-native-vector-icons/Feather";
 import LinearGradient from "react-native-linear-gradient";
 import { SCROLL_ITEM_HEIGHT } from "../../commons/constants";
 import { ScrollItemContext } from "../../components/scroll-items/ScrollItemv2";
 import { throttle } from "lodash";
 import { type Undefinable } from "@/types/app";
+import FastImage from "react-native-fast-image";
 
 interface VideoViewerProps {
     onShowDetails: () => void;
@@ -180,8 +180,10 @@ const VideoViewer = ({
                                 currentPost.creator.avatar === "" ? (
                                     <IconFeather name="user" size={30} />
                                 ) : (
-                                    <ResourceImage
-                                        resourceId={currentPost.creator.avatar}
+                                    <FastImage
+                                        source={{
+                                            uri: currentPost.creator.avatar,
+                                        }}
                                         className="h-full w-full"
                                     />
                                 )}

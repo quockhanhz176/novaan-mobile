@@ -1,5 +1,4 @@
 import IconLabelButton from "@/common/components/IconLabelButton";
-import ResourceImage from "@/common/components/ResourceImage";
 import {
     USER_SEARCH_FOLLOWER_COUNT_LABEL,
     USER_SEARCH_FOLLOW_BUTTON_FOLLOW,
@@ -14,6 +13,7 @@ import IconCommunity from "react-native-vector-icons/MaterialCommunityIcons";
 import type UserSearchResult from "../../types/UserSearchResult";
 import searchServices from "../../services/searchServices";
 import { debounce } from "lodash";
+import FastImage from "react-native-fast-image";
 
 interface UserSearchResultProps {
     user: UserSearchResult;
@@ -63,8 +63,8 @@ const UserSearchResultItem: FC<UserSearchResultProps> = ({
                             {user.avatar == null || user.avatar === "" ? (
                                 <IconFeather name="user" size={30} />
                             ) : (
-                                <ResourceImage
-                                    resourceId={user.avatar}
+                                <FastImage
+                                    source={{ uri: user.avatar }}
                                     className="h-full w-full"
                                 />
                             )}

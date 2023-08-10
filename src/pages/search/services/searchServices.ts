@@ -105,7 +105,7 @@ const getPreferences = async (): Promise<PreferenceSuite | null> => {
                     checked:
                         userPreferences?.[k].find(
                             (userPreference) =>
-                                userPreference === preferenceResponse.title
+                                userPreference === preferenceResponse.id
                         ) != null,
                     index: preferenceIndex++,
                 })),

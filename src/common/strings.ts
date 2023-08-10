@@ -331,3 +331,16 @@ export const SET_PREF_ALLERGEN_GUIDE =
 export const SET_PREF_FAILED =
     "Cập nhập không thành công. Vui lòng thử lại sau";
 export const SET_PREF_SUCCESS = "Sở thích của bạn đã được cập nhập";
+
+// Home
+export const HOME_LIKE_COUNT = "lượt thích";
+export const HOME_TRENDING_AUTHORS_TITLE = "Xem thêm từ";
+export const HOME_TRENDING_RECIPES_TITLE = "Mẹo vặt của tháng";
+export const HOME_TRENDING_TIPS_TITLE = "Công thức của tháng";
+export const HOME_NEWEST_POSTS_TITLE = "Những bài viết mới";
+export const HOME_FOLLOWING_POSTS_TITLE = "Bài viết từ tác giả bạn quan tâm";
+export const HOME_ADVANCED_SEARCH_TITLE = "Tìm kiếm nâng cao";
+export const HOME_ADVANCED_SEARCH_INTRODUCTION =
+    "Tìm công thức nấu ăn bạn có thể chuẩn bị chỉ với các nguyên liệu có sẵn?";
+export const HOME_ADVANCED_SEARCH_BUTTON = "Bắt đầu";
+export const HOME_POST_DETAILS_TITLE = "Chi tiết bài viết"

@@ -9,13 +9,29 @@ import AdvancedSearch from "./components/advanced-search/AdvancedSearch";
 import RecipeTipSearch from "./components/basic-search/RecipeTipSearch";
 import UserSearch from "./components/user-search/UserSearch";
 
+import { type BottomTabParamList } from "@/types/navigation";
+import { type BottomTabScreenProps } from "@react-navigation/bottom-tabs";
+
 export interface ReelParams {
     minimalPosts: MinimalPost[];
 }
 
-const Search: FC = () => {
+export interface SearchRouteProps {
+    advancedSearchShown?: boolean;
+}
+
+type SearchProps = BottomTabScreenProps<BottomTabParamList, "Search">;
+
+const Search: FC<SearchProps> = ({ route, navigation }) => {
+    const advancedSearchShown = route.params?.advancedSearchShown;
+    if (advancedSearchShown === true) {
+        navigation.setParams({ advancedSearchShown: false });
+    }
+
+    console.log("render");
+
     const [advancedSearchVisible, hideAdvancedSearch, showAdvancedSearch] =
-        useBooleanHook();
+        useBooleanHook(undefined, advancedSearchShown);
     const [userSearchVisible, hideUserSearch, showUserSearch] =
         useBooleanHook();
     const [reelVisible, hideReel, showReel] = useBooleanHook();
