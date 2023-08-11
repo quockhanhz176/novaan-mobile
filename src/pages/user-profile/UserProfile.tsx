@@ -26,6 +26,7 @@ import { type ProfileInfo } from "@/api/profile/types";
 import Following from "./pages/following/Following";
 import ProfileTabIcon from "./components/ProfileTabIcon";
 import MaterialCIcon from "react-native-vector-icons/MaterialCommunityIcons";
+import MaterialIcon from "react-native-vector-icons/MaterialIcons";
 import { SceneMap, TabBar, TabView } from "react-native-tab-view";
 import useBooleanHook from "@/common/components/BooleanHook";
 import CustomModal from "@/common/components/CustomModal";
@@ -36,6 +37,7 @@ interface UserProfileProps {
     userId?: string;
     showBackButton?: boolean;
     onClose?: () => void;
+    showStatus?: boolean;
 }
 
 interface UserProfileContextProps {
@@ -59,6 +61,7 @@ const UserProfile = ({
     userId,
     showBackButton = true,
     onClose,
+    showStatus = true,
 }: UserProfileProps): ReactElement<UserProfileProps> => {
     const isUserProfile = useMemo(() => userId == null, [userId]);
 
@@ -103,7 +106,7 @@ const UserProfile = ({
         }
 
         return SceneMap({
-            created: CreatedPosts,
+            created: () => <CreatedPosts showStatus={false} />,
         });
     }, [isUserProfile]);
 
@@ -121,8 +124,6 @@ const UserProfile = ({
         } catch {
             if (navigation == null) {
                 onClose?.();
-            } else {
-                navigation.navigate("Home");
             }
             Toast.show({
                 type: "error",
@@ -164,7 +165,7 @@ const UserProfile = ({
                             onPress={onClose}
                             className="pr-2 py-2 rounded-lg"
                         >
-                            <MaterialCIcon name="arrow-back" size={24} />
+                            <MaterialIcon name="arrow-back" size={24} />
                         </Pressable>
                     )}
                 </View>

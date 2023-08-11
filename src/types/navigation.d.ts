@@ -3,6 +3,7 @@ import { type UserProfileRouteProps } from "@/pages/user-profile/UserProfile";
 
 /* eslint-disable @typescript-eslint/consistent-type-definitions */
 export type RootStackParamList = {
+    SplashScreen: undefined;
     SignIn: undefined;
     SignUp: undefined;
     MainScreens: undefined;

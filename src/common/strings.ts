@@ -357,3 +357,6 @@ export const HOME_ADVANCED_SEARCH_INTRODUCTION =
     "Tìm công thức nấu ăn bạn có thể chuẩn bị chỉ với các nguyên liệu có sẵn?";
 export const HOME_ADVANCED_SEARCH_BUTTON = "Bắt đầu";
 export const HOME_POST_DETAILS_TITLE = "Chi tiết bài viết";
+
+// Splash screen
+export const SPLASH_SCREEN_APP_NAME = "NOVAAN";

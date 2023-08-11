@@ -3,7 +3,6 @@ import { View } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-import SignIn from "@/pages/auth/SignIn";
 import SignUp from "@/pages/auth/SignUp";
 import MainScreens from "@/pages/MainScreens";
 import CreateTip from "@/pages/create-post/create-tip/CreateTip";
@@ -16,6 +15,8 @@ import { enableScreens } from "react-native-screens";
 import { OrientationLock, lockAsync } from "expo-screen-orientation";
 import Greet from "@/pages/user-profile/pages/preferences/Greet";
 import SetPreferences from "@/pages/user-profile/pages/preferences/SetPreferences";
+import SplashScreen from "@/pages/auth/SplashScreen";
+import SignIn from "@/pages/auth/SignIn";
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 
@@ -49,8 +50,14 @@ const App: FC = () => {
                                         backgroundColor: "#FFFFFF",
                                     },
                                 }}
-                                initialRouteName="SignIn"
+                                initialRouteName="SplashScreen"
                             >
+                                <RootStack.Screen
+                                    name="SplashScreen"
+                                    component={SplashScreen}
+                                    options={{ title: "Splash Screen" }}
+                                />
+                                
                                 <RootStack.Group>
                                     <RootStack.Screen
                                         name="SignIn"

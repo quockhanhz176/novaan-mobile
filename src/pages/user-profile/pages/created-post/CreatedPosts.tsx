@@ -33,7 +33,13 @@ import { type MinimalPostInfo } from "@/api/profile/types";
 
 type ViewCategory = "recipe" | "tips";
 
-const CreatedPosts = (): ReactElement => {
+interface CreatedPostsProps {
+    showStatus?: boolean;
+}
+
+const CreatedPosts = ({
+    showStatus = true,
+}: CreatedPostsProps): ReactElement<CreatedPostsProps> => {
     const userProfileContext = useContext(UserProfileContext);
     const {
         getNext: getNextRecipes,
@@ -242,6 +248,7 @@ const CreatedPosts = (): ReactElement => {
                         loading={fetching}
                         handleItemPress={handleItemPress}
                         handleOnEndReached={fetchMorePost}
+                        showStatus={showStatus}
                     />
                 )}
                 {tipsEmpty ? (
@@ -256,6 +263,7 @@ const CreatedPosts = (): ReactElement => {
                         loading={fetching}
                         handleItemPress={handleItemPress}
                         handleOnEndReached={fetchMorePost}
+                        showStatus={showStatus}
                     />
                 )}
             </View>

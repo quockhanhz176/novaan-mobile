@@ -43,12 +43,8 @@ import { maybeCompleteAuthSession } from "expo-web-browser";
 import { useAuthRequest } from "expo-auth-session/providers/google";
 import { saveKeychain } from "@/common/keychainService";
 import { type RootStackParamList } from "@/types/navigation";
-import moment from "moment";
-import { useRefreshToken } from "@/api/auth/authApiHook";
-import { type TokenPayload } from "@/api/baseApiHook";
-import { getPayloadFromToken } from "@/api/common/utils/TokenUtils";
-import { getData } from "@/common/AsyncStorageService";
 import { useUserPreferences } from "@/api/profile/ProfileApi";
+import { handleSignInSuccessRedirect } from "./SplashScreen";
 
 interface SignInProps {
     navigation: NativeStackNavigationProp<RootStackParamList, "SignIn">;
@@ -66,7 +62,6 @@ const SignIn = (props: SignInProps): ReactElement<SignInProps> => {
     const [, response, promptAsync] = useAuthRequest({
         androidClientId: GOOGLE_API_KEY,
     });
-    const { refreshToken } = useRefreshToken();
 
     const { haveUserSetPreference } = useUserPreferences();
 
@@ -112,45 +107,8 @@ const SignIn = (props: SignInProps): ReactElement<SignInProps> => {
         };
     }, [navigation]);
 
-    const handlePersistentSignIn = async (): Promise<void> => {
-        setIsLoading(true);
-
-        // Check if there is a token exist
-        try {
-            const currentUserToken = await getPayloadFromToken<TokenPayload>();
-            if (currentUserToken.exp == null) {
-                return;
-            }
-
-            // Check token exp
-            const exp = moment.unix(Number(currentUserToken.exp));
-            const expired = moment().diff(exp) >= 0;
-
-            if (!expired) {
-                // Skip sign in
-                void handleSignInSuccessRedirect();
-                return;
-            }
-
-            // This will also throw error if there are no token exist in keychain store
-            const newToken = await refreshToken();
-            if (newToken == null) {
-                throw new Error();
-            }
-
-            // Save new token to secure store
-            await saveKeychain(KEYCHAIN_ID, newToken);
-            void handleSignInSuccessRedirect();
-        } catch (e) {
-            // Continue with normal sign in
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
     useEffect(() => {
         maybeCompleteAuthSession();
-        void handlePersistentSignIn();
     }, []);
 
     useEffect(() => {
@@ -179,7 +137,7 @@ const SignIn = (props: SignInProps): ReactElement<SignInProps> => {
 
             // Save token to secure store
             await saveKeychain(KEYCHAIN_ID, response.token);
-            void handleSignInSuccessRedirect();
+            void handleSignInSuccessRedirect(navigation, haveUserSetPreference);
         } catch (error) {
             alert(COMMON_SERVER_CONNECTION_FAIL_ERROR);
             console.error(`fail: ${String(error)}`);
@@ -197,7 +155,7 @@ const SignIn = (props: SignInProps): ReactElement<SignInProps> => {
                 return;
             }
             await saveKeychain(KEYCHAIN_ID, response.token);
-            void handleSignInSuccessRedirect();
+            void handleSignInSuccessRedirect(navigation, haveUserSetPreference);
         } catch (error) {
             alert(COMMON_SERVER_CONNECTION_FAIL_ERROR);
             console.error(`fail: ${String(error)}`);
@@ -216,22 +174,6 @@ const SignIn = (props: SignInProps): ReactElement<SignInProps> => {
 
     const handleSignUpRedirect = (): void => {
         navigation.navigate("SignUp");
-    };
-
-    const handleSignInSuccessRedirect = async (): Promise<void> => {
-        // Load data from cache (if possbile)
-        // If not, load data from API
-        let notFirstTime = await getData("haveUserSetPreference");
-        if (notFirstTime == null) {
-            notFirstTime = await haveUserSetPreference();
-        }
-
-        if (!notFirstTime) {
-            navigation.navigate("Greet");
-            return;
-        }
-
-        navigation.navigate("MainScreens");
     };
 
     return (
