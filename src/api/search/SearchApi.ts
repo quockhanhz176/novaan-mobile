@@ -10,6 +10,7 @@ import {
     type SearchResponseTip,
 } from "./types/SearchResponsePost";
 import type UserSearchResponse from "./types/UserSearchResponse";
+import type AutocompeletePostResponse from "./types/AutocompletePostResponse";
 
 const GET_PREFERENCES_URL = "preference/all";
 const USER_PREFERENCES_URL = "preference/me";
@@ -18,6 +19,7 @@ const TIP_SEARCH_URL = "search/tips";
 const USER_SEARCH_URL = "search/users";
 const ADVANCED_SEARCH_URL = "search/advanced/recipes";
 const ADVANCED_SEARCH_INGREDIENT_URL = "search/advanced/ingredients";
+const BASIC_SEARCH_AUTOCOMPLETE_URL = "search/basic/autocomplete";
 
 const baseApi = new BaseApi();
 
@@ -140,6 +142,16 @@ const searchUser = async (
     );
 };
 
+const autocompleteBasicSearch = async (
+    queryString: string
+): Promise<FailableResponse<AutocompeletePostResponse[]>> => {
+    return await baseApi.sendReceiveBase<AutocompeletePostResponse[]>(
+        `${BASIC_SEARCH_AUTOCOMPLETE_URL}?keyword=${queryString}`,
+        "SearchApi.autocompleteBasicSearch",
+        HttpMethod.GET
+    );
+};
+
 const searchApi = {
     getPreferences,
     getUserPreferences,
@@ -147,6 +159,7 @@ const searchApi = {
     getAdvancedSearchIngredients,
     searchPost,
     searchUser,
+    autocompleteBasicSearch,
 };
 
 export default searchApi;

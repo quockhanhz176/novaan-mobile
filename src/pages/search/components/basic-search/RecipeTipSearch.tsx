@@ -19,6 +19,7 @@ import React, {
     type StyleProp,
     TouchableOpacity,
     Keyboard,
+    FlatList,
 } from "react-native";
 import IconEvil from "react-native-vector-icons/EvilIcons";
 import CreatedPostList from "../../../user-profile/pages/created-post/components/CreatedPostList";
@@ -44,6 +45,9 @@ import IconCommunity from "react-native-vector-icons/MaterialCommunityIcons";
 import IconFA5 from "react-native-vector-icons/FontAwesome5";
 import usePagingHook from "@/common/components/PagingHook";
 import type PreferenceSuite from "../../types/PreferenceSuite";
+import type AutocompeletePostResponse from "@/api/search/types/AutocompletePostResponse";
+import { debounce } from "lodash";
+import AutoCompleteItem from "./AutocompleteItem";
 
 const routes: Route[] = [
     {
@@ -74,6 +78,7 @@ const RecipeTipSearch: FC<RecipeTipSearchParams> = ({
     showUserSearch,
 }) => {
     const [searchString, setSearchString] = useState("");
+    const searchStringRef = useRef("");
     const [preferenceSuite, dispatchSuite] = useReducer(
         suiteReducer,
         undefined
@@ -135,7 +140,9 @@ const RecipeTipSearch: FC<RecipeTipSearchParams> = ({
     const [inputFocus, setInputFocusFalse, setInputFocusTrue] =
         useBooleanHook();
     const inputRef = useRef<TextInput>(null);
-    // const [reelInitialIndex, setReelInitialIndex] = useState(0);
+    const [autocompletePosts, setAutocompletePosts] = useState<
+        AutocompeletePostResponse[]
+    >([]);
 
     useEffect(() => {
         // fetch preferences
@@ -165,6 +172,8 @@ const RecipeTipSearch: FC<RecipeTipSearchParams> = ({
 
     const clear = (): void => {
         setSearchString("");
+        searchStringRef.current = "";
+        setAutocompletePosts([]);
         const reset =
             getCurrentPostType() === "recipe" ? resetRecipes : resetTips;
         reset();
@@ -183,22 +192,17 @@ const RecipeTipSearch: FC<RecipeTipSearchParams> = ({
         void getReset({ searchString, preferenceSuite });
     };
 
-    const itemPressed = useCallback(
-        (item: MinimalPostInfo, _index: number): void => {
-            setReelParams?.({
-                minimalPosts: [
-                    {
-                        postId: item.id,
-                        postType: getRequestPostType(item.type),
-                    },
-                ],
-            });
-            showReel?.();
-        },
-        []
-    );
-
-    // const onEndReached = useCallback(() => {}, []);
+    const itemPressed = useCallback((item: MinimalPostInfo): void => {
+        setReelParams?.({
+            minimalPosts: [
+                {
+                    postId: item.id,
+                    postType: getRequestPostType(item.type),
+                },
+            ],
+        });
+        showReel?.();
+    }, []);
 
     const resultContentContainerStyle = useMemo(
         (): StyleProp<ViewStyle> => ({
@@ -233,18 +237,65 @@ const RecipeTipSearch: FC<RecipeTipSearchParams> = ({
                                 contentContainerStyle={
                                     resultContentContainerStyle
                                 }
+                                showStatus={false}
                             />
                         );
 
                     return (
                         <View className="flex-1 justify-center items-center">
-                            <Text className="text-cgrey-battleship">{BASIC_SEARCH_NO_POST}</Text>
+                            <Text className="text-cgrey-battleship">
+                                {BASIC_SEARCH_NO_POST}
+                            </Text>
                         </View>
                     );
                 })()}
             </View>
         );
     };
+
+    const autocomplete = useCallback(
+        debounce(async (value: string) => {
+            if (searchStringRef.current === "") {
+                setAutocompletePosts([]);
+                return;
+            }
+            if (value !== searchStringRef.current) {
+                return;
+            }
+
+            const result = await searchServices.autocompleteBasicSearch(value);
+            if (result != null && value === searchStringRef.current) {
+                setAutocompletePosts(result);
+            }
+        }, 100),
+        []
+    );
+
+    const onTextChange = useCallback(async (value: string) => {
+        setSearchString(value);
+        searchStringRef.current = value;
+        if (value === "") {
+            setAutocompletePosts([]);
+            return;
+        }
+
+        void autocomplete(value);
+    }, []);
+
+    const onAutoCompleteItemPress = useCallback(
+        async (item: AutocompeletePostResponse) => {
+            setReelParams?.({
+                minimalPosts: [
+                    {
+                        postId: item.id,
+                        postType: item.type,
+                    },
+                ],
+            });
+            showReel?.();
+        },
+        []
+    );
 
     return (
         <>
@@ -266,7 +317,7 @@ const RecipeTipSearch: FC<RecipeTipSearchParams> = ({
                             onFocus={setInputFocusTrue}
                             className="flex-1 text-base"
                             returnKeyType="search"
-                            onChangeText={setSearchString}
+                            onChangeText={onTextChange}
                             value={searchString}
                             onSubmitEditing={onSubmitEditing}
                         ></TextInput>
@@ -332,37 +383,55 @@ const RecipeTipSearch: FC<RecipeTipSearchParams> = ({
                 />
             </View>
             <AutoComplete searchBarRef={searchBarRef} showing={inputFocus}>
-                <View className="rounded-xl border border-cgrey-platinum bg-white overflow-hidden mt-1 py-1">
-                    <TouchableOpacity
-                        className="px-4 py-2 flex-row items-center"
-                        onPress={showAdvancedSearch}
-                    >
-                        <>
-                            <IconFA5
-                                name="search-plus"
-                                size={15}
-                                color={customColors.cgrey.dim}
+                <View className="rounded-xl border border-cgrey-platinum bg-white overflow-hidden mt-1 max-h-[320]">
+                    <FlatList
+                        keyboardShouldPersistTaps="always"
+                        data={autocompletePosts}
+                        renderItem={({ item }) => (
+                            <AutoCompleteItem
+                                item={item}
+                                onItemPressed={onAutoCompleteItemPress}
                             />
-                            <Text className="text-base ml-3 text-cgrey-dim">
-                                {BASIC_SEARCH_ADVANCED_SEARCH_BUTTON}
-                            </Text>
-                        </>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        className="px-4 py-2 flex-row items-center"
-                        onPress={showUserSearch}
-                    >
-                        <>
-                            <IconCommunity
-                                name="chef-hat"
-                                size={15}
-                                color={customColors.cgrey.dim}
-                            />
-                            <Text className="text-base ml-3 text-cgrey-dim">
-                                {BASIC_SEARCH_USER_SEARCH_BUTTON}
-                            </Text>
-                        </>
-                    </TouchableOpacity>
+                        )}
+                        ListHeaderComponent={<View className="h-1" />}
+                        ListFooterComponent={
+                            <>
+                                <TouchableOpacity
+                                    className="px-4 py-2 flex-row items-center"
+                                    onPress={showAdvancedSearch}
+                                >
+                                    <>
+                                        <IconFA5
+                                            name="search-plus"
+                                            size={15}
+                                            color={customColors.cgrey.dim}
+                                        />
+                                        <Text className="text-base ml-3 text-cgrey-dim">
+                                            {
+                                                BASIC_SEARCH_ADVANCED_SEARCH_BUTTON
+                                            }
+                                        </Text>
+                                    </>
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    className="px-4 py-2 flex-row items-center"
+                                    onPress={showUserSearch}
+                                >
+                                    <>
+                                        <IconCommunity
+                                            name="chef-hat"
+                                            size={15}
+                                            color={customColors.cgrey.dim}
+                                        />
+                                        <Text className="text-base ml-3 text-cgrey-dim">
+                                            {BASIC_SEARCH_USER_SEARCH_BUTTON}
+                                        </Text>
+                                    </>
+                                </TouchableOpacity>
+                                <View className="h-1" />
+                            </>
+                        }
+                    />
                 </View>
             </AutoComplete>
             <Modal

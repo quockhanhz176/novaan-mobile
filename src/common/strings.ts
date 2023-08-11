@@ -299,6 +299,8 @@ export const ADVANCED_SEARCH_BRIEF_2 =
 export const BASIC_SEARCH_NO_POST = "Không tìm thấy bài viết nào";
 export const BASIC_SEARCH_ADVANCED_SEARCH_BUTTON = "Tìm kiếm nâng cao";
 export const BASIC_SEARCH_USER_SEARCH_BUTTON = "Tìm kiếm tác giả";
+export const BASIC_SEARCH_RECIPE = "Công thức nấu ăn";
+export const BASIC_SEARCH_TIP = "Mẹo vặt";
 
 // User search
 export const USER_SEARCH_TITLE = "Tìm kiếm người dùng";
@@ -343,4 +345,4 @@ export const HOME_ADVANCED_SEARCH_TITLE = "Tìm kiếm nâng cao";
 export const HOME_ADVANCED_SEARCH_INTRODUCTION =
     "Tìm công thức nấu ăn bạn có thể chuẩn bị chỉ với các nguyên liệu có sẵn?";
 export const HOME_ADVANCED_SEARCH_BUTTON = "Bắt đầu";
-export const HOME_POST_DETAILS_TITLE = "Chi tiết bài viết"
+export const HOME_POST_DETAILS_TITLE = "Chi tiết bài viết";

@@ -297,6 +297,7 @@ const AdvancedSearch: FC<AdvancedSearchParams> = ({
                                 handleOnEndReached={onEndReach}
                                 handleItemPress={searchResultItem}
                                 contentContainerStyle={styles.createdPostList}
+                                showStatus={false}
                             />
                         ) : (
                             <View className="flex-1 justify-center items-center">

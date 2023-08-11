@@ -14,12 +14,14 @@ interface CreatedPostItemProps {
     index: number;
     item: MinimalPostInfo;
     onItemPress: (item: MinimalPostInfo, index: number) => void;
+    showStatus?: boolean;
 }
 
 const CreatedPostItem = ({
     index,
     item,
     onItemPress,
+    showStatus = true,
 }: CreatedPostItemProps): ReactElement<CreatedPostItemProps> => {
     const [imageFailed, setImageFailed] = useState(false);
 
@@ -45,7 +47,7 @@ const CreatedPostItem = ({
                 style={{ width: "90%", position: "relative" }}
                 onPress={onPress}
             >
-                {item.status != null && (
+                {showStatus && item.status != null && (
                     <PostItemStatusOverlay status={item.status} />
                 )}
                 {!imageFailed ? (

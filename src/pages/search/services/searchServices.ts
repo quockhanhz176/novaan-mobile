@@ -17,6 +17,7 @@ import { type MinimalPostInfo } from "@/api/profile/types";
 import type UserSearchResult from "../types/UserSearchResult";
 import followApi from "@/api/follow/FollowApi";
 import { getUserIdFromToken } from "@/api/common/utils/TokenUtils";
+import type AutocompeletePostResponse from "@/api/search/types/AutocompletePostResponse";
 
 const mapCategory = (category: PreferenceCategory): string[] | undefined => {
     const result = category.preferences.flatMap((value) =>
@@ -197,6 +198,13 @@ const setFollow = async (userId: string, value: boolean): Promise<void> => {
     await followApi.setFollow(userId, value);
 };
 
+const autocompleteBasicSearch = async (
+    queryString: string
+): Promise<AutocompeletePostResponse[] | null> => {
+    const result = await searchApi.autocompleteBasicSearch(queryString);
+    return result.success ? result.value : null;
+};
+
 const searchServices = {
     searchPost,
     getPreferences,
@@ -204,6 +212,7 @@ const searchServices = {
     getIngredients,
     searchUser,
     setFollow,
+    autocompleteBasicSearch,
 };
 
 export default searchServices;
