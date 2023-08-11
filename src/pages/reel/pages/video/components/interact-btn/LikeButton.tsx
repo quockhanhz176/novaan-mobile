@@ -1,10 +1,17 @@
-import React, { type ReactElement, useCallback, useContext, memo } from "react";
+import React, {
+    type ReactElement,
+    useCallback,
+    useContext,
+    memo,
+    useMemo,
+} from "react";
 import VideoButton from "../VideoButton";
 import { customColors } from "@root/tailwind.config";
 import numeral from "numeral";
-import { type PostInteraction, usePostInteract } from "@/api/post/PostApiHook";
+import { usePostInteract } from "@/api/post/PostApiHook";
 import { debounce } from "lodash";
 import { ScrollItemContext } from "@/pages/reel/components/scroll-items/ScrollItemv2";
+import { type PostInteraction } from "@/api/post/types/hooks.type";
 
 const LikeButton = (): ReactElement => {
     const { currentUserId, currentPost, likeInfo, handleLike, handleUnlike } =
@@ -29,19 +36,36 @@ const LikeButton = (): ReactElement => {
         [currentPost, currentUserId]
     );
 
-    const handleLikePress = async (liked: boolean): Promise<void> => {
-        liked ? handleUnlike() : handleLike();
+    const handleLikePress = useCallback(async (): Promise<void> => {
+        // Ignore like request when the post is not approved
+        // Approved = 1
+        if (currentPost == null || currentPost.status !== 1) {
+            return;
+        }
+
+        likeInfo.liked ? handleUnlike() : handleLike();
         sendLikeRequest.cancel();
-        await sendLikeRequest(liked);
-    };
+        await sendLikeRequest(likeInfo.liked);
+    }, [likeInfo.liked, currentPost]);
+
+    const buttonColor = useMemo(() => {
+        // Approved = 1
+        if (currentPost == null || currentPost.status !== 1) {
+            return customColors.cgrey.platinum;
+        }
+
+        if (likeInfo.liked) {
+            return customColors.heart;
+        } else {
+            return "white";
+        }
+    }, [likeInfo.liked, currentPost]);
 
     return (
         <VideoButton
             text={numeral(likeInfo.likeCount).format("0 a")}
-            iconColor={likeInfo.liked ? customColors.heart : "white"}
-            onPress={async () => {
-                await handleLikePress(likeInfo.liked);
-            }}
+            iconColor={buttonColor}
+            onPress={handleLikePress}
         />
     );
 };

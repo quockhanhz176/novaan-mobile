@@ -75,6 +75,7 @@ export const CREATE_POST_UPLOAD_TIP_TITLE = "Đăng mẹo vặt";
 
 // Create tip screen
 export const CREATE_TIP_TITLE = "Đăng tải mẹo vặt";
+export const EDIT_TIP_TITLE = "Chỉnh sửa mẹo vặt";
 export const CREATE_TIP_THANKS =
     "Chúng tôi rất vui khi bạn quyết định chia sẻ mẹo vặt của mình với cộng đồng!";
 export const CREATE_TIP_TITLE_LABEL = "Tiêu đề";
@@ -104,6 +105,8 @@ export const CREATE_TIP_PENDING = "Mẹo vặt của bạn đang được tải 
 export const CREATE_TIP_SUCCESS = "Mẹo vặt của bạn đã được đăng tải";
 export const CREATE_TIP_FAILED = "Đã có lỗi xảy ra khi đăng tải mẹo vặt";
 export const CREATE_TIP_FAILED_SECONDARY = "Xin vui lòng thử lại sau";
+export const EDIT_TIP_PENDING = "Mẹo vặt của bạn đang được cập nhật~";
+export const EDIT_TIP_SUCCESS = "Mẹo vặt của bạn đã được chỉnh sửa";
 
 // Create recipe screen
 export const CREATE_RECIPE_TITLE = "Tạo công thức";
@@ -173,11 +176,21 @@ export const CREATE_RECIPE_SUCCESS =
     "Công thức nấu ăn của bạn đã được đăng tải";
 export const CREATE_RECIPE_FAILED =
     "Đã có lỗi xảy ra khi đăng tải công thức nấu ăn";
-export const EDIT_RECIPE_PENDING = "Công thức của bạn đang được cập nhập";
-export const EDIT_RECIPE_SUCCESS = "Công thức nấu ăn của bạn đã được chỉnh sửa";
+export const EDIT_RECIPE_PENDING = "Công thức của bạn đang được cập nhật";
+export const EDIT_RECIPE_SUCCESS = "Công thức của bạn đã được cập nhật";
 export const EDIT_RECIPE_FAILED =
     "Đã có lỗi xảy ra khi chỉnh sửa công thức nấu ăn";
 export const CREATE_RECIPE_FAILED_SECONDARY = "Xin vui lòng thử lại sau";
+export const CREATE_RECIPE_CATEGORY_SUBTITLE =
+    "Giờ hãy thêm một số thông tin thêm để mọi người có thể tìm thấy bài viết của bạn dễ dàng hơn";
+export const CREATE_RECIPE_DIET_SUBTITLE =
+    "Công thức của bạn có liên quan hoặc có thể hỗ trợ cho chế độ ăn nào không? (Không bắt buộc)";
+export const CREATE_RECIPE_MEAL_TYPES_SUBTITLE =
+    "Công thức của bạn có thể thưởng thức tốt nhất vào thời gian nào trong ngày? (Không bắt buộc)";
+export const CREATE_RECIPE_CUISINE_SUBTITLE =
+    "Công thức của bạn bắt nguồn từ nền ẩm thực nào? (Không bắt buộc)";
+export const CREATE_RECIPE_ALLERGEN_SUBTITLE =
+    "Công thức của bạn có chứa những thành phần thường gây dị ứng nào không? (Không bắt buộc)";
 
 // Add ingredient screen
 export const ADD_INGREDIENT_TITLE = "Thêm nguyên liệu";
@@ -217,7 +230,7 @@ export const PROFILE_EMPTY_RECIPE = "Oops, phần này chưa có công thức n�
 export const PROFILE_EMPTY_TIPS = "Oops, phần này chưa có mẹo vặt nào cả";
 export const PROFILE_EMPTY_FOLLOWING = "Oops, bạn chưa theo dõi ai cả";
 export const PROFILE_PAGE_LABEL = "Trang cá nhân";
-export const PROFILE_UPDATE_PREF = "Cập nhập sở thích";
+export const PROFILE_UPDATE_PREF = "cập nhật chế độ ăn";
 export const PROFILE_LOGOUT = "Đăng xuất";
 export const PROFILE_EDIT_POST = "Chỉnh sửa bài viết";
 export const PROFILE_DELETE_POST = "Xóa bài viết";
@@ -329,8 +342,8 @@ export const SET_PREF_ALLERGEN_GUIDE =
     "Cuối cùng, hãy lựa chọn những thực phẩm có thể gây dị ứng hoặc không phù hợp với bạn để app có thể hạn chế mốt số công thức";
 
 export const SET_PREF_FAILED =
-    "Cập nhập không thành công. Vui lòng thử lại sau";
-export const SET_PREF_SUCCESS = "Sở thích của bạn đã được cập nhập";
+    "cập nhật không thành công. Vui lòng thử lại sau";
+export const SET_PREF_SUCCESS = "Chế độ ăn của bạn đã được cập nhật";
 
 // Home
 export const HOME_LIKE_COUNT = "lượt thích";

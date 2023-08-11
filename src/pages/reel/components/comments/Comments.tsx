@@ -55,8 +55,10 @@ const Comments = ({
     const [addEditVisible, hideAddEdit, showAddEdit] = useBooleanHook();
     const [commentMenuVisible, hideCommentMenu, showCommentMenu] =
         useBooleanHook();
-    const [reportMenuVisible, hideReportMenu, showReportMenu] = useBooleanHook();
-    const [reportFormVisible, hideReportForm, showReportForm] = useBooleanHook();
+    const [reportMenuVisible, hideReportMenu, showReportMenu] =
+        useBooleanHook();
+    const [reportFormVisible, hideReportForm, showReportForm] =
+        useBooleanHook();
 
     const [selectedComment, setSelectedComment] =
         useState<Undefinable<string>>(undefined);
@@ -192,13 +194,7 @@ const Comments = ({
     };
 
     const renderItem = useCallback(
-        ({
-            item,
-            currentUserId,
-        }: {
-            item: PostComment;
-            currentUserId: string;
-        }) => {
+        ({ item }: { item: PostComment }) => {
             if (item.userId === currentUserId) {
                 return <View></View>;
             }
@@ -210,7 +206,7 @@ const Comments = ({
                 />
             );
         },
-        []
+        [currentUserId]
     );
 
     return (
@@ -254,9 +250,7 @@ const Comments = ({
                         />
                     }
                     ListHeaderComponentStyle={{ flex: 1 }}
-                    renderItem={({ item }) =>
-                        renderItem({ item, currentUserId })
-                    }
+                    renderItem={renderItem}
                     extraData={userComment}
                 />
             </View>

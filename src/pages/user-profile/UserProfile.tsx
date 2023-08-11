@@ -153,7 +153,7 @@ const UserProfile = ({
         return <OverlayLoading />;
     }
 
-    const { username, followersCount } = profileInfo;
+    const { username, followersCount, avatar } = profileInfo;
 
     return (
         <View className="flex-1 bg-white">
@@ -169,7 +169,7 @@ const UserProfile = ({
                     )}
                 </View>
                 <View className="flex-row justify-start">
-                    <Text className="text-cprimary-300 text-lg font-semibold">
+                    <Text className="text-lg font-semibold">
                         {isUserProfile ? PROFILE_PAGE_LABEL : username}
                     </Text>
                 </View>
@@ -182,11 +182,7 @@ const UserProfile = ({
                                 hitSlop={5}
                                 delayPressIn={0}
                             >
-                                <MaterialCIcon
-                                    name="hamburger"
-                                    size={24}
-                                    color={customColors.cprimary["300"]}
-                                />
+                                <MaterialCIcon name="hamburger" size={24} />
                             </TouchableOpacity>
                             <CustomModal
                                 visible={profileSettingOpen}
@@ -199,17 +195,15 @@ const UserProfile = ({
                 </View>
             </View>
             <View className="mx-6 mt-6 flex-row items-start justify-start">
-                <Avatar.Text
+                <Avatar.Image
                     size={64}
                     style={{
                         backgroundColor: customColors.cprimary["300"],
                     }}
-                    label="XD"
+                    source={{ uri: avatar }}
                 />
                 <View className="flex-1 items-start mx-4">
-                    <Text className="text-lg font-semibold text-cprimary-300">
-                        {username}
-                    </Text>
+                    <Text className="text-lg font-semibold">{username}</Text>
                 </View>
             </View>
             <View className="mx-6 mt-6 flex-row justify-between">

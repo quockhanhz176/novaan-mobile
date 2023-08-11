@@ -19,6 +19,7 @@ import type Ingredient from "./Ingredient";
 import type Instruction from "./Instruction";
 import type RecipeTime from "./RecipeTime";
 import { type Setter } from "@/common/utils";
+import { type PreferenceObj } from "./PreferenceObj";
 
 export interface AdditionalRecipeInformation {
     difficulty: number;
@@ -28,6 +29,10 @@ export interface AdditionalRecipeInformation {
     cookTime: RecipeTime;
     instructions: Instruction[];
     ingredients: Ingredient[];
+    diets: PreferenceObj;
+    mealTypes: PreferenceObj;
+    cuisines: PreferenceObj;
+    allergens: PreferenceObj;
 }
 
 export type RecipeStates = TDVStates &
@@ -37,11 +42,9 @@ export type RecipeStates = TDVStates &
 export const recipeInformationContext = React.createContext<RecipeStates>({
     isEditing: false,
     title: "",
-    setTitle: () => {},
     description: "",
-    setDescription: () => {},
     video: null,
-    setVideo: () => {},
+    thumbnail: null,
     difficulty: 0,
     portionQuantity: 0,
     portionType: 0,
@@ -49,6 +52,14 @@ export const recipeInformationContext = React.createContext<RecipeStates>({
     cookTime: { hour: 0, minute: 0 },
     instructions: [],
     ingredients: [],
+    diets: {},
+    mealTypes: {},
+    cuisines: {},
+    allergens: {},
+    setTitle: () => {},
+    setDescription: () => {},
+    setVideo: () => {},
+    setThumbnail: () => {},
     setDifficulty: () => {},
     setPortionQuantity: () => {},
     setPortionType: () => {},
@@ -56,6 +67,10 @@ export const recipeInformationContext = React.createContext<RecipeStates>({
     setCookTime: () => {},
     setInstructions: () => {},
     setIngredients: () => {},
+    setDiets: () => {},
+    setMealTypes: () => {},
+    setCuisines: () => {},
+    setAllergens: () => {},
 });
 
 const createRecipeTDVLabels: TDVParams<RecipeStates>["labels"] = {

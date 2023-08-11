@@ -28,6 +28,9 @@ export type RecipeTabParamList = {
     PortionDificultyTime: undefined;
     Ingredients: undefined;
     Instructions: undefined;
+    DietMealType: undefined;
+    Cuisine: undefined;
+    Allergen: undefined;
 };
 
 export type IngredientStackParamList = {

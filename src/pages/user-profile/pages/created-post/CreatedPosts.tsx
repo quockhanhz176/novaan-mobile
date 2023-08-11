@@ -29,6 +29,7 @@ import PostSettingMenu from "./components/PostSettingMenu";
 import { useNavigation } from "@react-navigation/native";
 import { type RootStackParamList } from "@/types/navigation";
 import { type NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { type MinimalPostInfo } from "@/api/profile/types";
 
 type ViewCategory = "recipe" | "tips";
 
@@ -39,11 +40,38 @@ const CreatedPosts = (): ReactElement => {
         content: recipes,
         ended: recipesEnded,
     } = useUserRecipes(userProfileContext.userInfo?.userId);
+
     const {
         getNext: getNextTips,
         content: tips,
         ended: tipsEnded,
     } = useUserTips(userProfileContext.userInfo?.userId);
+
+    const formatRecipes: MinimalPostInfo[] = useMemo(() => {
+        if (recipes.length === 0) {
+            return [];
+        }
+
+        return recipes.map(
+            (recipe): MinimalPostInfo => ({
+                ...recipe,
+                type: recipe.type === "Recipe" ? "recipe" : "tip",
+            })
+        );
+    }, [recipes]);
+
+    const formatTips: MinimalPostInfo[] = useMemo(() => {
+        if (tips.length === 0) {
+            return [];
+        }
+
+        return tips.map(
+            (tip): MinimalPostInfo => ({
+                ...tip,
+                type: tip.type === "Recipe" ? "recipe" : "tip",
+            })
+        );
+    }, [tips]);
 
     const [viewingItem, setViewingItem] = useState(false);
     const [viewItem, setViewItem] =
@@ -210,7 +238,7 @@ const CreatedPosts = (): ReactElement => {
                 ) : (
                     <CreatedPostList
                         hidden={viewCategory !== "recipe"}
-                        data={recipes}
+                        data={formatRecipes}
                         loading={fetching}
                         handleItemPress={handleItemPress}
                         handleOnEndReached={fetchMorePost}
@@ -224,7 +252,7 @@ const CreatedPosts = (): ReactElement => {
                 ) : (
                     <CreatedPostList
                         hidden={viewCategory !== "tips"}
-                        data={tips}
+                        data={formatTips}
                         loading={fetching}
                         handleItemPress={handleItemPress}
                         handleOnEndReached={fetchMorePost}

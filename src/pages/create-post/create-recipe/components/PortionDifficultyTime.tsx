@@ -27,6 +27,7 @@ const PortionDificultyTime: FC<TitleDescriptionVideoProps> = (
     props: TitleDescriptionVideoProps
 ) => {
     const {
+        isEditing,
         cookTime,
         prepTime,
         portionQuantity,
@@ -58,28 +59,34 @@ const PortionDificultyTime: FC<TitleDescriptionVideoProps> = (
     );
 
     const labelClassName = "text-base font-medium uppercase";
+
     const setQuantity = (value: string): void => {
         if (value === "") {
             value = "0";
         }
         setPortionQuantity(parseFloat(value));
     };
+
     const setCookHour = (value: number): void => {
         cookTime.hour = value;
         setCookTime(cookTime);
     };
+
     const setCookMinute = (value: number): void => {
         cookTime.minute = value;
         setCookTime(cookTime);
     };
+
     const setPrepHour = (value: number): void => {
         prepTime.hour = value;
         setPrepTime(prepTime);
     };
+
     const setPrepMinute = (value: number): void => {
         prepTime.minute = value;
         setPrepTime(prepTime);
     };
+
     const toNumber = (value: string): number => {
         let numberValue = parseFloat(value);
         if (Number.isNaN(numberValue)) {
@@ -87,26 +94,33 @@ const PortionDificultyTime: FC<TitleDescriptionVideoProps> = (
         }
         return numberValue;
     };
+
     const onDifficultyChange = (value: string): void => {
         setDifficulty(toNumber(value));
     };
+
     const onPortionTypeChange = (value: string): void => {
         setPortionType(toNumber(value));
     };
 
     return (
         <ScrollView className="flex-1 bg-white">
-            <Text className="text-base p-5 bg-ctertiary">
-                {CREATE_RECIPE_PDT_SUBTITLE}
-            </Text>
+            {!isEditing && (
+                <Text className="text-base p-5 bg-ctertiary">
+                    {CREATE_RECIPE_PDT_SUBTITLE}
+                </Text>
+            )}
             <View className="px-3 py-7">
                 <Text className={labelClassName}>
                     {CREATE_RECIPE_PORTION_TITLE}
                     <WarningAsterisk />
                 </Text>
-                <View className="z-[4000] flex-row space-x-2 justify-center mt-2 px-20">
+                <View className="z-10 flex-row space-x-2 justify-center mt-2 px-20">
                     <TextInput
-                        value={String(portionQuantity)}
+                        value={
+                            portionQuantity === 0 ? "" : String(portionQuantity)
+                        }
+                        placeholder="0"
                         keyboardType="decimal-pad"
                         textAlign={"center"}
                         className="text-base flex-1 py-2 border-cgrey-platinum bg-cgrey-seasalt rounded-md border-b"

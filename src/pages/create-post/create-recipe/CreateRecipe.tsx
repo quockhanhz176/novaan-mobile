@@ -1,5 +1,11 @@
 import { type NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { type ReactElement, useState, useMemo, useEffect } from "react";
+import {
+    type ReactElement,
+    useState,
+    useMemo,
+    useEffect,
+    useCallback,
+} from "react";
 import { Bar } from "react-native-progress";
 import React, { Text, TouchableOpacity, View } from "react-native";
 import IconEvill from "react-native-vector-icons/EvilIcons";
@@ -10,6 +16,7 @@ import {
     CREATE_RECIPE_PREVIOUS_STEP_BUTTON_TITLE,
     CREATE_RECIPE_SUBMIT,
     CREATE_RECIPE_TITLE,
+    EDIT_RECIPE_PENDING,
     EDIT_RECIPE_SUBMIT,
     EDIT_RECIPE_TITLE,
 } from "@/common/strings";
@@ -42,6 +49,13 @@ import { useSWRConfig } from "swr";
 import { useResourceUrl } from "@/api/utils/resourceHooks";
 import type Instruction from "./types/Instruction";
 import { getUserRecipesUrl } from "@/api/profile/ProfileApi";
+import DietMealType from "./components/DietMealType";
+import Cuisines from "./components/Cuisines";
+import Allergens from "./components/Allergens";
+import OverlayLoading from "@/common/components/OverlayLoading";
+import { type PreferenceObj } from "./types/PreferenceObj";
+import Toast from "react-native-toast-message";
+import { getUserIdFromToken } from "@/api/common/utils/TokenUtils";
 
 interface CreateRecipeProps {
     navigation: NativeStackNavigationProp<RootStackParamList, "CreateTip">;
@@ -60,9 +74,10 @@ const CreateRecipe = ({
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [video, setVideo] = useState<Asset | null>(null);
+    const [thumbnail, setThumbnail] = useState<string | null>(null);
     const [difficulty, setDifficulty] = useState(-1);
     const [portionQuantity, setPortionQuantity] = useState(0);
-    const [portionType, setPortionType] = useState(-1);
+    const [portionType, setPortionType] = useState(0);
     const [prepTime, setPrepTime] = useState({ hour: 0, minute: 0 });
     const [cookTime, setCookTime] = useState({ hour: 0, minute: 0 });
     const [instructions, setInstructions] = useState<
@@ -71,7 +86,15 @@ const CreateRecipe = ({
     const [ingredients, setIngredients] = useState<RecipeStates["ingredients"]>(
         []
     );
+
+    const [diets, setDiets] = useState<PreferenceObj>({});
+    const [mealTypes, setMealTypes] = useState<PreferenceObj>({});
+    const [cuisines, setCuisines] = useState<PreferenceObj>({});
+    const [allergens, setAllergens] = useState<PreferenceObj>({});
+
     const [currentScreen, setCurrentScreen] = useState(0);
+
+    const [isLoading, setIsLoading] = useState(true);
 
     const { postInfo, fetchPostInfo } = usePostInfo();
     const { fetchUrl } = useResourceUrl();
@@ -79,19 +102,17 @@ const CreateRecipe = ({
     const { mutate } = useSWRConfig();
 
     const isEditing: boolean = useMemo(
-        () => route.params?.postId == null,
+        () => route.params?.postId != null,
         [route.params]
     );
 
     useEffect(() => {
         if (route.params?.postId == null) {
+            setIsLoading(false);
             return;
         }
 
-        void fetchPostInfo(
-            { postId: route.params.postId, postType: "Recipe" },
-            false
-        );
+        void fetchPostInfo({ postId: route.params.postId, postType: "Recipe" });
     }, []);
 
     const setEditPost = async (): Promise<void> => {
@@ -106,6 +127,7 @@ const CreateRecipe = ({
         const {
             title,
             description,
+            thumbnail,
             difficulty,
             portionType,
             portionQuantity,
@@ -113,15 +135,56 @@ const CreateRecipe = ({
             cookTime,
             instructions,
             ingredients,
+            diets = [],
+            mealTypes = [],
+            cuisines = [],
+            allergens = [],
         } = postInfo;
+
+        const thumbnailUrl = await fetchUrl(thumbnail);
 
         setTitle(title);
         setDescription(description);
+        setThumbnail(thumbnailUrl ?? null);
         setDifficulty(difficulty);
         setPortionType(portionType);
         setPortionQuantity(portionQuantity);
         setPrepTime(prepTime);
         setCookTime(cookTime);
+
+        setDiets(
+            diets.reduce((acc: PreferenceObj, curr: string): PreferenceObj => {
+                acc[curr] = true;
+                return acc;
+            }, {})
+        );
+        setMealTypes(
+            mealTypes.reduce(
+                (acc: PreferenceObj, curr: string): PreferenceObj => {
+                    acc[curr] = true;
+                    return acc;
+                },
+                {}
+            )
+        );
+        setCuisines(
+            cuisines.reduce(
+                (acc: PreferenceObj, curr: string): PreferenceObj => {
+                    acc[curr] = true;
+                    return acc;
+                },
+                {}
+            )
+        );
+        setAllergens(
+            allergens.reduce(
+                (acc: PreferenceObj, curr: string): PreferenceObj => {
+                    acc[curr] = true;
+                    return acc;
+                },
+                {}
+            )
+        );
 
         setIngredients(
             ingredients.map((ingre, index) => ({ ...ingre, id: index }))
@@ -147,6 +210,7 @@ const CreateRecipe = ({
         );
 
         setInstructions(formattedInstruction);
+        setIsLoading(false);
     };
 
     useEffect(() => {
@@ -158,7 +222,11 @@ const CreateRecipe = ({
         PortionDificultyTime: undefined,
         Ingredients: undefined,
         Instructions: undefined,
+        DietMealType: undefined,
+        Cuisine: undefined,
+        Allergen: undefined,
     };
+
     const screens = Object.keys(paramList);
     const progressStep = 1 / screens.length;
 
@@ -181,6 +249,7 @@ const CreateRecipe = ({
                     title,
                     description,
                     video,
+                    thumbnail,
                     difficulty,
                     portionQuantity,
                     portionType,
@@ -188,58 +257,83 @@ const CreateRecipe = ({
                     cookTime,
                     ingredients,
                     instructions,
+                    diets,
+                    mealTypes,
+                    cuisines,
+                    allergens,
                 },
                 () => {
                     navigateBack();
                 }
             );
-            return;
-        }
+        } else {
+            if (postInfo == null) {
+                return;
+            }
 
-        if (postInfo == null) {
-            return;
+            await handleRecipeEdit(
+                postInfo.id,
+                postInfo.video,
+                postInfo.thumbnail,
+                {
+                    title,
+                    description,
+                    video,
+                    thumbnail,
+                    difficulty,
+                    portionQuantity,
+                    portionType,
+                    prepTime,
+                    cookTime,
+                    ingredients,
+                    instructions,
+                    diets,
+                    mealTypes,
+                    cuisines,
+                    allergens,
+                },
+                () => {
+                    Toast.show({ type: "info", text1: EDIT_RECIPE_PENDING });
+                    navigateBack();
+                }
+            );
         }
-
-        await handleRecipeEdit(postInfo.id, postInfo.video, {
-            title,
-            description,
-            video,
-            difficulty,
-            portionQuantity,
-            portionType,
-            prepTime,
-            cookTime,
-            ingredients,
-            instructions,
-        });
 
         // Revalidate data and navigate back
+        const currentUserId = await getUserIdFromToken();
         await mutate(
             // Only creator can edit their own post so it's safe to assume currentUserId === postInfo.creator.userId
             (key) =>
                 Array.isArray(key) &&
-                key[0] === getUserRecipesUrl(postInfo.creator.userId)
+                key[0] === getUserRecipesUrl(currentUserId)
         );
-        navigateBack();
     };
 
-    const goNextScreen = (): void => {
+    const goNextScreen = useCallback((): void => {
         if (currentScreen < screens.length - 1) {
             recipeTabRef.navigate(screens[currentScreen + 1] as any);
             setCurrentScreen((prevScreen) => prevScreen + 1);
         }
-    };
+    }, [recipeTabRef, currentScreen]);
 
-    const goPreviousScreen = (): void => {
+    const goPreviousScreen = useCallback((): void => {
         if (currentScreen > 0) {
             recipeTabRef.navigate(screens[currentScreen - 1] as any);
             setCurrentScreen((prevScreen) => prevScreen - 1);
         }
-    };
+    }, [recipeTabRef, currentScreen]);
 
     const exit = (): void => {
         rootNavigation.pop();
     };
+
+    if (isLoading) {
+        return (
+            <View className="flex-1">
+                <OverlayLoading />
+            </View>
+        );
+    }
 
     return (
         <View className="flex-1">
@@ -253,7 +347,7 @@ const CreateRecipe = ({
                         <IconEvill name="close" size={25} color="#000" />
                     </TouchableOpacity>
                     <Text className="text-xl font-medium">
-                        {isEditing ? CREATE_RECIPE_TITLE : EDIT_RECIPE_TITLE}
+                        {isEditing ? EDIT_RECIPE_TITLE : CREATE_RECIPE_TITLE}
                     </Text>
                 </View>
                 <TouchableOpacity
@@ -268,7 +362,7 @@ const CreateRecipe = ({
                         size={18}
                     />
                     <Text className="text-sm font-semibold text-cprimary-500">
-                        {isEditing ? CREATE_RECIPE_SUBMIT : EDIT_RECIPE_SUBMIT}
+                        {isEditing ? EDIT_RECIPE_SUBMIT : CREATE_RECIPE_SUBMIT}
                     </Text>
                 </TouchableOpacity>
             </View>
@@ -290,6 +384,8 @@ const CreateRecipe = ({
                     setDescription,
                     video,
                     setVideo,
+                    thumbnail,
+                    setThumbnail,
                     difficulty,
                     setDifficulty,
                     portionType,
@@ -304,6 +400,14 @@ const CreateRecipe = ({
                     setIngredients,
                     instructions,
                     setInstructions,
+                    diets,
+                    setDiets,
+                    mealTypes,
+                    setMealTypes,
+                    cuisines,
+                    setCuisines,
+                    allergens,
+                    setAllergens,
                 }}
             >
                 <NavigationContainer independent={true} ref={recipeTabRef}>
@@ -333,6 +437,15 @@ const CreateRecipe = ({
                             name="Instructions"
                             component={ViewInstruction}
                         />
+                        <RecipeTab.Screen
+                            name="DietMealType"
+                            component={DietMealType}
+                        />
+                        <RecipeTab.Screen name="Cuisine" component={Cuisines} />
+                        <RecipeTab.Screen
+                            name="Allergen"
+                            component={Allergens}
+                        />
                     </RecipeTab.Navigator>
                 </NavigationContainer>
             </recipeInformationContext.Provider>
@@ -343,10 +456,11 @@ const CreateRecipe = ({
             >
                 <TouchableOpacity
                     className={
-                        bottomNavButtonClassName +
-                        " border-2 border-cprimary-500"
+                        bottomNavButtonClassName + " border border-cprimary-500"
                     }
+                    delayPressIn={0}
                     onPress={goPreviousScreen}
+                    activeOpacity={0.6}
                 >
                     <IconAnt
                         name="arrowleft"

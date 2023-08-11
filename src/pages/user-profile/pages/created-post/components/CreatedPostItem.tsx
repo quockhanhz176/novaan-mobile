@@ -1,5 +1,5 @@
 import { type MinimalPostInfo } from "@/api/profile/types";
-import React, { memo, useState, type ReactElement } from "react";
+import React, { memo, useState, type ReactElement, useEffect } from "react";
 import {
     type ImageErrorEventData,
     type NativeSyntheticEvent,
@@ -9,6 +9,7 @@ import { Card } from "react-native-paper";
 import MaterialCIcon from "react-native-vector-icons/MaterialCommunityIcons";
 import PostItemStatusOverlay from "./PostItemStatusOverlay";
 import { customColors } from "@root/tailwind.config";
+import { useFetchResourceUrl } from "@/api/utils/resourceHooks";
 
 interface CreatedPostItemProps {
     index: number;
@@ -23,7 +24,16 @@ const CreatedPostItem = ({
     onItemPress,
     showStatus = true,
 }: CreatedPostItemProps): ReactElement<CreatedPostItemProps> => {
+    const { fetchUrl, resourceUrl } = useFetchResourceUrl();
+
     const [imageFailed, setImageFailed] = useState(false);
+
+    useEffect(() => {
+        if (item.thumbnail == null || item.thumbnail === "") {
+            return;
+        }
+        void fetchUrl(item.thumbnail);
+    }, []);
 
     const handleError = (
         e: NativeSyntheticEvent<ImageErrorEventData>
@@ -50,16 +60,7 @@ const CreatedPostItem = ({
                 {showStatus && item.status != null && (
                     <PostItemStatusOverlay status={item.status} />
                 )}
-                {!imageFailed ? (
-                    <Card.Cover
-                        source={{
-                            // TODO: Replace with thumbnail later
-                            uri: item.title,
-                        }}
-                        onError={handleError}
-                        theme={{ roundness: 4 }}
-                    />
-                ) : (
+                {imageFailed || resourceUrl == null || resourceUrl === "" ? (
                     <View
                         className="justify-center items-center bg-gray-200 rounded-t-lg"
                         style={{ height: 195, minHeight: 195 }}
@@ -70,6 +71,14 @@ const CreatedPostItem = ({
                             color={customColors.cgrey.grey}
                         />
                     </View>
+                ) : (
+                    <Card.Cover
+                        source={{
+                            uri: resourceUrl,
+                        }}
+                        onError={handleError}
+                        theme={{ roundness: 4 }}
+                    />
                 )}
                 <Card.Title
                     title={item.title}

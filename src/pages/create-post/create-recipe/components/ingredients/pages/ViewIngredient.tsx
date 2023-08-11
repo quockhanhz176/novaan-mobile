@@ -1,4 +1,9 @@
-import React, { useContext, type ReactElement, useState } from "react";
+import React, {
+    useContext,
+    type ReactElement,
+    useState,
+    useCallback,
+} from "react";
 import { View, Text, TouchableOpacity, FlatList } from "react-native";
 import { recipeInformationContext } from "../../../types/RecipeParams";
 import type Ingredient from "../../../types/Ingredient";
@@ -15,7 +20,7 @@ import AddIngredient from "./AddIngredient";
 import { type Undefinable } from "@/types/app";
 
 const ViewIngredients = (): ReactElement => {
-    const { ingredients, setIngredients } = useContext(
+    const { isEditing, ingredients, setIngredients } = useContext(
         recipeInformationContext
     );
 
@@ -52,6 +57,20 @@ const ViewIngredients = (): ReactElement => {
         setShowAddIngredient(false);
     };
 
+    const renderItem = useCallback(({ item }: { item: Ingredient }) => {
+        return (
+            <IngredientItem
+                ingredient={item}
+                onDeletePress={() => {
+                    deleteIngredient(item.id);
+                }}
+                onEditPress={() => {
+                    openEditIngredient(item);
+                }}
+            />
+        );
+    }, []);
+
     return (
         <>
             <FlatList
@@ -59,9 +78,11 @@ const ViewIngredients = (): ReactElement => {
                 className="bg-white"
                 ListHeaderComponent={
                     <View>
-                        <Text className="text-base p-5 bg-ctertiary">
-                            {CREATE_RECIPE_INGREDIENTS_SUBTITLE}
-                        </Text>
+                        {!isEditing && (
+                            <Text className="text-base p-5 bg-ctertiary">
+                                {CREATE_RECIPE_INGREDIENTS_SUBTITLE}
+                            </Text>
+                        )}
                         <Text className={labelClassName + " mt-6 mx-3"}>
                             {CREATE_RECIPE_INGREDIENTS_TITLE}
                             <WarningAsterisk />
@@ -90,17 +111,7 @@ const ViewIngredients = (): ReactElement => {
                     ) : null
                 }
                 data={ingredients}
-                renderItem={({ item }) => (
-                    <IngredientItem
-                        ingredient={item}
-                        onDeletePress={() => {
-                            deleteIngredient(item.id);
-                        }}
-                        onEditPress={() => {
-                            openEditIngredient(item);
-                        }}
-                    />
-                )}
+                renderItem={renderItem}
                 keyExtractor={(item) => item.id.toString()}
                 extraData={refreshIndicator}
             />

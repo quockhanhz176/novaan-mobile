@@ -1,4 +1,10 @@
-import React, { useRef, useState, type ReactElement, useContext } from "react";
+import React, {
+    useRef,
+    useState,
+    type ReactElement,
+    useContext,
+    useCallback,
+} from "react";
 import { View, Text, TouchableOpacity, FlatList } from "react-native";
 import {
     CREATE_RECIPE_INSTRUCTIONS_SUBTITLE,
@@ -15,7 +21,7 @@ import { type Undefinable } from "@/types/app";
 import AddInstruction from "./AddInstruction";
 
 const ViewInstruction = (): ReactElement => {
-    const { instructions, setInstructions } = useContext(
+    const { isEditing, instructions, setInstructions } = useContext(
         recipeInformationContext
     );
     const [refreshIndicator, setRefreshIndicator] = useState(false);
@@ -60,6 +66,20 @@ const ViewInstruction = (): ReactElement => {
         setShowAddInstruction(false);
     };
 
+    const renderItem = useCallback(({ item }: { item: Instruction }) => {
+        return (
+            <InstructionItem
+                instruction={item}
+                onDeletePress={() => {
+                    deleteInstruction(item.id);
+                }}
+                onEditPress={() => {
+                    openEditInstruction(item);
+                }}
+            />
+        );
+    }, []);
+
     return (
         <>
             <FlatList
@@ -67,9 +87,11 @@ const ViewInstruction = (): ReactElement => {
                 className="bg-white"
                 ListHeaderComponent={
                     <View>
-                        <Text className="text-base p-5 bg-ctertiary ">
-                            {CREATE_RECIPE_INSTRUCTIONS_SUBTITLE}
-                        </Text>
+                        {!isEditing && (
+                            <Text className="text-base p-5 bg-ctertiary ">
+                                {CREATE_RECIPE_INSTRUCTIONS_SUBTITLE}
+                            </Text>
+                        )}
                         <Text className={labelClassName + " mt-6 mx-3"}>
                             {CREATE_RECIPE_INSTRUCTIONS_TITLE}
                             <WarningAsterisk />
@@ -98,17 +120,7 @@ const ViewInstruction = (): ReactElement => {
                     ) : null
                 }
                 data={instructions}
-                renderItem={({ item }) => (
-                    <InstructionItem
-                        instruction={item}
-                        onDeletePress={() => {
-                            deleteInstruction(item.id);
-                        }}
-                        onEditPress={() => {
-                            openEditInstruction(item);
-                        }}
-                    />
-                )}
+                renderItem={renderItem}
                 keyExtractor={(item) => item.id.toString()}
                 extraData={refreshIndicator}
             />

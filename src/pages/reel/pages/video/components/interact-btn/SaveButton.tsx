@@ -1,10 +1,17 @@
-import React, { type ReactElement, useCallback, useContext, memo } from "react";
+import React, {
+    type ReactElement,
+    useCallback,
+    useContext,
+    memo,
+    useMemo,
+} from "react";
 import VideoButton from "../VideoButton";
 import { REEL_VIDEO_SAVE } from "@/common/strings";
 import { customColors } from "@root/tailwind.config";
-import { type PostInteraction, usePostInteract } from "@/api/post/PostApiHook";
+import { usePostInteract } from "@/api/post/PostApiHook";
 import { debounce } from "lodash";
 import { ScrollItemContext } from "@/pages/reel/components/scroll-items/ScrollItemv2";
+import { type PostInteraction } from "@/api/post/types/hooks.type";
 
 const SaveButton = (): ReactElement => {
     const { currentPost, currentUserId, saved, handleSave, handleUnsave } =
@@ -35,27 +42,35 @@ const SaveButton = (): ReactElement => {
         [currentPost, currentUserId]
     );
 
-    const handleSavePost = useCallback(
-        async (saved: boolean): Promise<void> => {
-            if (currentPost == null) {
-                return;
-            }
+    const handleSavePost = useCallback(async (): Promise<void> => {
+        if (currentPost == null || currentPost.status !== 1) {
+            return;
+        }
 
-            saved ? handleUnsave() : handleSave();
-            sendSaveRequest.cancel();
-            await sendSaveRequest(saved);
-        },
-        []
-    );
+        saved ? handleUnsave() : handleSave();
+        sendSaveRequest.cancel();
+        await sendSaveRequest(saved);
+    }, [saved, currentPost]);
+
+    const buttonColor = useMemo(() => {
+        // Approved = 1
+        if (currentPost == null || currentPost.status !== 1) {
+            return customColors.cgrey.platinum;
+        }
+
+        if (saved) {
+            return customColors.save;
+        } else {
+            return "white";
+        }
+    }, [saved, currentPost]);
 
     return (
         <VideoButton
             icon="md-bookmark"
             text={REEL_VIDEO_SAVE}
-            onPress={async () => {
-                await handleSavePost(saved);
-            }}
-            iconColor={saved ? customColors.save : "white"}
+            onPress={handleSavePost}
+            iconColor={buttonColor}
         />
     );
 };

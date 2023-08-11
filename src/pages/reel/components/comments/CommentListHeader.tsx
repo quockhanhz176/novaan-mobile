@@ -1,4 +1,4 @@
-import React, { memo, type ReactElement } from "react";
+import React, { memo, useContext, type ReactElement } from "react";
 import type PostComment from "../../types/PostComment";
 import ResourceImage from "@/common/components/ResourceImage";
 import { REEL_COMMENTS_BUTTON_TITLE } from "@/common/strings";
@@ -6,6 +6,7 @@ import { View, TouchableOpacity, Text } from "react-native";
 import { Divider } from "react-native-paper";
 import CommentItem from "./CommentItem";
 import IconFeather from "react-native-vector-icons/Feather";
+import { ScrollItemContext } from "../scroll-items/ScrollItemv2";
 
 interface CommentListHeaderProps {
     userComment?: PostComment;
@@ -18,6 +19,8 @@ const CommentListHeader = ({
     showAddEdit,
     showCommentMenu,
 }: CommentListHeaderProps): ReactElement<CommentListHeaderProps> => {
+    const { currentPost } = useContext(ScrollItemContext);
+
     if (userComment === undefined) {
         return (
             <View className="flex-1">
@@ -31,6 +34,9 @@ const CommentListHeader = ({
                     <TouchableOpacity
                         className="grow bg-cgrey-whitesmoke rounded-lg p-2 justify-center"
                         onPress={showAddEdit}
+                        disabled={
+                            currentPost == null || currentPost.status !== 1
+                        }
                     >
                         <Text className="text-cgrey-grey">
                             {REEL_COMMENTS_BUTTON_TITLE}

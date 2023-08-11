@@ -9,17 +9,14 @@ import {
     type UserPreferences,
     type UseUserPreferencesReturn,
 } from "./types";
-import {
-    type TipResponse,
-    type RecipeResponse,
-} from "../post/types/PostResponse";
 import { type PaginationHookReturn } from "../common/types/PaginationHook";
 import { getUserIdFromToken } from "../common/utils/TokenUtils";
-import type PreferenceSuiteResponse from "../search/types/PreferenceSuiteResponse";
 import { responseObjectValid } from "../common/utils/ResponseUtils";
 import type PreferenceResponse from "../search/types/PreferenceResponse";
 import { getData, storeData } from "@/common/AsyncStorageService";
 import moment from "moment";
+import { type AllPreferenceResponse } from "./types/preference.type";
+import { type MinimalPostResponse } from "../post/types/PostListResponse";
 
 const PAGE_SIZE = 4;
 
@@ -166,7 +163,7 @@ const useGetUserContentSwr = <T,>(
             return;
         }
 
-        if (data.length === 0 || data.length < PAGE_SIZE) {
+        if (data.length === 0 || data.length < PAGE_SIZE * (currentPage + 1)) {
             setEnded(true);
         }
         setContent(data);
@@ -211,20 +208,20 @@ export const getUserSavedUrl = (userId: string): string => {
 
 export const useUserRecipes = (
     userId?: string
-): PaginationHookReturn<RecipeResponse> => {
-    return useGetUserContentSwr<RecipeResponse>(getUserRecipesUrl, userId);
+): PaginationHookReturn<MinimalPostResponse> => {
+    return useGetUserContentSwr<MinimalPostResponse>(getUserRecipesUrl, userId);
 };
 
 export const useUserTips = (
     userId?: string
-): PaginationHookReturn<TipResponse> => {
-    return useGetUserContentSwr<TipResponse>(getUserTipsUrl, userId);
+): PaginationHookReturn<MinimalPostResponse> => {
+    return useGetUserContentSwr<MinimalPostResponse>(getUserTipsUrl, userId);
 };
 
 export const useUserFollowing = (
     userId?: string
 ): PaginationHookReturn<MinimalUserInfo> => {
-    return useGetUserContent<MinimalUserInfo>(getUserFollowingUrl, userId);
+    return useGetUserContentSwr<MinimalUserInfo>(getUserFollowingUrl, userId);
 };
 
 export const useUserFollower = (
@@ -244,14 +241,16 @@ export const useAppPreferences = (): UseAppPreferenceReturn => {
     const { getReq } = useFetch({ authorizationRequired: true });
 
     const [diets, setDiets] = useState<PreferenceResponse[]>([]);
+    const [mealTypes, setMealTypes] = useState<PreferenceResponse[]>([]);
     const [cuisines, setCuisines] = useState<PreferenceResponse[]>([]);
     const [allergens, setAllergens] = useState<PreferenceResponse[]>([]);
 
     const getAllPreferenceOptions = async (): Promise<boolean> => {
         const cachePreference = await loadCachePreference();
         if (cachePreference != null) {
-            const { diets, cuisines, allergens } = cachePreference;
+            const { diets, mealTypes, cuisines, allergens } = cachePreference;
             setDiets(diets);
+            setMealTypes(mealTypes);
             setCuisines(cuisines);
             setAllergens(allergens);
             return true;
@@ -262,9 +261,10 @@ export const useAppPreferences = (): UseAppPreferenceReturn => {
             return false;
         }
 
-        const { diets, cuisines, allergens } =
-            response as PreferenceSuiteResponse;
+        const { diets, mealTypes, cuisines, allergens } =
+            response as AllPreferenceResponse;
         setDiets(diets);
+        setMealTypes(mealTypes);
         setCuisines(cuisines);
         setAllergens(allergens);
 
@@ -273,7 +273,7 @@ export const useAppPreferences = (): UseAppPreferenceReturn => {
     };
 
     const saveCachePreference = async (
-        data: PreferenceSuiteResponse
+        data: AllPreferenceResponse
     ): Promise<void> => {
         // Store data with expiration set to 1 days after current timestamp
         await storeData("preferenceData", {
@@ -283,7 +283,7 @@ export const useAppPreferences = (): UseAppPreferenceReturn => {
     };
 
     const loadCachePreference =
-        async (): Promise<PreferenceSuiteResponse | null> => {
+        async (): Promise<AllPreferenceResponse | null> => {
             const cache = await getData("preferenceData");
             if (cache == null) {
                 return null;
@@ -297,12 +297,13 @@ export const useAppPreferences = (): UseAppPreferenceReturn => {
 
             return {
                 diets: cache.diets,
+                mealTypes: cache.mealTypes,
                 cuisines: cache.cuisines,
                 allergens: cache.allergens,
             };
         };
 
-    return { diets, cuisines, allergens, getAllPreferenceOptions };
+    return { diets, mealTypes, cuisines, allergens, getAllPreferenceOptions };
 };
 
 // For getting + setting current user preferences

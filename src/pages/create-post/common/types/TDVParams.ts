@@ -8,6 +8,7 @@ export interface TDVInformation {
     title: string;
     description: string;
     video: Asset | null;
+    thumbnail: string | null;
 }
 
 export type TDVStates = TDVInformation & Setter<TDVInformation>;

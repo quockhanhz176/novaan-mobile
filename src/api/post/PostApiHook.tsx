@@ -16,7 +16,6 @@ import {
     type UseReportCommentReturn,
     type PostInteraction,
 } from "./types/hooks.type";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import type PostComment from "@/pages/reel/types/PostComment";
 import type Post from "@/pages/reel/types/Post";
 import { getRecipeTime } from "@/pages/create-post/create-recipe/types/RecipeTime";
@@ -42,7 +41,6 @@ const INTERACT_POST_LIKE = "content/interaction/like";
 const INTERACT_REPORT = "content/interaction/report";
 
 const REELS_DATA_EXP = 24 * 60 * 60 * 1000; // 1 day in milliseconds
-const POSTS_DATA_EXP = 60 * 60 * 1000; // 1 hour in milliseconds
 
 // For getting reel's data
 export const usePostList = (): UsePostListReturn => {
@@ -96,17 +94,8 @@ export const usePostInfo = (): UsePostInfoReturn => {
     const [postInfo, setPostInfo] = useState<Undefinable<Post>>(undefined);
 
     const fetchPostInfo = async (
-        info: MinimalPost,
-        fromCache = true
+        info: MinimalPost
     ): Promise<Undefinable<Post>> => {
-        if (fromCache) {
-            const cacheData = await getCacheData(info);
-            if (cacheData != null) {
-                setPostInfo(cacheData);
-                return cacheData;
-            }
-        }
-
         const requestUrl =
             info.postType === "Recipe" ? GET_RECIPE_URL : GET_TIP_URL;
         const postType: Post["type"] =
@@ -131,40 +120,39 @@ export const usePostInfo = (): UsePostInfoReturn => {
             );
         }
 
-        await storeCacheData(postResponse);
         setPostInfo(postResponse);
         return postResponse;
     };
 
-    const getCacheData = async (
-        info: MinimalPost
-    ): Promise<Undefinable<Post>> => {
-        const cacheData = await AsyncStorage.getItem(info.postId);
-        if (cacheData == null || cacheData === "") {
-            return undefined;
-        }
+    // const getCacheData = async (
+    //     info: MinimalPost
+    // ): Promise<Undefinable<Post>> => {
+    //     const cacheData = await AsyncStorage.getItem(info.postId);
+    //     if (cacheData == null || cacheData === "") {
+    //         return undefined;
+    //     }
 
-        const cache = JSON.parse(cacheData);
+    //     const cache = JSON.parse(cacheData);
 
-        // Invalidate cache
-        if (cache.exp == null || cache.data == null) {
-            return undefined;
-        }
-        if (cache.exp > new Date().getUTCMilliseconds()) {
-            return undefined;
-        }
+    //     // Invalidate cache
+    //     if (cache.exp == null || cache.data == null) {
+    //         return undefined;
+    //     }
+    //     if (cache.exp > new Date().getUTCMilliseconds()) {
+    //         return undefined;
+    //     }
 
-        return cache.data;
-    };
+    //     return cache.data;
+    // };
 
-    const storeCacheData = async (post: Post): Promise<void> => {
-        const cacheObject = {
-            data: post,
-            exp: new Date().getUTCMilliseconds() + POSTS_DATA_EXP,
-        };
-        const data = JSON.stringify(cacheObject);
-        await AsyncStorage.setItem(post.id, data);
-    };
+    // const storeCacheData = async (post: Post): Promise<void> => {
+    //     const cacheObject = {
+    //         data: post,
+    //         exp: new Date().getUTCMilliseconds() + POSTS_DATA_EXP,
+    //     };
+    //     const data = JSON.stringify(cacheObject);
+    //     await AsyncStorage.setItem(post.id, data);
+    // };
 
     return { postInfo, fetchPostInfo };
 };

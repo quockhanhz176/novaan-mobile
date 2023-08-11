@@ -54,7 +54,6 @@ const SavedPosts = (): ReactElement => {
     }, [userInfo]);
 
     const savedRecipes: MinimalPostInfo[] = useMemo(() => {
-        console.log("currentContent Recipe", content);
         if (content == null || content.length === 0) {
             return [];
         }
@@ -70,8 +69,6 @@ const SavedPosts = (): ReactElement => {
     }, [content]);
 
     const savedTips: MinimalPostInfo[] = useMemo(() => {
-        console.log("currentContent Tip", content);
-
         if (content == null || content.length === 0) {
             return [];
         }

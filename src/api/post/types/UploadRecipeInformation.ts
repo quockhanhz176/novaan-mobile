@@ -3,6 +3,8 @@ export default interface UploadRecipeInformation {
     description: string;
     videoUri: string;
     videoExtension: string;
+    thumbnailUri: string;
+    thumbnailExtension: string;
     difficulty: number;
     portionType: number;
     portionQuantity: number;
@@ -10,11 +12,19 @@ export default interface UploadRecipeInformation {
     cookTime: string;
     instructions: InstructionInformation[];
     ingredients: IngredientInformation[];
+    diets: string[];
+    mealTypes: string[];
+    cuisines: string[];
+    allergens: string[];
 }
 
 export interface EditRecipeInformation
-    extends Omit<UploadRecipeInformation, "videoExtension"> {
+    extends Omit<
+        UploadRecipeInformation,
+        "videoExtension" | "thumbnailExtension"
+    > {
     videoExtension?: string;
+    thumbnailExtension?: string;
 }
 
 export interface InstructionInformation {

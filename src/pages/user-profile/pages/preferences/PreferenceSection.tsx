@@ -1,14 +1,15 @@
 import type PreferenceResponse from "@/api/search/types/PreferenceResponse";
-import React, { type ReactElement } from "react";
+import React, { memo, useCallback, type ReactElement } from "react";
 import { View, Text, ActivityIndicator } from "react-native";
 import PreferenceChip from "./PreferenceChip";
 import { customColors } from "@root/tailwind.config";
+import { type PreferenceObj } from "@/pages/create-post/create-recipe/types/PreferenceObj";
 
 interface PreferenceSectionProps {
     categories: PreferenceResponse[];
-    selectedCategories: string[];
+    selectedCategories: PreferenceObj;
     setCategories: (category: PreferenceResponse) => void;
-    sectionDesc: string;
+    sectionDesc?: string;
 }
 
 const PreferenceSection = ({
@@ -17,19 +18,34 @@ const PreferenceSection = ({
     sectionDesc,
     setCategories,
 }: PreferenceSectionProps): ReactElement<PreferenceSectionProps> => {
+    const isSelected = useCallback(
+        (category: PreferenceResponse): boolean => {
+            return selectedCategories[category.id] == null
+                ? false
+                : (selectedCategories[category.id] as boolean);
+        },
+        [selectedCategories]
+    );
+
+    if (categories.length === 0) {
+        return <View></View>;
+    }
+
     return (
         <View className="flex-1">
-            <Text className="text-base p-5 bg-ctertiary">{sectionDesc}</Text>
+            {(sectionDesc != null || sectionDesc !== "") && (
+                <Text className="text-base p-5 bg-ctertiary">
+                    {sectionDesc}
+                </Text>
+            )}
             {categories.length > 0 ? (
-                <View className="flex-row flex-wrap pt-4">
+                <View className="flex-row flex-wrap pt-2 px-2">
                     {categories.map((category) => (
                         <PreferenceChip
                             key={category.id}
                             item={category}
-                            onPress={() => {
-                                setCategories(category);
-                            }}
-                            selectedCategories={selectedCategories}
+                            onPress={setCategories}
+                            selected={isSelected(category)}
                         />
                     ))}
                 </View>
@@ -46,4 +62,9 @@ const PreferenceSection = ({
     );
 };
 
-export default PreferenceSection;
+export default memo(
+    PreferenceSection,
+    (prev, next) =>
+        prev.categories === next.categories &&
+        prev.selectedCategories === next.selectedCategories
+);

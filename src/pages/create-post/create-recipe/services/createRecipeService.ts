@@ -15,7 +15,6 @@ import {
     EDIT_RECIPE_SUCCESS,
 } from "@/common/strings";
 import { Alert } from "react-native";
-import PostApi from "@/api/post/PostApi";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
 import type RecipeSubmission from "../types/RecipeSubmission";
 import portionTypeItems from "../types/PortionTypeItems";
@@ -33,11 +32,13 @@ import {
 import { getUrlExtension } from "@/common/utils";
 import UploadApi from "@/api/post/UploadApi";
 import { type UploadResponse } from "@/api/post/types/UploadResponse";
+import { type PreferenceObj } from "../types/PreferenceObj";
 
 const validateRecipeSubmission = ({
     title,
     description,
     video,
+    thumbnail,
     difficulty,
     portionQuantity,
     portionType,
@@ -53,6 +54,11 @@ const validateRecipeSubmission = ({
     }
 
     if (video == null) {
+        return invalidResponse(CREATE_RECIPE_VIDEO_REQUIRED_ERROR);
+    }
+
+    // If video presents, so should the thumbnail be
+    if (thumbnail == null) {
         return invalidResponse(CREATE_RECIPE_VIDEO_REQUIRED_ERROR);
     }
 
@@ -139,11 +145,22 @@ const validateRecipeEdit = ({
     return { valid: true };
 };
 
+const mapObjToValue = (from: PreferenceObj): string[] => {
+    const result: string[] = [];
+    Object.entries(from).forEach(([key, value]) => {
+        if (value != null && value) {
+            result.push(key);
+        }
+    });
+
+    return result;
+};
+
 export const handleRecipeSubmission = async (
     recipeSubmission: RecipeSubmission,
     onRecipeValid?: () => void
 ): Promise<void> => {
-    const { video } = recipeSubmission;
+    const { video, thumbnail } = recipeSubmission;
     const validationResult = validateRecipeSubmission(recipeSubmission);
     if (!validationResult.valid) {
         Alert.alert(
@@ -158,6 +175,13 @@ export const handleRecipeSubmission = async (
     if (video == null || video.uri == null) {
         console.error(
             "video or video.uri is null, which is impossible after validation"
+        );
+        return;
+    }
+
+    if (thumbnail == null) {
+        console.error(
+            "thumbnail video or video.uri is null, which is impossible after validation"
         );
         return;
     }
@@ -199,10 +223,16 @@ export const handleRecipeSubmission = async (
                 };
             }
         );
-        const uploadResult = await PostApi.uploadRecipe({
+        const uploadResult = await UploadApi.uploadRecipeV2({
             ...recipeSubmission,
+            diets: mapObjToValue(recipeSubmission.diets),
+            mealTypes: mapObjToValue(recipeSubmission.mealTypes),
+            cuisines: mapObjToValue(recipeSubmission.cuisines),
+            allergens: mapObjToValue(recipeSubmission.allergens),
             videoUri: realVideoPath,
             videoExtension: videoInfo.extension,
+            thumbnailUri: thumbnail,
+            thumbnailExtension: getUrlExtension(thumbnail),
             instructions,
             cookTime: getTimeString(recipeSubmission.cookTime),
             prepTime: getTimeString(recipeSubmission.prepTime),
@@ -231,7 +261,9 @@ export const handleRecipeSubmission = async (
 export const handleRecipeEdit = async (
     postId: string,
     videoUrl: string,
-    recipeSubmission: RecipeSubmission
+    thumbnailUrl: string,
+    recipeSubmission: RecipeSubmission,
+    onRecipeValid?: () => void
 ): Promise<void> => {
     const validationResult = validateRecipeEdit(recipeSubmission);
     if (!validationResult.valid) {
@@ -241,6 +273,19 @@ export const handleRecipeEdit = async (
         );
         return;
     }
+
+    // Should not be possible
+    if (recipeSubmission.thumbnail == null) {
+        Alert.alert(
+            CREATE_RECIPE_INVALID_ERROR_TITLE,
+            validationResult.message
+        );
+        return;
+    }
+
+    onRecipeValid?.();
+
+    console.log(recipeSubmission);
 
     const getTimeString = (time: RecipeTime): string => {
         const day = Math.floor(time.hour / 24);
@@ -271,10 +316,15 @@ export const handleRecipeEdit = async (
 
     const payload: EditRecipeInformation = {
         ...recipeSubmission,
+        diets: mapObjToValue(recipeSubmission.diets),
+        mealTypes: mapObjToValue(recipeSubmission.mealTypes),
+        cuisines: mapObjToValue(recipeSubmission.cuisines),
+        allergens: mapObjToValue(recipeSubmission.allergens),
         instructions,
         cookTime: getTimeString(recipeSubmission.cookTime),
         prepTime: getTimeString(recipeSubmission.prepTime),
         videoUri: "",
+        thumbnailUri: "",
     };
 
     const { video } = recipeSubmission;
@@ -284,6 +334,7 @@ export const handleRecipeEdit = async (
         // Keep current video
         if (video == null || video.uri == null) {
             payload.videoUri = videoUrl;
+            payload.thumbnailUri = thumbnailUrl;
             uploadResult = await UploadApi.editRecipe(postId, payload);
         }
         // Replace current video with new video
@@ -296,6 +347,10 @@ export const handleRecipeEdit = async (
             const { realVideoPath, videoInfo } = result;
             payload.videoUri = realVideoPath;
             payload.videoExtension = videoInfo.extension;
+            payload.thumbnailUri = recipeSubmission.thumbnail;
+            payload.thumbnailExtension = getUrlExtension(
+                recipeSubmission.thumbnail
+            );
             uploadResult = await UploadApi.editRecipe(postId, payload);
         }
 
@@ -308,7 +363,9 @@ export const handleRecipeEdit = async (
             type: "success",
             text1: EDIT_RECIPE_SUCCESS,
         });
-    } catch {
+    } catch (e) {
+        console.log(e);
+
         // Notify the user when it fails
         Toast.show({
             type: "error",

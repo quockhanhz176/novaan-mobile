@@ -6,6 +6,7 @@ import {
     CREATE_TIP_SUCCESS,
     CREATE_TIP_TITLE_REQUIRED_ERROR,
     CREATE_TIP_VIDEO_REQUIRED_ERROR,
+    EDIT_TIP_SUCCESS,
 } from "@/common/strings";
 import type TipSubmission from "../types/TipSubmission";
 import { Alert } from "react-native";
@@ -17,6 +18,7 @@ import {
 } from "../../common/commonServices";
 import UploadApi from "@/api/post/UploadApi";
 import { type UploadResponse } from "@/api/post/types/UploadResponse";
+import { getUrlExtension } from "@/common/utils";
 
 const validateTipSubmission = ({
     title,
@@ -58,7 +60,7 @@ export const handleTipSubmission = async (
     tipSubmission: TipSubmission,
     onTipValid?: () => void
 ): Promise<void> => {
-    const { title, video, description } = tipSubmission;
+    const { title, video, description, thumbnail } = tipSubmission;
     const validationResult = validateTipSubmission(tipSubmission);
     if (!validationResult.valid) {
         Alert.alert(CREATE_TIP_INVALID_ERROR_TITLE, validationResult.message);
@@ -86,8 +88,11 @@ export const handleTipSubmission = async (
         const uploadResult = await UploadApi.uploadTipV2(
             title,
             description,
-            realVideoPath,
-            videoInfo.extension
+            { videoUrl: realVideoPath, videoExtension: videoInfo.extension },
+            {
+                thumbnailUrl: thumbnail,
+                thumbnailExtension: getUrlExtension(thumbnail),
+            }
         );
 
         if (!uploadResult.success) {
@@ -113,7 +118,9 @@ export const handleTipSubmission = async (
 export const handleTipEdit = async (
     postId: string,
     videoUrl: string,
-    tipSubmission: TipSubmission
+    thumbnailUrl: string,
+    tipSubmission: TipSubmission,
+    onTipValid?: () => void
 ): Promise<void> => {
     const validationResult = validateTipEdit(tipSubmission);
     if (!validationResult.valid) {
@@ -121,17 +128,20 @@ export const handleTipEdit = async (
         return;
     }
 
-    const { title, description, video } = tipSubmission;
+    onTipValid?.();
+
+    const { title, description, video, thumbnail } = tipSubmission;
 
     try {
         let uploadResult: UploadResponse;
-        // Retain current video
-        if (video == null) {
+        // Retain current video (also mean same thumbnail)
+        if (video == null && thumbnail == null) {
             uploadResult = await UploadApi.editTip(
                 postId,
                 title,
                 description,
-                videoUrl
+                { videoUrl },
+                { thumbnailUrl }
             );
         }
         // Replace current video with new video
@@ -150,8 +160,14 @@ export const handleTipEdit = async (
                 postId,
                 title,
                 description,
-                realVideoPath,
-                videoInfo.extension
+                {
+                    videoUrl: realVideoPath,
+                    videoExtension: videoInfo.extension,
+                },
+                {
+                    thumbnailUrl: thumbnail,
+                    thumbnailExtension: getUrlExtension(thumbnail),
+                }
             );
         }
 
@@ -162,7 +178,7 @@ export const handleTipEdit = async (
         // Notify the user when upload is success
         Toast.show({
             type: "success",
-            text1: CREATE_TIP_SUCCESS,
+            text1: EDIT_TIP_SUCCESS,
         });
     } catch {
         // Notify the user when it fails
