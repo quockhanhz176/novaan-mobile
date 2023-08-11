@@ -57,7 +57,7 @@ const App: FC = () => {
                                     component={SplashScreen}
                                     options={{ title: "Splash Screen" }}
                                 />
-                                
+
                                 <RootStack.Group>
                                     <RootStack.Screen
                                         name="SignIn"

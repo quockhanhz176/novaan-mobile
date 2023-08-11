@@ -12,12 +12,16 @@ import { usePostInteract } from "@/api/post/PostApiHook";
 import { debounce } from "lodash";
 import { ScrollItemContext } from "@/pages/reel/components/scroll-items/ScrollItemv2";
 import { type PostInteraction } from "@/api/post/types/hooks.type";
+import { useSWRConfig } from "swr";
+import { getUserSavedUrl } from "@/api/profile/ProfileApi";
 
 const SaveButton = (): ReactElement => {
     const { currentPost, currentUserId, saved, handleSave, handleUnsave } =
         useContext(ScrollItemContext);
 
     const { savePost } = usePostInteract();
+
+    const { mutate } = useSWRConfig();
 
     // Memoize debounce function, crucial for this to work
     const sendSaveRequest = useCallback(
@@ -35,6 +39,12 @@ const SaveButton = (): ReactElement => {
                             : "CulinaryTip",
                 };
                 await savePost(interaction, currentUserId);
+                await mutate(
+                    // Only creator can edit their own post so it's safe to assume currentUserId === postInfo.creator.userId
+                    (key) =>
+                        Array.isArray(key) &&
+                        key[0] === getUserSavedUrl(currentUserId)
+                );
             },
             1000,
             {}
@@ -43,7 +53,7 @@ const SaveButton = (): ReactElement => {
     );
 
     const handleSavePost = useCallback(async (): Promise<void> => {
-        if (currentPost == null || currentPost.status !== 1) {
+        if (currentPost == null || currentPost.status !== "Approved") {
             return;
         }
 
@@ -54,7 +64,7 @@ const SaveButton = (): ReactElement => {
 
     const buttonColor = useMemo(() => {
         // Approved = 1
-        if (currentPost == null || currentPost.status !== 1) {
+        if (currentPost == null || currentPost.status !== "Approved") {
             return customColors.cgrey.platinum;
         }
 

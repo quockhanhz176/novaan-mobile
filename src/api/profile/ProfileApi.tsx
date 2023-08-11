@@ -146,10 +146,14 @@ const useGetUserContentSwr = <T,>(
         [currentPage]
     );
 
-    const { data } = useFetchSwr([getContentUrl(userId), queryParams], {
+    const url = useMemo(() => getContentUrl(userId), [userId]);
+
+    const { data } = useFetchSwr([url, queryParams], {
         authorizationRequired: true,
         timeout: 10000,
     });
+
+    console.log(data);
 
     useEffect(() => {
         if (data == null) {

@@ -76,6 +76,13 @@ export const handleTipSubmission = async (
         return;
     }
 
+    if (thumbnail == null) {
+        console.error(
+            "thumbnail is null, which is impossible when video is not null"
+        );
+        return;
+    }
+
     try {
         const result = await compressVideo("tipTDVParams", video.uri);
 
@@ -135,7 +142,7 @@ export const handleTipEdit = async (
     try {
         let uploadResult: UploadResponse;
         // Retain current video (also mean same thumbnail)
-        if (video == null && thumbnail == null) {
+        if (video == null || thumbnail == null) {
             uploadResult = await UploadApi.editTip(
                 postId,
                 title,

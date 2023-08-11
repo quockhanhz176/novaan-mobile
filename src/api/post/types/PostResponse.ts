@@ -7,7 +7,7 @@ export interface PostResponseBase {
     description: string;
     video: string;
     thumbnail: string;
-    status: number;
+    status: "Pending" | "Approved" | "Rejected" | "Reported";
     createdAt?: Date; // 2023-06-29T20:11:06.124Z
     updatedAt?: Date;
     adminComment?: string;

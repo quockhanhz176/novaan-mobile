@@ -224,6 +224,8 @@ export const sendBaseRequest = async (
             delete headers["Content-Type"];
         }
 
+        console.log(`Requesting to: ${API_URL}${url}`);
+
         const response = await fetch(`${API_URL}${url}`, options);
         clearTimeout(timeoutId);
         return response;
@@ -301,9 +303,6 @@ export const useFetchSwr = (
         url: string,
         queryParams: string
     ]): Promise<any> => {
-        console.log("URL", url);
-        console.log("params", queryParams);
-
         const urlWithParam = `${url}${queryParams}`;
         return await getReq(urlWithParam);
     };

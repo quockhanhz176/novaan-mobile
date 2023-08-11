@@ -33,7 +33,7 @@ const CreatedPostItem = ({
             return;
         }
         void fetchUrl(item.thumbnail);
-    }, []);
+    }, [item.thumbnail]);
 
     const handleError = (
         e: NativeSyntheticEvent<ImageErrorEventData>

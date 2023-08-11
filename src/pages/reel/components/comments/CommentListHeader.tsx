@@ -35,7 +35,8 @@ const CommentListHeader = ({
                         className="grow bg-cgrey-whitesmoke rounded-lg p-2 justify-center"
                         onPress={showAddEdit}
                         disabled={
-                            currentPost == null || currentPost.status !== 1
+                            currentPost == null ||
+                            currentPost.status !== "Approved"
                         }
                     >
                         <Text className="text-cgrey-grey">

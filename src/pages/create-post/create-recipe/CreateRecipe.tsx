@@ -16,7 +16,6 @@ import {
     CREATE_RECIPE_PREVIOUS_STEP_BUTTON_TITLE,
     CREATE_RECIPE_SUBMIT,
     CREATE_RECIPE_TITLE,
-    EDIT_RECIPE_PENDING,
     EDIT_RECIPE_SUBMIT,
     EDIT_RECIPE_TITLE,
 } from "@/common/strings";
@@ -45,17 +44,13 @@ import { createMaterialTopTabNavigator } from "@react-navigation/material-top-ta
 import ViewIngredients from "./components/ingredients/pages/ViewIngredient";
 import ViewInstruction from "./components/instructions/pages/ViewInstruction";
 import { usePostInfo } from "@/api/post/PostApiHook";
-import { useSWRConfig } from "swr";
 import { useResourceUrl } from "@/api/utils/resourceHooks";
 import type Instruction from "./types/Instruction";
-import { getUserRecipesUrl } from "@/api/profile/ProfileApi";
 import DietMealType from "./components/DietMealType";
 import Cuisines from "./components/Cuisines";
 import Allergens from "./components/Allergens";
 import OverlayLoading from "@/common/components/OverlayLoading";
 import { type PreferenceObj } from "./types/PreferenceObj";
-import Toast from "react-native-toast-message";
-import { getUserIdFromToken } from "@/api/common/utils/TokenUtils";
 
 interface CreateRecipeProps {
     navigation: NativeStackNavigationProp<RootStackParamList, "CreateTip">;
@@ -98,8 +93,6 @@ const CreateRecipe = ({
 
     const { postInfo, fetchPostInfo } = usePostInfo();
     const { fetchUrl } = useResourceUrl();
-
-    const { mutate } = useSWRConfig();
 
     const isEditing: boolean = useMemo(
         () => route.params?.postId != null,
@@ -262,7 +255,7 @@ const CreateRecipe = ({
                     cuisines,
                     allergens,
                 },
-                () => {
+                async () => {
                     navigateBack();
                 }
             );
@@ -292,21 +285,11 @@ const CreateRecipe = ({
                     cuisines,
                     allergens,
                 },
-                () => {
-                    Toast.show({ type: "info", text1: EDIT_RECIPE_PENDING });
+                async () => {
                     navigateBack();
                 }
             );
         }
-
-        // Revalidate data and navigate back
-        const currentUserId = await getUserIdFromToken();
-        await mutate(
-            // Only creator can edit their own post so it's safe to assume currentUserId === postInfo.creator.userId
-            (key) =>
-                Array.isArray(key) &&
-                key[0] === getUserRecipesUrl(currentUserId)
-        );
     };
 
     const goNextScreen = useCallback((): void => {

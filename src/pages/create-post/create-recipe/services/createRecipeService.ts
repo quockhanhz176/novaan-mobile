@@ -33,6 +33,9 @@ import { getUrlExtension } from "@/common/utils";
 import UploadApi from "@/api/post/UploadApi";
 import { type UploadResponse } from "@/api/post/types/UploadResponse";
 import { type PreferenceObj } from "../types/PreferenceObj";
+import { getUserIdFromToken } from "@/api/common/utils/TokenUtils";
+import { getUserRecipesUrl } from "@/api/profile/ProfileApi";
+import { mutate } from "swr";
 
 const validateRecipeSubmission = ({
     title,
@@ -54,6 +57,11 @@ const validateRecipeSubmission = ({
     }
 
     if (video == null) {
+        return invalidResponse(CREATE_RECIPE_VIDEO_REQUIRED_ERROR);
+    }
+
+    // If video presents, so should the thumbnail be
+    if (thumbnail == null) {
         return invalidResponse(CREATE_RECIPE_VIDEO_REQUIRED_ERROR);
     }
 
@@ -145,7 +153,7 @@ const validateRecipeEdit = ({
     return { valid: true };
 };
 
-const mapObjToValue = (from: PreferenceObj): string[] => {
+export const mapPreferenceObjToValue = (from: PreferenceObj): string[] => {
     const result: string[] = [];
     Object.entries(from).forEach(([key, value]) => {
         if (value != null && value) {
@@ -225,10 +233,10 @@ export const handleRecipeSubmission = async (
         );
         const uploadResult = await UploadApi.uploadRecipeV2({
             ...recipeSubmission,
-            diets: mapObjToValue(recipeSubmission.diets),
-            mealTypes: mapObjToValue(recipeSubmission.mealTypes),
-            cuisines: mapObjToValue(recipeSubmission.cuisines),
-            allergens: mapObjToValue(recipeSubmission.allergens),
+            diets: mapPreferenceObjToValue(recipeSubmission.diets),
+            mealTypes: mapPreferenceObjToValue(recipeSubmission.mealTypes),
+            cuisines: mapPreferenceObjToValue(recipeSubmission.cuisines),
+            allergens: mapPreferenceObjToValue(recipeSubmission.allergens),
             videoUri: realVideoPath,
             videoExtension: videoInfo.extension,
             thumbnailUri: thumbnail,
@@ -241,6 +249,15 @@ export const handleRecipeSubmission = async (
         if (!uploadResult.success) {
             throw Error("Upload failed");
         }
+
+        // Revalidate data and navigate back
+        const currentUserId = await getUserIdFromToken();
+        await mutate(
+            // Only creator can edit their own post so it's safe to assume currentUserId === postInfo.creator.userId
+            (key) =>
+                Array.isArray(key) &&
+                key[0] === getUserRecipesUrl(currentUserId)
+        );
 
         // Notify the user when upload is success
         Toast.show({
@@ -316,10 +333,10 @@ export const handleRecipeEdit = async (
 
     const payload: EditRecipeInformation = {
         ...recipeSubmission,
-        diets: mapObjToValue(recipeSubmission.diets),
-        mealTypes: mapObjToValue(recipeSubmission.mealTypes),
-        cuisines: mapObjToValue(recipeSubmission.cuisines),
-        allergens: mapObjToValue(recipeSubmission.allergens),
+        diets: mapPreferenceObjToValue(recipeSubmission.diets),
+        mealTypes: mapPreferenceObjToValue(recipeSubmission.mealTypes),
+        cuisines: mapPreferenceObjToValue(recipeSubmission.cuisines),
+        allergens: mapPreferenceObjToValue(recipeSubmission.allergens),
         instructions,
         cookTime: getTimeString(recipeSubmission.cookTime),
         prepTime: getTimeString(recipeSubmission.prepTime),
@@ -357,6 +374,15 @@ export const handleRecipeEdit = async (
         if (!uploadResult.success) {
             throw Error("Upload failed");
         }
+
+        // Revalidate data and navigate back
+        const currentUserId = await getUserIdFromToken();
+        await mutate(
+            // Only creator can edit their own post so it's safe to assume currentUserId === postInfo.creator.userId
+            (key) =>
+                Array.isArray(key) &&
+                key[0] === getUserRecipesUrl(currentUserId)
+        );
 
         // Notify the user when upload is success
         Toast.show({

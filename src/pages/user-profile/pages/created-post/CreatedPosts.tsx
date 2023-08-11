@@ -21,7 +21,6 @@ import CustomToggleButton from "./components/CustomToggleButton";
 import { UserProfileContext } from "../../UserProfile";
 import CreatedPostList from "./components/CreatedPostList";
 import EmptyCreatedPost from "./components/EmptyCreatedPost";
-import type PostResponse from "@/api/post/types/PostResponse";
 import { type Undefinable } from "@/types/app";
 import CustomModal from "@/common/components/CustomModal";
 import useBooleanHook from "@/common/components/BooleanHook";
@@ -81,7 +80,7 @@ const CreatedPosts = ({
 
     const [viewingItem, setViewingItem] = useState(false);
     const [viewItem, setViewItem] =
-        useState<Undefinable<PostResponse>>(undefined);
+        useState<Undefinable<MinimalPostInfo>>(undefined);
 
     const [viewCategory, setViewCategory] = useState<ViewCategory>("recipe");
     const [fetching, setFetching] = useState(false);
@@ -159,7 +158,7 @@ const CreatedPosts = ({
     //     };
     // };
 
-    const handleItemPress = (item: PostResponse): void => {
+    const handleItemPress = (item: MinimalPostInfo): void => {
         setViewingItem(true);
         setViewItem(item);
     };

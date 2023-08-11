@@ -39,7 +39,7 @@ const LikeButton = (): ReactElement => {
     const handleLikePress = useCallback(async (): Promise<void> => {
         // Ignore like request when the post is not approved
         // Approved = 1
-        if (currentPost == null || currentPost.status !== 1) {
+        if (currentPost == null || currentPost.status !== "Approved") {
             return;
         }
 
@@ -50,7 +50,7 @@ const LikeButton = (): ReactElement => {
 
     const buttonColor = useMemo(() => {
         // Approved = 1
-        if (currentPost == null || currentPost.status !== 1) {
+        if (currentPost == null || currentPost.status !== "Approved") {
             return customColors.cgrey.platinum;
         }
 
