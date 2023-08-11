@@ -1,6 +1,5 @@
 import {
     CREATE_RECIPE_DESCRIPTION_REQUIRED_ERROR,
-    CREATE_RECIPE_DESCRIPTION_TOO_SHORT_ERROR,
     CREATE_RECIPE_DIFFICULTY_MISSING,
     CREATE_RECIPE_FAILED,
     CREATE_RECIPE_FAILED_SECONDARY,
@@ -35,8 +34,6 @@ import { getUrlExtension } from "@/common/utils";
 import UploadApi from "@/api/post/UploadApi";
 import { type UploadResponse } from "@/api/post/types/UploadResponse";
 
-const DESCRIPTION_LENGTH_LOWER_LIMIT = 30;
-
 const validateRecipeSubmission = ({
     title,
     description,
@@ -53,10 +50,6 @@ const validateRecipeSubmission = ({
 
     if (description.length === 0) {
         return invalidResponse(CREATE_RECIPE_DESCRIPTION_REQUIRED_ERROR);
-    }
-
-    if (description.length < DESCRIPTION_LENGTH_LOWER_LIMIT) {
-        return invalidResponse(CREATE_RECIPE_DESCRIPTION_TOO_SHORT_ERROR);
     }
 
     if (video == null) {
@@ -111,10 +104,6 @@ const validateRecipeEdit = ({
 
     if (description.length === 0) {
         return invalidResponse(CREATE_RECIPE_DESCRIPTION_REQUIRED_ERROR);
-    }
-
-    if (description.length < DESCRIPTION_LENGTH_LOWER_LIMIT) {
-        return invalidResponse(CREATE_RECIPE_DESCRIPTION_TOO_SHORT_ERROR);
     }
 
     if (portionQuantity <= 0) {

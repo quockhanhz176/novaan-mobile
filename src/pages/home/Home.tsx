@@ -111,8 +111,8 @@ const Home: FC<HomeProps> = ({ navigation }: HomeProps) => {
             <ScrollView>
                 <View className="h-[30]" />
                 <PostListSection
-                    title={HOME_TRENDING_TIPS_TITLE}
-                    data={trendingTips}
+                    title={HOME_TRENDING_RECIPES_TITLE}
+                    data={trendingRecipes}
                     onItemPress={onPostClick}
                 />
                 {trendingAuthors.length > 0 && (
@@ -133,8 +133,8 @@ const Home: FC<HomeProps> = ({ navigation }: HomeProps) => {
                     </TitleSection>
                 )}
                 <PostListSection
-                    title={HOME_TRENDING_RECIPES_TITLE}
-                    data={trendingRecipes}
+                    title={HOME_TRENDING_TIPS_TITLE}
+                    data={trendingTips}
                     onItemPress={onPostClick}
                 />
                 <View className="mb-12 rounded-lg bg-ctertiary p-4 mx-4">

@@ -1,6 +1,5 @@
 import {
     CREATE_TIP_DESCRIPTION_REQUIRED_ERROR,
-    CREATE_TIP_DESCRIPTION_TOO_SHORT_ERROR,
     CREATE_TIP_FAILED,
     CREATE_TIP_FAILED_SECONDARY,
     CREATE_TIP_INVALID_ERROR_TITLE,
@@ -19,8 +18,6 @@ import {
 import UploadApi from "@/api/post/UploadApi";
 import { type UploadResponse } from "@/api/post/types/UploadResponse";
 
-const DESCRIPTION_LENGTH_LOWER_LIMIT = 30;
-
 const validateTipSubmission = ({
     title,
     description,
@@ -32,10 +29,6 @@ const validateTipSubmission = ({
 
     if (description.length === 0) {
         return invalidResponse(CREATE_TIP_DESCRIPTION_REQUIRED_ERROR);
-    }
-
-    if (description.length < DESCRIPTION_LENGTH_LOWER_LIMIT) {
-        return invalidResponse(CREATE_TIP_DESCRIPTION_TOO_SHORT_ERROR);
     }
 
     if (video == null) {
@@ -56,10 +49,6 @@ const validateTipEdit = ({
 
     if (description.length === 0) {
         return invalidResponse(CREATE_TIP_DESCRIPTION_REQUIRED_ERROR);
-    }
-
-    if (description.length < DESCRIPTION_LENGTH_LOWER_LIMIT) {
-        return invalidResponse(CREATE_TIP_DESCRIPTION_TOO_SHORT_ERROR);
     }
 
     return { valid: true };

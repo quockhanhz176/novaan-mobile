@@ -92,8 +92,6 @@ export const CREATE_TIP_INVALID_ERROR_TITLE =
 export const CREATE_TIP_TITLE_REQUIRED_ERROR = "Tiêu đề không được để trống";
 export const CREATE_TIP_DESCRIPTION_REQUIRED_ERROR =
     "Mô tả không được để trống";
-export const CREATE_TIP_DESCRIPTION_TOO_SHORT_ERROR =
-    "Mô tả không được ngắn hơn 30 ký tự";
 export const CREATE_TIP_VIDEO_REQUIRED_ERROR =
     "Mẹo vặt phải được đăng kèm với video minh họa";
 export const CREATE_TIP_VIDEO_WRONG_LENGTH_ERROR =
@@ -152,8 +150,6 @@ export const CREATE_RECIPE_INVALID_ERROR_TITLE =
 export const CREATE_RECIPE_TITLE_REQUIRED_ERROR = "Tiêu đề không được để trống";
 export const CREATE_RECIPE_DESCRIPTION_REQUIRED_ERROR =
     "Mô tả không được để trống";
-export const CREATE_RECIPE_DESCRIPTION_TOO_SHORT_ERROR =
-    "Mô tả không được ngắn hơn 30 ký tự";
 export const CREATE_RECIPE_VIDEO_REQUIRED_ERROR =
     "Công thức nấu ăn phải được đăng kèm với video minh họa";
 export const CREATE_RECIPE_VIDEO_WRONG_LENGTH_ERROR =
@@ -339,8 +335,8 @@ export const SET_PREF_SUCCESS = "Sở thích của bạn đã được cập nh�
 // Home
 export const HOME_LIKE_COUNT = "lượt thích";
 export const HOME_TRENDING_AUTHORS_TITLE = "Xem thêm từ";
-export const HOME_TRENDING_RECIPES_TITLE = "Mẹo vặt của tháng";
-export const HOME_TRENDING_TIPS_TITLE = "Công thức của tháng";
+export const HOME_TRENDING_RECIPES_TITLE = "Công thức của tháng";
+export const HOME_TRENDING_TIPS_TITLE = "Mẹo vặt của tháng";
 export const HOME_NEWEST_POSTS_TITLE = "Những bài viết mới";
 export const HOME_FOLLOWING_POSTS_TITLE = "Bài viết từ tác giả bạn quan tâm";
 export const HOME_ADVANCED_SEARCH_TITLE = "Tìm kiếm nâng cao";
