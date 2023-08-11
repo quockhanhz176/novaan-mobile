@@ -25,6 +25,15 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
 
+      - name: Create temp .env
+        uses: SpicyPizza/create-envfile@v2.0
+        with:
+          file_name: .env
+          envkey_API_URL: ${{secrets.NOVAAN_API_URL}}
+          envkey_API_TIMEOUT: "5000"
+          envkey_KEYCHAIN_ID: ${{secrets.NOVAAN_KEYCHAIN_ID}}
+          envkey_GOOGLE_API_KEY: ${{secrets.NOVAAN_GG_API_KEY}}
+
       - name: Install Node dependencies
         run: npm ci
 
