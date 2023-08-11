@@ -21,7 +21,6 @@ import CustomToggleButton from "./components/CustomToggleButton";
 import { UserProfileContext } from "../../UserProfile";
 import CreatedPostList from "./components/CreatedPostList";
 import EmptyCreatedPost from "./components/EmptyCreatedPost";
-import type PostResponse from "@/api/post/types/PostResponse";
 import { type Undefinable } from "@/types/app";
 import CustomModal from "@/common/components/CustomModal";
 import useBooleanHook from "@/common/components/BooleanHook";
@@ -29,25 +28,59 @@ import PostSettingMenu from "./components/PostSettingMenu";
 import { useNavigation } from "@react-navigation/native";
 import { type RootStackParamList } from "@/types/navigation";
 import { type NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { type MinimalPostInfo } from "@/api/profile/types";
 
 type ViewCategory = "recipe" | "tips";
 
-const CreatedPosts = (): ReactElement => {
+interface CreatedPostsProps {
+    showStatus?: boolean;
+}
+
+const CreatedPosts = ({
+    showStatus = true,
+}: CreatedPostsProps): ReactElement<CreatedPostsProps> => {
     const userProfileContext = useContext(UserProfileContext);
     const {
         getNext: getNextRecipes,
         content: recipes,
         ended: recipesEnded,
     } = useUserRecipes(userProfileContext.userInfo?.userId);
+
     const {
         getNext: getNextTips,
         content: tips,
         ended: tipsEnded,
     } = useUserTips(userProfileContext.userInfo?.userId);
 
+    const formatRecipes: MinimalPostInfo[] = useMemo(() => {
+        if (recipes.length === 0) {
+            return [];
+        }
+
+        return recipes.map(
+            (recipe): MinimalPostInfo => ({
+                ...recipe,
+                type: recipe.type === "Recipe" ? "recipe" : "tip",
+            })
+        );
+    }, [recipes]);
+
+    const formatTips: MinimalPostInfo[] = useMemo(() => {
+        if (tips.length === 0) {
+            return [];
+        }
+
+        return tips.map(
+            (tip): MinimalPostInfo => ({
+                ...tip,
+                type: tip.type === "Recipe" ? "recipe" : "tip",
+            })
+        );
+    }, [tips]);
+
     const [viewingItem, setViewingItem] = useState(false);
     const [viewItem, setViewItem] =
-        useState<Undefinable<PostResponse>>(undefined);
+        useState<Undefinable<MinimalPostInfo>>(undefined);
 
     const [viewCategory, setViewCategory] = useState<ViewCategory>("recipe");
     const [fetching, setFetching] = useState(false);
@@ -125,7 +158,7 @@ const CreatedPosts = (): ReactElement => {
     //     };
     // };
 
-    const handleItemPress = (item: PostResponse): void => {
+    const handleItemPress = (item: MinimalPostInfo): void => {
         setViewingItem(true);
         setViewItem(item);
     };
@@ -210,10 +243,11 @@ const CreatedPosts = (): ReactElement => {
                 ) : (
                     <CreatedPostList
                         hidden={viewCategory !== "recipe"}
-                        data={recipes}
+                        data={formatRecipes}
                         loading={fetching}
                         handleItemPress={handleItemPress}
                         handleOnEndReached={fetchMorePost}
+                        showStatus={showStatus}
                     />
                 )}
                 {tipsEmpty ? (
@@ -224,10 +258,11 @@ const CreatedPosts = (): ReactElement => {
                 ) : (
                     <CreatedPostList
                         hidden={viewCategory !== "tips"}
-                        data={tips}
+                        data={formatTips}
                         loading={fetching}
                         handleItemPress={handleItemPress}
                         handleOnEndReached={fetchMorePost}
+                        showStatus={showStatus}
                     />
                 )}
             </View>

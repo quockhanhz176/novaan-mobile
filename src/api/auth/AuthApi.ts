@@ -13,8 +13,7 @@ const SIGN_UP_URL = "auth/signup";
 const SIGNIN_GOOGLE_URL = "auth/google";
 
 // TODO: Change this to error code later
-const SIGN_UP_EMAIL_EXIST_ERROR =
-    "This email had been associated with another account.";
+const SIGN_UP_EMAIL_EXIST_ERROR_CODE = 1004;
 const SIGN_UP_USERNAME_EXIST_ERROR =
     "This username had been associated with another account.";
 
@@ -54,15 +53,17 @@ const signUp = async (
         password,
         email,
     });
+    console.log("AuthApi.signUp - response", JSON.stringify(response));
 
     if (!response.ok) {
         const body = await response.json();
-        const message = body?.body.message;
+        console.log("AuthApi.signUp - body", JSON.stringify(body));
+        const errorCode = body?.errCode;
 
         // TODO: Change this to error code later
         let errMessage: SignUpErrReason = "unknown";
-        switch (message) {
-            case SIGN_UP_EMAIL_EXIST_ERROR:
+        switch (errorCode) {
+            case SIGN_UP_EMAIL_EXIST_ERROR_CODE:
                 errMessage = "email exists";
                 break;
             case SIGN_UP_USERNAME_EXIST_ERROR:

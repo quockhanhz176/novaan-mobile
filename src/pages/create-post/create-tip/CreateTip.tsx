@@ -1,4 +1,4 @@
-import React, { useState, type FC, useEffect } from "react";
+import React, { useState, type FC, useEffect, useMemo } from "react";
 import {
     View,
     Text,
@@ -22,6 +22,8 @@ import {
     CREATE_TIP_DESCRIPTION_PLACEHOLDER,
     CREATE_TIP_TITLE,
     CREATE_TIP_SUBMIT,
+    EDIT_TIP_TITLE,
+    EDIT_RECIPE_PENDING,
 } from "@/common/strings";
 import { customColors } from "@root/tailwind.config";
 import { type NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -35,6 +37,8 @@ import { usePostInfo } from "@/api/post/PostApiHook";
 import { type RouteProp } from "@react-navigation/native";
 import { useSWRConfig } from "swr";
 import { getUserTipsUrl } from "@/api/profile/ProfileApi";
+import Toast from "react-native-toast-message";
+import { getUserIdFromToken } from "@/api/common/utils/TokenUtils";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const defaultThumbnail = require("@root/assets/default-video.png");
@@ -58,6 +62,8 @@ const CreateTip: FC<CreateTipProps> = ({
     // const { resourceUrl, fetchUrl } = useFetchResourceUrl();
 
     const { mutate } = useSWRConfig();
+
+    const isEditing = useMemo(() => route.params?.postId != null, [route]);
 
     useEffect(() => {
         // Fetch initial data if editing
@@ -101,30 +107,41 @@ const CreateTip: FC<CreateTipProps> = ({
 
     const submit = async (): Promise<void> => {
         if (route.params?.postId == null) {
-            await handleTipSubmission({ title, description, video }, () => {
-                navigateBack();
-            });
-            return;
-        }
+            await handleTipSubmission(
+                { title, description, video, thumbnail: thumbnailUri },
+                () => {
+                    navigateBack();
+                }
+            );
+        } else {
+            if (postInfo == null) {
+                return;
+            }
 
-        if (postInfo == null) {
-            return;
+            await handleTipEdit(
+                postInfo.id,
+                postInfo.video,
+                postInfo.thumbnail,
+                {
+                    title,
+                    description,
+                    video,
+                    thumbnail: thumbnailUri,
+                },
+                () => {
+                    Toast.show({ type: "info", text1: EDIT_RECIPE_PENDING });
+                    navigateBack();
+                }
+            );
         }
-
-        await handleTipEdit(postInfo.id, postInfo.video, {
-            title,
-            description,
-            video,
-        });
 
         // Revalidate user profile created tips
+        const currentUserId = await getUserIdFromToken();
         await mutate(
             // Only creator can edit their own post so it's safe to assume currentUserId === postInfo.creator.userId
             (key) =>
-                Array.isArray(key) &&
-                key[0] === getUserTipsUrl(postInfo.creator.userId)
+                Array.isArray(key) && key[0] === getUserTipsUrl(currentUserId)
         );
-        navigateBack();
     };
 
     return (
@@ -139,14 +156,16 @@ const CreateTip: FC<CreateTipProps> = ({
                         <IconEvill name="close" size={25} color="#000" />
                     </TouchableOpacity>
                     <Text className="text-xl font-medium">
-                        {CREATE_TIP_TITLE}
+                        {isEditing ? EDIT_TIP_TITLE : CREATE_TIP_TITLE}
                     </Text>
                 </View>
             </View>
             <ScrollView>
-                <Text className="text-base p-5 bg-ctertiary ">
-                    {CREATE_TIP_THANKS}
-                </Text>
+                {!isEditing && (
+                    <Text className="text-base p-5 bg-ctertiary ">
+                        {CREATE_TIP_THANKS}
+                    </Text>
+                )}
                 <View className="px-3 py-7">
                     <Text className={labelClassName}>
                         {CREATE_TIP_TITLE_LABEL}

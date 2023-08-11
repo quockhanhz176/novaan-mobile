@@ -3,7 +3,6 @@ import React, {
     type FC,
     useCallback,
     useRef,
-    type ReactElement,
     useEffect,
     memo,
 } from "react";
@@ -111,16 +110,19 @@ const InfiniteScroll: FC<InfiniteScrollProps> = ({
         scrollHeight.current = e.nativeEvent.layout.height;
     };
 
-    const renderItem = ({ item }: { item: InternalPost }): ReactElement => {
-        return (
-            <ScrollItem
-                post={item}
-                showUserProfile={showUserProfile}
-                onPageChange={onScrollItemPageChange}
-                isVideoPaused={item.index !== currentPage}
-            />
-        );
-    };
+    const renderItem = useCallback(
+        ({ item }: { item: InternalPost }) => {
+            return (
+                <ScrollItem
+                    post={item}
+                    showUserProfile={showUserProfile}
+                    onPageChange={onScrollItemPageChange}
+                    isVideoPaused={item.index !== currentPage}
+                />
+            );
+        },
+        [showUserProfile, currentPage]
+    );
 
     return (
         <SafeAreaView style={{ height: SCROLL_ITEM_HEIGHT }}>

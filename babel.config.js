@@ -29,5 +29,10 @@ module.exports = function (api) {
                 },
             ],
         ],
+        env: {
+            production: {
+                plugins: ["transform-remove-console"],
+            },
+        },
     };
 };

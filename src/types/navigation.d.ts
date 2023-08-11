@@ -1,7 +1,9 @@
+import { type SearchRouteProps } from "@/pages/search/Search";
 import { type UserProfileRouteProps } from "@/pages/user-profile/UserProfile";
 
 /* eslint-disable @typescript-eslint/consistent-type-definitions */
 export type RootStackParamList = {
+    SplashScreen: undefined;
     SignIn: undefined;
     SignUp: undefined;
     MainScreens: undefined;
@@ -13,7 +15,7 @@ export type RootStackParamList = {
 
 export type BottomTabParamList = {
     Home: undefined;
-    Search: undefined;
+    Search: SearchRouteProps;
     Reel: undefined;
     UserProfile: UserProfileRouteProps;
     CreatePostPopup: undefined;
@@ -27,6 +29,9 @@ export type RecipeTabParamList = {
     PortionDificultyTime: undefined;
     Ingredients: undefined;
     Instructions: undefined;
+    DietMealType: undefined;
+    Cuisine: undefined;
+    Allergen: undefined;
 };
 
 export type IngredientStackParamList = {

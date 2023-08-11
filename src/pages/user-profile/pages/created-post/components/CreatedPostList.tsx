@@ -13,17 +13,19 @@ interface CreatedPostListProps {
     hidden: boolean;
     handleItemPress: (item: MinimalPostInfo, index: number) => void;
     handleOnEndReached: () => void;
-    loading: boolean;
+    loading?: boolean;
     contentContainerStyle?: StyleProp<ViewStyle>;
+    showStatus?: boolean;
 }
 
 const CreatedPostList = ({
     data,
     hidden,
-    loading,
+    loading = false,
     handleItemPress,
     handleOnEndReached,
     contentContainerStyle,
+    showStatus = true,
 }: CreatedPostListProps): ReactElement<CreatedPostListProps> => {
     // Render as hidden when needed to avoid rendering the whole list again
 
@@ -33,6 +35,7 @@ const CreatedPostList = ({
                 index={index}
                 item={item}
                 onItemPress={handleItemPress}
+                showStatus={showStatus}
             />
         ),
         [data]

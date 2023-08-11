@@ -12,9 +12,7 @@ const ProfileStatItem = (
     return (
         <View className="items-center">
             <Text numberOfLines={1}>{props.label}</Text>
-            <Text className="text-xl font-semibold text-cprimary-300">
-                {props.value}
-            </Text>
+            <Text className="text-xl font-semibold">{props.value}</Text>
         </View>
     );
 };

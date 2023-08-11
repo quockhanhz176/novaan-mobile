@@ -25,8 +25,13 @@ const RecipeTimeInput: FC<RecipeTimeInputProps> = ({
             return;
         }
 
-        setHour(value.hour.toString());
-        setMinute(value.minute.toString());
+        if (value.hour > 0) {
+            setHour(value.hour.toString());
+        }
+
+        if (value.minute > 0) {
+            setMinute(value.minute.toString());
+        }
     }, [value]);
 
     const checkNumberInput = (

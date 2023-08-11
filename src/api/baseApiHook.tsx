@@ -11,7 +11,6 @@ import useSwr, { type Key, type SWRResponse } from "swr";
 
 // GLOBAL IN-MEMORY VARIABLE (DO NOT TOUCH)
 let tokenExpTimestamp: number = -1;
-let currentToken = "";
 
 interface RequestConfig {
     timeout?: number;
@@ -81,13 +80,7 @@ export const sendBaseRequest = async (
             config?.authorizationRequired != null &&
             config.authorizationRequired
         ) {
-            if (currentToken === "") {
-                currentToken = await getKeychainValue(KEYCHAIN_ID);
-                if (currentToken == null) {
-                    throw new Error("Access token not found");
-                }
-            }
-
+            let currentToken = await getKeychainValue(KEYCHAIN_ID);
             currentToken = await getNewTokenIfExpired(currentToken);
 
             headers.append("Authorization", `Bearer ${currentToken}`);
@@ -231,6 +224,8 @@ export const sendBaseRequest = async (
             delete headers["Content-Type"];
         }
 
+        console.log(`Requesting to: ${API_URL}${url}`);
+
         const response = await fetch(`${API_URL}${url}`, options);
         clearTimeout(timeoutId);
         return response;
@@ -308,9 +303,6 @@ export const useFetchSwr = (
         url: string,
         queryParams: string
     ]): Promise<any> => {
-        console.log("URL", url);
-        console.log("params", queryParams);
-
         const urlWithParam = `${url}${queryParams}`;
         return await getReq(urlWithParam);
     };

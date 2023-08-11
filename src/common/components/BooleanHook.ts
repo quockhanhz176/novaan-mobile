@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
 type BooleanHookReturn = [
     boolean,
@@ -13,18 +13,21 @@ const useBooleanHook = (
 ): BooleanHookReturn => {
     const [value, setInternalValue] = useState(initialValue ?? false);
 
-    const setValue = (value: boolean): void => {
-        setInternalValue(value);
-        onValueChange?.(value);
-    };
+    const setValue = useCallback(
+        (value: boolean): void => {
+            setInternalValue(value);
+            onValueChange?.(value);
+        },
+        [onValueChange]
+    );
 
-    const setFalse = (): void => {
+    const setFalse = useCallback((): void => {
         setValue(false);
-    };
+    }, [setValue]);
 
-    const setTrue = (): void => {
+    const setTrue = useCallback((): void => {
         setValue(true);
-    };
+    }, [setValue]);
 
     return [value, setFalse, setTrue, setValue];
 };

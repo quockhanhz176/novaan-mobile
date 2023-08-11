@@ -1,212 +1,220 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { getData, storeData } from "@/common/AsyncStorageService";
-import moment from "moment";
 import React, {
     useState,
     type FC,
-    memo,
-    useCallback,
-    createContext,
-    useContext,
     useEffect,
-    type ReactElement,
+    useCallback,
+    useRef,
 } from "react";
-import { StyleSheet, TouchableOpacity, View, Text } from "react-native";
-import { FlatList } from "react-native-gesture-handler";
+import {
+    FlatList,
+    ScrollView,
+    View,
+    Text,
+    TouchableOpacity,
+    Modal,
+    ActivityIndicator,
+} from "react-native";
+import TitleSection from "./components/TitleSection";
+import UserItem from "./components/UserItem";
+import homeServices from "./services/homeServices";
+import PostListSection from "./components/PostListSection";
+import {
+    HOME_ADVANCED_SEARCH_BUTTON,
+    HOME_ADVANCED_SEARCH_INTRODUCTION,
+    HOME_ADVANCED_SEARCH_TITLE,
+    HOME_FOLLOWING_POSTS_TITLE,
+    HOME_NEWEST_POSTS_TITLE,
+    HOME_POST_DETAILS_TITLE,
+    HOME_TRENDING_AUTHORS_TITLE,
+    HOME_TRENDING_RECIPES_TITLE,
+    HOME_TRENDING_TIPS_TITLE,
+} from "@/common/strings";
+import { type BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
+import { type BottomTabParamList } from "@/types/navigation";
+import useBooleanHook from "@/common/components/BooleanHook";
+import UserProfile from "../user-profile/UserProfile";
+import IconMaterial from "react-native-vector-icons/MaterialIcons";
+import InfiniteScroll from "../reel/InfiniteScrollv2";
+import { type MinimalPost } from "@/api/post/types/PostListResponse";
+import { type PostType } from "@/api/post/types/PostResponse";
+import { type RecommendationPost } from "./types/RecommendationPost";
+import type RecommendationUserResponse from "@/api/recommendation/types/RecommendationUserResponse";
+import { MD2Colors } from "react-native-paper";
 
-interface AState {
-    a: number;
-    setA: (value: number) => void;
-    b: number;
+interface HomeProps {
+    navigation: BottomTabNavigationProp<BottomTabParamList, "Home">;
 }
 
-const AContext = createContext<AState>({
-    a: 0,
-    setA: () => {},
-    b: 12,
-});
-
-const Home: FC = () => {
-    const [outer, setOuter] = useState(true);
-    const [a, setA] = useState(2);
-
-    console.log("render 0");
-
-    const onPress = (): void => {
-        setOuter(!outer);
-        setA(1 - a);
-    };
-
-    return (
-        <AContext.Provider value={{ a, setA, b: 12 }}>
-            <View className="flex-1 justify-center items-center bg-white flex-row">
-                <View className="justify-center items-center">
-                    <TouchableOpacity className="mb-5 p-3" onPress={onPress}>
-                        <Text className="text-base">{a}</Text>
-                    </TouchableOpacity>
-                    <Component1 outer={outer} />
-                </View>
-                <View className="justify-center items-center ml-3">
-                    <Component4 />
-                </View>
-                <View className="justify-center items-center ml-3">
-                    <Component6 />
-                </View>
-            </View>
-        </AContext.Provider>
+const Home: FC<HomeProps> = ({ navigation }: HomeProps) => {
+    const [trendingAuthors, setTrendingAuthors] = useState<
+        RecommendationUserResponse[]
+    >([]);
+    const [trendingRecipes, setTrendingRecipes] = useState<
+        RecommendationPost[]
+    >([]);
+    const [trendingTips, setTrendingTips] = useState<RecommendationPost[]>([]);
+    const [newestPosts, setNewestPosts] = useState<RecommendationPost[]>([]);
+    const [followingPosts, setFollowingPosts] = useState<RecommendationPost[]>(
+        []
     );
-};
+    const [profileVisible, hideProfile, showProfile] = useBooleanHook();
+    const profileIdRef = useRef<string>();
+    const [fullPostVisible, hideFullPost, showFullPost] = useBooleanHook();
+    const postRef = useRef<MinimalPost>();
+    const [loading, setLoading] = useState(true);
 
-const Component1 = memo(function Component1({
-    outer,
-}: {
-    outer: boolean;
-}): ReactElement {
-    const [number1, setNumber1] = useState(0);
-
-    const onPress = useCallback(() => {
-        setNumber1(1 - number1);
-    }, [number1]);
-
-    console.log("render 1");
-    return (
-        <View className="p-3 space-y-2 bg-[#A3B18A] items-center">
-            <TouchableOpacity onPress={onPress} className="mb-5 p-3">
-                <Text className="text-base">{number1}</Text>
-            </TouchableOpacity>
-            <Component2 />
-        </View>
-    );
-});
-
-const Component2: FC = memo(function Component2() {
-    const { a, setA } = useContext(AContext);
-
-    const onPress = useCallback(() => {
-        setA(-a);
-    }, [a]);
-
-    console.log("render 2");
-
-    return (
-        <View className="p-3 bg-[#588157] items-center">
-            <TouchableOpacity onPress={onPress} className="mb-5 p-3">
-                <Text className="text-white text-base">sun</Text>
-            </TouchableOpacity>
-            <Component3 />
-        </View>
-    );
-});
-
-const Component3: FC = memo(function Component3() {
-    const onPress = useCallback(() => {}, []);
-    const { setA } = useContext(AContext);
-
-    console.log("render 3");
-    return (
-        <View className="p-3 bg-[#3A5A40] items-center">
-            <TouchableOpacity onPress={onPress}>
-                <Text className="text-white text-base">moon</Text>
-            </TouchableOpacity>
-        </View>
-    );
-});
-
-const Component4: FC = memo(function Component4() {
-    const [w, setW] = useState<Wrapper>({ b: 6, c: 12 });
-    const [d, setD] = useState<number[]>([4, 8]);
-
-    const onPress = useCallback(() => {
-        setW({ ...w, b: -w.b });
+    useEffect(() => {
+        Promise.all([
+            homeServices.getTrendingAuthors().then((value) => {
+                value != null && setTrendingAuthors(value);
+            }),
+            homeServices.getTrendingRecipes().then((value) => {
+                value != null && setTrendingRecipes(value);
+            }),
+            homeServices.getTrendingTips().then((value) => {
+                value != null && setTrendingTips(value);
+            }),
+            homeServices.getNewestPosts().then((value) => {
+                value != null && setNewestPosts(value);
+            }),
+            homeServices.getPostsFromFollowings().then((value) => {
+                value != null && setFollowingPosts(value);
+            }),
+        ])
+            .then(() => {
+                setLoading(false);
+            })
+            .catch(() => {});
     }, []);
 
-    console.log("render 4");
+    const onAdvancedSearchClick = useCallback(() => {
+        navigation.navigate("Search", {
+            advancedSearchShown: true,
+        });
+    }, []);
+
+    const onPostClick = useCallback((postId: string, postType: PostType) => {
+        postRef.current = {
+            postId,
+            postType: postType === "recipe" ? "Recipe" : "CulinaryTip",
+        };
+        showFullPost();
+    }, []);
+
+    const onUserClick = useCallback((userId: string) => {
+        profileIdRef.current = userId;
+        showProfile();
+    }, []);
 
     return (
-        <View className="p-3 bg-[#A3B18A] items-center">
-            <TouchableOpacity onPress={onPress} className="mb-5 p-3">
-                <Text className="text-white text-base">
-                    {w.b} {w.c} {d[0]} {d[1]}
-                </Text>
-            </TouchableOpacity>
-            <Component5 w={w} setW={setW} d={d} setD={setD} />
-        </View>
-    );
-});
-
-interface Wrapper {
-    b: number;
-    c: number;
-}
-
-interface Component5Props {
-    w: Wrapper;
-    d: number[];
-    setD: (value: number[]) => void;
-    setW: (value: Wrapper) => void;
-}
-
-const Component5: FC<Component5Props> = memo(function Component5({
-    w,
-    setW,
-}: Component5Props) {
-    const onPressB = useCallback(() => {
-        setW({ ...w, b: -w.b });
-    }, [w]);
-    const onPressC = useCallback(() => {
-        setW({ ...w, c: -w.c });
-    }, [w]);
-
-    console.log("render 5");
-
-    return (
-        <View className="p-3 bg-[#588157] items-center flex-row">
-            <TouchableOpacity onPress={onPressB} className="p-1">
-                <Text className="text-white text-base">sun</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={onPressC} className="p-1">
-                <Text className="text-white text-base">dial</Text>
-            </TouchableOpacity>
-        </View>
-    );
-});
-
-const Component6: FC = () => {
-    const [data, setData] = useState([0, 1, 2, 3, ]);
-    const increase = useCallback(() => {
-        setData([...data, data.length]);
-    }, [data]);
-    return (
-        <View className="p-3 bg-[#DAD7CD] items-center">
-            <TouchableOpacity onPress={increase}>
-                <Text>Increase</Text>
-            </TouchableOpacity>
-            <Component7 data={data} />
-        </View>
-    );
-};
-
-interface Component7Props {
-    data: number[];
-}
-
-const Component7: FC<Component7Props> = ({ data }) => {
-    const [d, setD] = useState([0, 1, 2, 3, 4, 5, 6, 7, 8]);
-    const increase = useCallback(() => {
-        setD([...d, d.length]);
-    }, [d]);
-    return (
-        <View className="h-[200] bg-[#A3B18A] p-3">
-            <TouchableOpacity className="p-2" onPress={increase}>
-                <Text>Increase</Text>
-            </TouchableOpacity>
-
-            <FlatList
-                data={data}
-                renderItem={({ item }) => (
-                    <Text className="p-3 bg-2 bg-[#588157]">{item}</Text>
+        <View className="flex-1 w-full bg-white">
+            <ScrollView>
+                <View className="h-[30]" />
+                <PostListSection
+                    title={HOME_TRENDING_RECIPES_TITLE}
+                    data={trendingRecipes}
+                    onItemPress={onPostClick}
+                />
+                {trendingAuthors.length > 0 && (
+                    <TitleSection title={HOME_TRENDING_AUTHORS_TITLE}>
+                        <FlatList
+                            showsHorizontalScrollIndicator={false}
+                            horizontal={true}
+                            data={trendingAuthors}
+                            renderItem={({ item }) => (
+                                <UserItem user={item} onPress={onUserClick} />
+                            )}
+                            ListHeaderComponent={() => <View className="w-4" />}
+                            ListFooterComponent={() => <View className="w-4" />}
+                            ItemSeparatorComponent={() => (
+                                <View className="w-3" />
+                            )}
+                        />
+                    </TitleSection>
                 )}
-            />
+                <PostListSection
+                    title={HOME_TRENDING_TIPS_TITLE}
+                    data={trendingTips}
+                    onItemPress={onPostClick}
+                />
+                <View className="mb-12 rounded-lg bg-ctertiary p-4 mx-4">
+                    <View className="flex-row">
+                        <View className="flex-1">
+                            <Text className="text-xl text-capitalize font-bold">
+                                {HOME_ADVANCED_SEARCH_TITLE}
+                            </Text>
+                            <Text className="text-base mt-2">
+                                {HOME_ADVANCED_SEARCH_INTRODUCTION}
+                            </Text>
+                        </View>
+                    </View>
+                    <View className="items-end mt-6 mb-2">
+                        <TouchableOpacity
+                            className="bg-cprimary-500 px-6 py-1 rounded-full"
+                            onPress={onAdvancedSearchClick}
+                        >
+                            <Text className="text-white font-bold text-lg">
+                                {HOME_ADVANCED_SEARCH_BUTTON}
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+                <PostListSection
+                    title={HOME_NEWEST_POSTS_TITLE}
+                    data={newestPosts}
+                    onItemPress={onPostClick}
+                />
+                <PostListSection
+                    title={HOME_FOLLOWING_POSTS_TITLE}
+                    data={followingPosts}
+                    onItemPress={onPostClick}
+                />
+            </ScrollView>
+            {loading && (
+                <View className="absolute top-0 bottom-0 left-0 right-0 bg-white">
+                    <ActivityIndicator
+                        animating={true}
+                        color={MD2Colors.red400}
+                        size={100}
+                        className="absolute top-0 bottom-0 right-0 left-0"
+                    />
+                </View>
+            )}
+            <Modal
+                animationType="slide"
+                visible={profileVisible}
+                onRequestClose={hideProfile}
+            >
+                <UserProfile
+                    userId={profileIdRef?.current}
+                    onClose={hideProfile}
+                />
+            </Modal>
+            <Modal
+                animationType="slide"
+                visible={fullPostVisible}
+                onRequestClose={hideFullPost}
+            >
+                <View
+                    style={{ height: 50 }}
+                    className="flex-row justify-between items-center"
+                >
+                    <TouchableOpacity
+                        onPress={hideFullPost}
+                        className="px-4 py-2 rounded-lg"
+                    >
+                        <IconMaterial name="arrow-back" size={24} />
+                    </TouchableOpacity>
+                    <View className="flex-1 items-center mr-12">
+                        <Text className="text-base font-semibold">
+                            {HOME_POST_DETAILS_TITLE}
+                        </Text>
+                    </View>
+                </View>
+                {postRef.current != null && (
+                    <InfiniteScroll postIds={[postRef.current]} />
+                )}
+            </Modal>
         </View>
     );
 };

@@ -1,4 +1,4 @@
-import React, { useState, type FC, useContext } from "react";
+import React, { type FC, useContext } from "react";
 import {
     View,
     Text,
@@ -14,6 +14,7 @@ import { type NativeStackNavigationProp } from "@react-navigation/native-stack";
 import TDVParamTypes from "../types/TDVParams";
 import { pickVideoAndThumbnail } from "../commonServices";
 import { type RootStackParamList } from "@/types/navigation";
+import { recipeInformationContext } from "../../create-recipe/types/RecipeParams";
 
 export interface TDVRouteProps {
     labelType: keyof typeof TDVParamTypes;
@@ -27,6 +28,9 @@ export interface TitleDescriptionVideoProps {
 const TitleDescriptionVideo: FC<TitleDescriptionVideoProps> = (
     props: TitleDescriptionVideoProps
 ) => {
+    const { isEditing, thumbnail, setThumbnail } = useContext(
+        recipeInformationContext
+    );
     const {
         route: {
             params: { labelType },
@@ -37,7 +41,6 @@ const TitleDescriptionVideo: FC<TitleDescriptionVideoProps> = (
             ? useContext(TDVParamTypes[labelType].states)
             : useContext(TDVParamTypes[labelType].states);
     const labels = TDVParamTypes[labelType].labels;
-    const [thumbnailUri, setThumbnailUri] = useState<string | null>();
 
     const labelClassName = "text-base font-medium uppercase";
 
@@ -50,12 +53,16 @@ const TitleDescriptionVideo: FC<TitleDescriptionVideoProps> = (
     };
 
     const selectVideo = async (): Promise<void> => {
-        await pickVideoAndThumbnail(setVideo, setThumbnailUri);
+        await pickVideoAndThumbnail(setVideo, setThumbnail);
     };
 
     return (
         <ScrollView className="bg-white">
-            <Text className="text-base p-5 bg-ctertiary ">{labels.thank}</Text>
+            {!isEditing && (
+                <Text className="text-base p-5 bg-ctertiary ">
+                    {labels.thank}
+                </Text>
+            )}
             <View className="px-3 py-7">
                 <Text className={labelClassName}>
                     {labels.titleLabel}
@@ -100,7 +107,7 @@ const TitleDescriptionVideo: FC<TitleDescriptionVideoProps> = (
                     {labels.mediaLabel}
                     <WarningAsterisk />
                 </Text>
-                {thumbnailUri == null ? (
+                {thumbnail == null ? (
                     <TouchableOpacity
                         activeOpacity={0.5}
                         onPress={selectVideo}
@@ -126,7 +133,7 @@ const TitleDescriptionVideo: FC<TitleDescriptionVideoProps> = (
                     >
                         <Image
                             className="h-full w-full"
-                            source={{ uri: thumbnailUri }}
+                            source={{ uri: thumbnail }}
                         />
                     </TouchableOpacity>
                 )}

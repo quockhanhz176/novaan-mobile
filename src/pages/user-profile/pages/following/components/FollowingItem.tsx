@@ -1,5 +1,4 @@
 import React, {
-    useEffect,
     type ReactElement,
     useState,
     useMemo,
@@ -12,11 +11,12 @@ import {
     Text,
     Pressable,
     type GestureResponderEvent,
+    TouchableOpacity,
 } from "react-native";
-import { useFetchResourceUrl } from "@/api/utils/resourceHooks";
 import { customColors } from "@root/tailwind.config";
 import followApi from "@/api/follow/FollowApi";
 import { debounce } from "lodash";
+import { FOLLOWING_ITEM_HEIGHT } from "@/common/constants";
 
 interface FollowingItemProps {
     followInfo: MinimalUserInfo;
@@ -32,11 +32,6 @@ const FollowingItem = ({
     // TODO: Implement follow/unfollow later
     const [followingPress, setFollowingPress] = useState(false);
     const [isFollowing, setIsFollowing] = useState(true);
-
-    const { resourceUrl, fetchUrl } = useFetchResourceUrl();
-    useEffect(() => {
-        void fetchUrl(followInfo.avatar);
-    }, [followInfo.avatar]);
 
     const followingBtnColor = useMemo(() => {
         if (isFollowing) {
@@ -85,15 +80,23 @@ const FollowingItem = ({
     };
 
     return (
-        <Pressable
-            className="flex-1 flex-row mx-4 my-2 items-center"
+        <TouchableOpacity
+            className="flex-row mx-4 my-2 items-center"
+            style={{
+                height: FOLLOWING_ITEM_HEIGHT,
+                minHeight: FOLLOWING_ITEM_HEIGHT,
+            }}
             onPress={handleItemPress}
+            activeOpacity={0.6}
         >
             <View>
-                {resourceUrl === "" ? (
+                {followInfo.avatar === "" ? (
                     <Avatar.Icon size={48} icon="account-circle" />
                 ) : (
-                    <Avatar.Image size={48} source={{ uri: resourceUrl }} />
+                    <Avatar.Image
+                        size={48}
+                        source={{ uri: followInfo.avatar }}
+                    />
                 )}
             </View>
             <View className="flex-1 ml-2 ">
@@ -111,7 +114,7 @@ const FollowingItem = ({
                     </Text>
                 </Pressable>
             </View>
-        </Pressable>
+        </TouchableOpacity>
     );
 };
 

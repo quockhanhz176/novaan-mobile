@@ -14,8 +14,6 @@ import React, {
     type ReactElement,
     useRef,
     useMemo,
-    type Dispatch,
-    type SetStateAction,
     useEffect,
     useCallback,
 } from "react";
@@ -33,19 +31,20 @@ import { Toast } from "react-native-toast-message/lib/src/Toast";
 import { type NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { type RootStackParamList } from "@/types/navigation";
 import { storeData } from "@/common/AsyncStorageService";
-
-type Preference = PreferenceResponse;
+import { type RouteProp } from "@react-navigation/native";
+import { type PreferenceObj } from "@/pages/create-post/create-recipe/types/PreferenceObj";
+import { mapPreferenceObjToValue } from "@/pages/create-post/create-recipe/services/createRecipeService";
 
 export type PreferenceItem = PreferenceResponse | { selected: boolean };
 
 interface SetPreferencesProps {
     navigation: NativeStackNavigationProp<RootStackParamList, "SetPreferences">;
-    firstTime: boolean;
+    route: RouteProp<RootStackParamList, "SetPreferences">;
 }
 
 const SetPreferences = ({
     navigation,
-    firstTime,
+    route,
 }: SetPreferencesProps): ReactElement<SetPreferencesProps> => {
     // Query all preferences and save to cache
     const { diets, cuisines, allergens, getAllPreferenceOptions } =
@@ -53,9 +52,11 @@ const SetPreferences = ({
     const { getUserPreferences, setUserPreferences } = useUserPreferences();
 
     // Store selected preferences
-    const [selectedDiets, setSelectedDiets] = useState<string[]>([]);
-    const [selectedCuisines, setSelectedCuisines] = useState<string[]>([]);
-    const [selectedAllergens, setSelectedAllergens] = useState<string[]>([]);
+    const [selectedDiets, setSelectedDiets] = useState<PreferenceObj>({});
+    const [selectedCuisines, setSelectedCuisines] = useState<PreferenceObj>({});
+    const [selectedAllergens, setSelectedAllergens] = useState<PreferenceObj>(
+        {}
+    );
 
     const [index, setIndex] = useState(0);
     const [loading, setLoading] = useState(false);
@@ -64,11 +65,34 @@ const SetPreferences = ({
 
     const swiperRef = useRef<Swiper>(null);
 
+    const firstTime = useMemo(() => route.params.firstTime, [route]);
+
     const fetchUserPreferences = async (): Promise<void> => {
         const { diets, cuisines, allergens } = await getUserPreferences();
-        setSelectedDiets(diets);
-        setSelectedCuisines(cuisines);
-        setSelectedAllergens(allergens);
+        setSelectedDiets(
+            diets.reduce((acc: PreferenceObj, curr: string): PreferenceObj => {
+                acc[curr] = true;
+                return acc;
+            }, {})
+        );
+        setSelectedCuisines(
+            cuisines.reduce(
+                (acc: PreferenceObj, curr: string): PreferenceObj => {
+                    acc[curr] = true;
+                    return acc;
+                },
+                {}
+            )
+        );
+        setSelectedAllergens(
+            allergens.reduce(
+                (acc: PreferenceObj, curr: string): PreferenceObj => {
+                    acc[curr] = true;
+                    return acc;
+                },
+                {}
+            )
+        );
     };
 
     useEffect(() => {
@@ -99,27 +123,39 @@ const SetPreferences = ({
         swiperRef.current?.scrollBy(-1);
     }, [index]);
 
-    const handleSelectCategory = useCallback(
-        (state: string[], setState: Dispatch<SetStateAction<string[]>>) =>
-            (category: Preference) => {
-                // Filter to see if this is a unselect
-                const newState = state.filter((item) => item !== category.id);
-                if (newState.length >= state.length) {
-                    newState.push(category.id);
-                }
-                setState(newState);
-            },
+    const handleSelectDiets = useCallback((category: PreferenceResponse) => {
+        setSelectedDiets((selected: PreferenceObj) => ({
+            ...selected,
+            [category.id]: !(selected[category.id] ?? false),
+        }));
+    }, []);
+
+    const handleSelectCuisines = useCallback((category: PreferenceResponse) => {
+        setSelectedCuisines((selected: PreferenceObj) => ({
+            ...selected,
+            [category.id]: !(selected[category.id] ?? false),
+        }));
+    }, []);
+
+    const handleSelectAllergens = useCallback(
+        (category: PreferenceResponse) => {
+            setSelectedAllergens((selected: PreferenceObj) => ({
+                ...selected,
+                [category.id]: !(selected[category.id] ?? false),
+            }));
+        },
         []
     );
 
     const handleSubmitPreferences = async (): Promise<void> => {
         setLoading(true);
         // Save preferences
+
         try {
             await setUserPreferences({
-                diets: selectedDiets,
-                cuisines: selectedCuisines,
-                allergens: selectedAllergens,
+                diets: mapPreferenceObjToValue(selectedDiets),
+                cuisines: mapPreferenceObjToValue(selectedCuisines),
+                allergens: mapPreferenceObjToValue(selectedAllergens),
             });
         } catch {
             Toast.show({ type: "error", text1: SET_PREF_FAILED });
@@ -151,28 +187,19 @@ const SetPreferences = ({
                 <PreferenceSection
                     categories={diets}
                     selectedCategories={selectedDiets}
-                    setCategories={handleSelectCategory(
-                        selectedDiets,
-                        setSelectedDiets
-                    )}
+                    setCategories={handleSelectDiets}
                     sectionDesc={SET_PREF_DIET_GUIDE}
                 />
                 <PreferenceSection
                     categories={cuisines}
                     selectedCategories={selectedCuisines}
-                    setCategories={handleSelectCategory(
-                        selectedCuisines,
-                        setSelectedCuisines
-                    )}
+                    setCategories={handleSelectCuisines}
                     sectionDesc={SET_PREF_CUISINE_GUIDE}
                 />
                 <PreferenceSection
                     categories={allergens}
                     selectedCategories={selectedAllergens}
-                    setCategories={handleSelectCategory(
-                        selectedAllergens,
-                        setSelectedAllergens
-                    )}
+                    setCategories={handleSelectAllergens}
                     sectionDesc={SET_PREF_ALLERGEN_GUIDE}
                 />
             </Swiper>

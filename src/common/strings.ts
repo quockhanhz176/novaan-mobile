@@ -22,6 +22,8 @@ export const COMMON_EXIT_APP_YES = "Có";
 // Authentication message
 export const AUTH_EMAIL_INVALID = "*Email không hợp lệ";
 export const AUTH_PASSWORD_TOO_SHORT = "*Mật khẩu phải dài ít nhất 8 kí tự";
+export const AUTH_PASSWORD_WRONG_PATTERN =
+    "*Mật khẩu phải chứa ít nhất 1 chữ số, 1 chữ thường và 1 chữ hoa";
 export const AUTH_NAME_INVALID =
     "*Tên hiện thị chỉ bao gồm chữ hoa, chữ thường và dẫu cách giữa các từ";
 
@@ -73,6 +75,7 @@ export const CREATE_POST_UPLOAD_TIP_TITLE = "Đăng mẹo vặt";
 
 // Create tip screen
 export const CREATE_TIP_TITLE = "Đăng tải mẹo vặt";
+export const EDIT_TIP_TITLE = "Chỉnh sửa mẹo vặt";
 export const CREATE_TIP_THANKS =
     "Chúng tôi rất vui khi bạn quyết định chia sẻ mẹo vặt của mình với cộng đồng!";
 export const CREATE_TIP_TITLE_LABEL = "Tiêu đề";
@@ -90,8 +93,6 @@ export const CREATE_TIP_INVALID_ERROR_TITLE =
 export const CREATE_TIP_TITLE_REQUIRED_ERROR = "Tiêu đề không được để trống";
 export const CREATE_TIP_DESCRIPTION_REQUIRED_ERROR =
     "Mô tả không được để trống";
-export const CREATE_TIP_DESCRIPTION_TOO_SHORT_ERROR =
-    "Mô tả không được ngắn hơn 30 ký tự";
 export const CREATE_TIP_VIDEO_REQUIRED_ERROR =
     "Mẹo vặt phải được đăng kèm với video minh họa";
 export const CREATE_TIP_VIDEO_WRONG_LENGTH_ERROR =
@@ -104,6 +105,8 @@ export const CREATE_TIP_PENDING = "Mẹo vặt của bạn đang được tải 
 export const CREATE_TIP_SUCCESS = "Mẹo vặt của bạn đã được đăng tải";
 export const CREATE_TIP_FAILED = "Đã có lỗi xảy ra khi đăng tải mẹo vặt";
 export const CREATE_TIP_FAILED_SECONDARY = "Xin vui lòng thử lại sau";
+export const EDIT_TIP_PENDING = "Mẹo vặt của bạn đang được cập nhật~";
+export const EDIT_TIP_SUCCESS = "Mẹo vặt của bạn đã được chỉnh sửa";
 
 // Create recipe screen
 export const CREATE_RECIPE_TITLE = "Tạo công thức";
@@ -150,8 +153,6 @@ export const CREATE_RECIPE_INVALID_ERROR_TITLE =
 export const CREATE_RECIPE_TITLE_REQUIRED_ERROR = "Tiêu đề không được để trống";
 export const CREATE_RECIPE_DESCRIPTION_REQUIRED_ERROR =
     "Mô tả không được để trống";
-export const CREATE_RECIPE_DESCRIPTION_TOO_SHORT_ERROR =
-    "Mô tả không được ngắn hơn 30 ký tự";
 export const CREATE_RECIPE_VIDEO_REQUIRED_ERROR =
     "Công thức nấu ăn phải được đăng kèm với video minh họa";
 export const CREATE_RECIPE_VIDEO_WRONG_LENGTH_ERROR =
@@ -175,11 +176,21 @@ export const CREATE_RECIPE_SUCCESS =
     "Công thức nấu ăn của bạn đã được đăng tải";
 export const CREATE_RECIPE_FAILED =
     "Đã có lỗi xảy ra khi đăng tải công thức nấu ăn";
-export const EDIT_RECIPE_PENDING = "Công thức của bạn đang được cập nhập";
-export const EDIT_RECIPE_SUCCESS = "Công thức nấu ăn của bạn đã được chỉnh sửa";
+export const EDIT_RECIPE_PENDING = "Công thức của bạn đang được cập nhật";
+export const EDIT_RECIPE_SUCCESS = "Công thức của bạn đã được cập nhật";
 export const EDIT_RECIPE_FAILED =
     "Đã có lỗi xảy ra khi chỉnh sửa công thức nấu ăn";
 export const CREATE_RECIPE_FAILED_SECONDARY = "Xin vui lòng thử lại sau";
+export const CREATE_RECIPE_CATEGORY_SUBTITLE =
+    "Giờ hãy thêm một số thông tin thêm để mọi người có thể tìm thấy bài viết của bạn dễ dàng hơn";
+export const CREATE_RECIPE_DIET_SUBTITLE =
+    "Công thức của bạn có liên quan hoặc có thể hỗ trợ cho chế độ ăn nào không? (Không bắt buộc)";
+export const CREATE_RECIPE_MEAL_TYPES_SUBTITLE =
+    "Công thức của bạn có thể thưởng thức tốt nhất vào thời gian nào trong ngày? (Không bắt buộc)";
+export const CREATE_RECIPE_CUISINE_SUBTITLE =
+    "Công thức của bạn bắt nguồn từ nền ẩm thực nào? (Không bắt buộc)";
+export const CREATE_RECIPE_ALLERGEN_SUBTITLE =
+    "Công thức của bạn có chứa những thành phần thường gây dị ứng nào không? (Không bắt buộc)";
 
 // Add ingredient screen
 export const ADD_INGREDIENT_TITLE = "Thêm nguyên liệu";
@@ -219,7 +230,7 @@ export const PROFILE_EMPTY_RECIPE = "Oops, phần này chưa có công thức n�
 export const PROFILE_EMPTY_TIPS = "Oops, phần này chưa có mẹo vặt nào cả";
 export const PROFILE_EMPTY_FOLLOWING = "Oops, bạn chưa theo dõi ai cả";
 export const PROFILE_PAGE_LABEL = "Trang cá nhân";
-export const PROFILE_UPDATE_PREF = "Cập nhập sở thích";
+export const PROFILE_UPDATE_PREF = "Cập nhật chế độ ăn";
 export const PROFILE_LOGOUT = "Đăng xuất";
 export const PROFILE_EDIT_POST = "Chỉnh sửa bài viết";
 export const PROFILE_DELETE_POST = "Xóa bài viết";
@@ -299,6 +310,8 @@ export const ADVANCED_SEARCH_BRIEF_2 =
 export const BASIC_SEARCH_NO_POST = "Không tìm thấy bài viết nào";
 export const BASIC_SEARCH_ADVANCED_SEARCH_BUTTON = "Tìm kiếm nâng cao";
 export const BASIC_SEARCH_USER_SEARCH_BUTTON = "Tìm kiếm tác giả";
+export const BASIC_SEARCH_RECIPE = "Công thức nấu ăn";
+export const BASIC_SEARCH_TIP = "Mẹo vặt";
 
 // User search
 export const USER_SEARCH_TITLE = "Tìm kiếm người dùng";
@@ -329,5 +342,21 @@ export const SET_PREF_ALLERGEN_GUIDE =
     "Cuối cùng, hãy lựa chọn những thực phẩm có thể gây dị ứng hoặc không phù hợp với bạn để app có thể hạn chế mốt số công thức";
 
 export const SET_PREF_FAILED =
-    "Cập nhập không thành công. Vui lòng thử lại sau";
-export const SET_PREF_SUCCESS = "Sở thích của bạn đã được cập nhập";
+    "cập nhật không thành công. Vui lòng thử lại sau";
+export const SET_PREF_SUCCESS = "Chế độ ăn của bạn đã được cập nhật";
+
+// Home
+export const HOME_LIKE_COUNT = "lượt thích";
+export const HOME_TRENDING_AUTHORS_TITLE = "Xem thêm từ";
+export const HOME_TRENDING_RECIPES_TITLE = "Công thức của tháng";
+export const HOME_TRENDING_TIPS_TITLE = "Mẹo vặt của tháng";
+export const HOME_NEWEST_POSTS_TITLE = "Những bài viết mới";
+export const HOME_FOLLOWING_POSTS_TITLE = "Bài viết từ tác giả bạn quan tâm";
+export const HOME_ADVANCED_SEARCH_TITLE = "Tìm kiếm nâng cao";
+export const HOME_ADVANCED_SEARCH_INTRODUCTION =
+    "Tìm công thức nấu ăn bạn có thể chuẩn bị chỉ với các nguyên liệu có sẵn?";
+export const HOME_ADVANCED_SEARCH_BUTTON = "Bắt đầu";
+export const HOME_POST_DETAILS_TITLE = "Chi tiết bài viết";
+
+// Splash screen
+export const SPLASH_SCREEN_APP_NAME = "NOVAAN";

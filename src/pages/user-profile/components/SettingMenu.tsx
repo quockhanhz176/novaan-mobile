@@ -35,7 +35,6 @@ const SettingMenu = ({
         await invalidateData("userPreferenceData");
         await invalidateData("haveUserSetPreference");
 
-        // Clear user token
         await deleteKeychainValue(KEYCHAIN_ID);
 
         // To login

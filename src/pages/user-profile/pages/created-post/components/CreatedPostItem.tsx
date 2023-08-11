@@ -1,5 +1,5 @@
 import { type MinimalPostInfo } from "@/api/profile/types";
-import React, { memo, useState, type ReactElement } from "react";
+import React, { memo, useState, type ReactElement, useEffect } from "react";
 import {
     type ImageErrorEventData,
     type NativeSyntheticEvent,
@@ -8,19 +8,32 @@ import {
 import { Card } from "react-native-paper";
 import MaterialCIcon from "react-native-vector-icons/MaterialCommunityIcons";
 import PostItemStatusOverlay from "./PostItemStatusOverlay";
+import { customColors } from "@root/tailwind.config";
+import { useFetchResourceUrl } from "@/api/utils/resourceHooks";
 
 interface CreatedPostItemProps {
     index: number;
     item: MinimalPostInfo;
     onItemPress: (item: MinimalPostInfo, index: number) => void;
+    showStatus?: boolean;
 }
 
 const CreatedPostItem = ({
     index,
     item,
     onItemPress,
+    showStatus = true,
 }: CreatedPostItemProps): ReactElement<CreatedPostItemProps> => {
+    const { fetchUrl, resourceUrl } = useFetchResourceUrl();
+
     const [imageFailed, setImageFailed] = useState(false);
+
+    useEffect(() => {
+        if (item.thumbnail == null || item.thumbnail === "") {
+            return;
+        }
+        void fetchUrl(item.thumbnail);
+    }, [item.thumbnail]);
 
     const handleError = (
         e: NativeSyntheticEvent<ImageErrorEventData>
@@ -32,6 +45,10 @@ const CreatedPostItem = ({
         onItemPress(item, index);
     };
 
+    if (item.title === "Communication: Roosters") {
+        console.log(imageFailed);
+    }
+
     return (
         <View className="w-1/2 items-center my-2">
             <Card
@@ -40,28 +57,28 @@ const CreatedPostItem = ({
                 style={{ width: "90%", position: "relative" }}
                 onPress={onPress}
             >
-                <PostItemStatusOverlay status={item.status} />
-                {!imageFailed ? (
-                    <>
-                        <Card.Cover
-                            source={{
-                                // TODO: Replace with thumbnail later
-                                uri: item.title,
-                            }}
-                            onError={handleError}
-                            theme={{ roundness: 4 }}
-                        />
-                    </>
-                ) : (
+                {showStatus && item.status != null && (
+                    <PostItemStatusOverlay status={item.status} />
+                )}
+                {imageFailed || resourceUrl == null || resourceUrl === "" ? (
                     <View
-                        className="flex-1 justify-center items-center bg-gray-200 rounded-t-lg"
-                        style={{ height: 195 }}
+                        className="justify-center items-center bg-gray-200 rounded-t-lg"
+                        style={{ height: 195, minHeight: 195 }}
                     >
                         <MaterialCIcon
                             name="file-image-remove-outline"
-                            size={24}
+                            size={40}
+                            color={customColors.cgrey.grey}
                         />
                     </View>
+                ) : (
+                    <Card.Cover
+                        source={{
+                            uri: resourceUrl,
+                        }}
+                        onError={handleError}
+                        theme={{ roundness: 4 }}
+                    />
                 )}
                 <Card.Title
                     title={item.title}

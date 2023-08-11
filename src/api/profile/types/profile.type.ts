@@ -1,6 +1,7 @@
 import type PostResponse from "@/api/post/types/PostResponse";
 import type PreferenceSuiteResponse from "@/api/search/types/PreferenceSuiteResponse";
 import { type Undefinable } from "@/types/app";
+import { type AllPreferenceResponse } from "./preference.type";
 
 export interface Followership {
     id: string;
@@ -37,12 +38,12 @@ export interface SavedPostResponse {
     postType: "Recipe" | "CulinaryTip";
 }
 
-export type MinimalPostInfo = Pick<
-    PostResponse,
-    "id" | "type" | "title" | "status"
->;
+export type MinimalPostInfo = Pick<PostResponse, "id" | "type" | "title"> & {
+    status?: number;
+    thumbnail?: string;
+};
 
-export interface UseAppPreferenceReturn extends PreferenceSuiteResponse {
+export interface UseAppPreferenceReturn extends AllPreferenceResponse {
     getAllPreferenceOptions: () => Promise<boolean>;
 }
 

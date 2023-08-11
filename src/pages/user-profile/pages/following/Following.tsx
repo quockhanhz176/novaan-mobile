@@ -1,52 +1,51 @@
-import React, { useEffect, type ReactElement, useState, useMemo } from "react";
+import React, {
+    useEffect,
+    type ReactElement,
+    useState,
+    useContext,
+    memo,
+    useCallback,
+} from "react";
 import { useUserFollowing } from "@/api/profile/ProfileApi";
 import { FlatList, View, Modal } from "react-native";
 import FollowingItem from "./components/FollowingItem";
-import { content } from "@root/tailwind.config";
 import { type MinimalUserInfo } from "@/api/profile/types";
 import { type Undefinable } from "@/types/app";
-import UserProfile from "../../UserProfile";
+import UserProfile, { UserProfileContext } from "../../UserProfile";
+import EmptyFollowing from "./components/EmptyFollowing";
+import { BOTTOM_NAV_HEIGHT, FOLLOWING_ITEM_HEIGHT } from "@/common/constants";
 
 interface FollowingProps {
-    userId?: string;
     setFollowingCount?: (setter: (value: number) => number) => void;
 }
 
 const Following = ({
-    userId,
     setFollowingCount,
 }: FollowingProps): ReactElement<FollowingProps> => {
+    const { userInfo } = useContext(UserProfileContext);
     const {
-        content: following,
+        content,
         ended,
-        getNext,
-        refresh,
-    } = useUserFollowing(userId);
-
-    const [loading, setLoading] = useState(false);
+        getNext: getNextFollowing,
+    } = useUserFollowing(userInfo?.userId);
 
     const [viewingProfile, setViewProfile] = useState(false);
     const [selectedProfile, setSelectedProfile] =
         useState<Undefinable<MinimalUserInfo>>(undefined);
 
-    const isEmpty = useMemo(
-        () => ended && content.length === 0,
-        [content, ended]
-    );
-
-    useEffect(() => {
-        refresh();
-        void getNext();
-    }, [userId]);
-
-    const handleGetMoreFollowing = async (): Promise<void> => {
+    const fetchMoreFollowing = async (): Promise<void> => {
         if (ended) {
             return;
         }
-        setLoading(true);
-        await getNext();
-        setLoading(false);
+        await getNextFollowing();
     };
+
+    useEffect(() => {
+        if (userInfo == null) {
+            return;
+        }
+        void fetchMoreFollowing();
+    }, [userInfo]);
 
     const handleItemPress = (item: MinimalUserInfo): void => {
         setSelectedProfile(item);
@@ -58,26 +57,40 @@ const Following = ({
         setViewProfile(false);
     };
 
+    const renderItem = useCallback(
+        ({ item }: { item: MinimalUserInfo }): any => {
+            return (
+                <FollowingItem
+                    followInfo={item}
+                    onItemPress={handleItemPress}
+                    setFollowingCount={setFollowingCount}
+                />
+            );
+        },
+        []
+    );
+
     return (
         <View className="flex-1">
-            <FlatList
-                style={{ display: isEmpty ? "none" : "flex" }}
-                data={following}
-                className="w-full"
-                keyExtractor={(item) => item.userId}
-                contentContainerStyle={{ marginTop: 8 }}
-                renderItem={({ item }) => (
-                    <FollowingItem
-                        followInfo={item}
-                        onItemPress={handleItemPress}
-                        setFollowingCount={setFollowingCount}
-                    />
-                )}
-                onEndReached={handleGetMoreFollowing}
-                onEndReachedThreshold={1}
-                refreshing={loading}
-                showsVerticalScrollIndicator={false}
-            />
+            {content == null || content.length === 0 ? (
+                <EmptyFollowing />
+            ) : (
+                <FlatList
+                    data={content}
+                    className="w-full"
+                    keyExtractor={(item) => item.userId}
+                    contentContainerStyle={{ marginTop: 8 }}
+                    renderItem={renderItem}
+                    getItemLayout={(_, index) => ({
+                        length: FOLLOWING_ITEM_HEIGHT,
+                        offset: FOLLOWING_ITEM_HEIGHT * index,
+                        index,
+                    })}
+                    style={{ paddingBottom: BOTTOM_NAV_HEIGHT }}
+                    onEndReached={fetchMoreFollowing}
+                    showsVerticalScrollIndicator={false}
+                />
+            )}
             <Modal animationType="slide" visible={viewingProfile}>
                 <UserProfile
                     userId={selectedProfile?.userId}
@@ -88,4 +101,4 @@ const Following = ({
     );
 };
 
-export default Following;
+export default memo(Following);

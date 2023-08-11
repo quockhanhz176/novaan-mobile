@@ -128,11 +128,9 @@ const InfiniteScroll: FC<InfiniteScrollProps> = ({
         ({
             item,
             index,
-            currentPage,
         }: {
             item: MinimalPost;
             index: number;
-            currentPage: number;
         }): ReactElement => {
             return (
                 <ScrollItem
@@ -144,7 +142,7 @@ const InfiniteScroll: FC<InfiniteScrollProps> = ({
                 />
             );
         },
-        []
+        [currentPage]
     );
 
     if (renderPosts.length === 0) {
@@ -161,9 +159,7 @@ const InfiniteScroll: FC<InfiniteScrollProps> = ({
                 onMomentumScrollEnd={onMomentumScrollEnd}
                 scrollEnabled={scrollEnabled}
                 pagingEnabled={true}
-                renderItem={({ item, index }) =>
-                    renderItem({ item, index, currentPage })
-                }
+                renderItem={renderItem}
                 onEndReachedThreshold={END_REACH_THRESHOLD}
                 onEndReached={fetchNextData}
                 onLayout={onLayout}

@@ -115,10 +115,15 @@ const Details = (): ReactElement => {
                         emptyStar={"star"}
                         disabled
                         emptyStarColor={customColors.cgrey.platinum}
-                        rating={4.5}
+                        rating={currentPost.averageRating}
                     />
                 </View>
-                <Text className="text-base text-cprimary-300">4.5</Text>
+                <Text className="text-base text-cprimary-300">
+                    {currentPost.averageRating.toFixed(1)}
+                </Text>
+                <Text className="text-base text-cprimary-300 ml-2">
+                    ({currentPost.ratingCount})
+                </Text>
             </View>
             <View className="flex-row justify-between items-center mx-4 mt-8">
                 <View className="flex-row justify-start items-center">

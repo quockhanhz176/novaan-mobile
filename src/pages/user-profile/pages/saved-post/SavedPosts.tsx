@@ -34,8 +34,6 @@ const SavedPosts = (): ReactElement => {
         getNext: getNextSavedPosts,
     } = useUserSavedPost(userInfo?.userId);
 
-    const [fetching, setFetching] = useState(false);
-
     const [viewCategory, setViewCategory] = useState<ViewCategory>("recipe");
     const [viewingItem, setViewingItem] = useState(false);
     const [viewItem, setViewItem] =
@@ -45,42 +43,45 @@ const SavedPosts = (): ReactElement => {
         if (ended) {
             return;
         }
-        setFetching(true);
         await getNextSavedPosts();
-        setFetching(false);
     };
 
     useEffect(() => {
+        if (userInfo == null) {
+            return;
+        }
         void fetchMorePost();
     }, [userInfo]);
 
-    const savedRecipes: MinimalPostInfo[] = useMemo(
-        () =>
-            content
-                .filter((post) => post.postType === "Recipe")
-                .map(
-                    (item): MinimalPostInfo => ({
-                        id: item.postId,
-                        type: "recipe",
-                        title: item.postTitle,
-                    })
-                ),
-        [content]
-    );
+    const savedRecipes: MinimalPostInfo[] = useMemo(() => {
+        if (content == null || content.length === 0) {
+            return [];
+        }
+        return content
+            .filter((post) => post.postType === "Recipe")
+            .map(
+                (item): MinimalPostInfo => ({
+                    id: item.postId,
+                    type: "recipe",
+                    title: item.postTitle,
+                })
+            );
+    }, [content]);
 
-    const savedTips: MinimalPostInfo[] = useMemo(
-        () =>
-            content
-                .filter((tip) => tip.postType === "CulinaryTip")
-                .map(
-                    (item): MinimalPostInfo => ({
-                        id: item.postId,
-                        type: "tip",
-                        title: item.postTitle,
-                    })
-                ),
-        [content]
-    );
+    const savedTips: MinimalPostInfo[] = useMemo(() => {
+        if (content == null || content.length === 0) {
+            return [];
+        }
+        return content
+            .filter((tip) => tip.postType === "CulinaryTip")
+            .map(
+                (item): MinimalPostInfo => ({
+                    id: item.postId,
+                    type: "tip",
+                    title: item.postTitle,
+                })
+            );
+    }, [content]);
 
     const recipesEmpty = useMemo(
         () => savedRecipes.length === 0,
@@ -149,7 +150,6 @@ const SavedPosts = (): ReactElement => {
                     <CreatedPostList
                         hidden={viewCategory !== "recipe"}
                         data={savedRecipes}
-                        loading={fetching}
                         handleItemPress={handleItemPress}
                         handleOnEndReached={fetchMorePost}
                     />
@@ -163,7 +163,6 @@ const SavedPosts = (): ReactElement => {
                     <CreatedPostList
                         hidden={viewCategory !== "tips"}
                         data={savedTips}
-                        loading={fetching}
                         handleItemPress={handleItemPress}
                         handleOnEndReached={fetchMorePost}
                     />
