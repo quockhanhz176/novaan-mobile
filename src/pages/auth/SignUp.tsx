@@ -28,6 +28,7 @@ import {
     SIGN_UP_NAME_PLACEHOLDER,
     SIGN_UP_NAME_TITLE,
     AUTH_NAME_INVALID,
+    AUTH_PASSWORD_WRONG_PATTERN,
 } from "@/common/strings";
 import authApi from "@/api/auth/AuthApi";
 import OverlayLoading from "@/common/components/OverlayLoading";
@@ -177,6 +178,7 @@ const SignUp = (props: SignUpProps): ReactElement<SignUpProps> => {
                         rules={{
                             required: true,
                             minLength: 8,
+                            pattern: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/,
                         }}
                         render={({ field: { onChange, onBlur, value } }) => (
                             <TextInput
@@ -199,6 +201,9 @@ const SignUp = (props: SignUpProps): ReactElement<SignUpProps> => {
                         )}
                         {errors.password?.type === "minLength" && (
                             <ErrorText>{AUTH_PASSWORD_TOO_SHORT}</ErrorText>
+                        )}
+                        {errors.password?.type === "pattern" && (
+                            <ErrorText>{AUTH_PASSWORD_WRONG_PATTERN}</ErrorText>
                         )}
                     </View>
 

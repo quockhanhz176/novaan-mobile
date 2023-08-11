@@ -22,6 +22,8 @@ export const COMMON_EXIT_APP_YES = "Có";
 // Authentication message
 export const AUTH_EMAIL_INVALID = "*Email không hợp lệ";
 export const AUTH_PASSWORD_TOO_SHORT = "*Mật khẩu phải dài ít nhất 8 kí tự";
+export const AUTH_PASSWORD_WRONG_PATTERN =
+    "*Mật khẩu phải chứa ít nhất 1 chữ số, 1 chữ thường và 1 chữ hoa";
 export const AUTH_NAME_INVALID =
     "*Tên hiện thị chỉ bao gồm chữ hoa, chữ thường và dẫu cách giữa các từ";
 
