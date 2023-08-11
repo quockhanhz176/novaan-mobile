@@ -1,5 +1,4 @@
 import type PostResponse from "@/api/post/types/PostResponse";
-import type PreferenceSuiteResponse from "@/api/search/types/PreferenceSuiteResponse";
 import { type Undefinable } from "@/types/app";
 import { type AllPreferenceResponse } from "./preference.type";
 

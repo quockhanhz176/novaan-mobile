@@ -94,8 +94,7 @@ export const usePostInfo = (): UsePostInfoReturn => {
     const [postInfo, setPostInfo] = useState<Undefinable<Post>>(undefined);
 
     const fetchPostInfo = async (
-        info: MinimalPost,
-        fromCache = true
+        info: MinimalPost
     ): Promise<Undefinable<Post>> => {
         const requestUrl =
             info.postType === "Recipe" ? GET_RECIPE_URL : GET_TIP_URL;

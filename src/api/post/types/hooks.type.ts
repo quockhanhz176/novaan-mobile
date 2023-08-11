@@ -17,10 +17,7 @@ export interface UsePostListReturn {
 
 export interface UsePostInfoReturn {
     postInfo: Undefinable<Post>;
-    fetchPostInfo: (
-        info: MinimalPost,
-        fromCache?: boolean
-    ) => Promise<Undefinable<Post>>;
+    fetchPostInfo: (info: MinimalPost) => Promise<Undefinable<Post>>;
 }
 
 export interface UsePostCommentsReturn {

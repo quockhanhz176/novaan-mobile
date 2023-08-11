@@ -176,22 +176,6 @@ const SignIn = (props: SignInProps): ReactElement<SignInProps> => {
         navigation.navigate("SignUp");
     };
 
-    const handleSignInSuccessRedirect = async (): Promise<void> => {
-        // Load data from cache (if possbile)
-        // If not, load data from API
-        let notFirstTime = await getData("haveUserSetPreference");
-        if (notFirstTime == null) {
-            notFirstTime = await haveUserSetPreference();
-        }
-
-        if (!notFirstTime) {
-            navigation.navigate("Greet");
-            return;
-        }
-
-        navigation.navigate("MainScreens");
-    };
-
     return (
         <>
             <View className="flex-1 mt-24 mx-8">

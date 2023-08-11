@@ -10,7 +10,3 @@ export default interface TipSubmission {
 export interface TipEdit extends Pick<TipSubmission, "title" | "description"> {
     video: ImagePicker.Asset | null | undefined | string;
 }
-
-export interface TipEdit extends Pick<TipSubmission, "title" | "description"> {
-    video: ImagePicker.Asset | null | undefined | string;
-}

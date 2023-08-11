@@ -165,7 +165,7 @@ const UserProfile = ({
                             onPress={onClose}
                             className="pr-2 py-2 rounded-lg"
                         >
-                            <MaterialCIcon name="arrow-back" size={24} />
+                            <MaterialIcon name="arrow-back" size={24} />
                         </Pressable>
                     )}
                 </View>
