@@ -7,23 +7,16 @@ import React, {
     useState,
     memo,
 } from "react";
-import { Modal, Pressable, Text, TouchableOpacity, View } from "react-native";
 import { UserProfileContext } from "../../UserProfile";
 import { ToggleButton } from "react-native-paper";
 import CustomToggleButton from "../created-post/components/CustomToggleButton";
-import {
-    PROFILE_EMPTY_RECIPE,
-    PROFILE_EMPTY_TIPS,
-    PROFILE_POSTED_TITLE,
-} from "@/common/strings";
+import { PROFILE_EMPTY_RECIPE, PROFILE_EMPTY_TIPS } from "@/common/strings";
 import CreatedPostList from "../created-post/components/CreatedPostList";
 import EmptyCreatedPost from "../created-post/components/EmptyCreatedPost";
 import { type Undefinable } from "@/types/app";
 import { type MinimalPostInfo } from "@/api/profile/types";
-import InfiniteScroll from "@/pages/reel/InfiniteScrollv2";
-import IonIcon from "react-native-vector-icons/Ionicons";
-import MaterialIcon from "react-native-vector-icons/MaterialIcons";
 import PostDetailModal from "../created-post/components/PostDetailModal";
+import { View } from "react-native";
 
 type ViewCategory = "recipe" | "tips";
 
