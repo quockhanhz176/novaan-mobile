@@ -1,4 +1,4 @@
-import React, { type ReactElement } from "react";
+import React, { type ReactElement, memo } from "react";
 import { Modal, View, TouchableOpacity, Text } from "react-native";
 import { type NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { type RootStackParamList } from "@/types/navigation";
@@ -13,17 +13,19 @@ import { type MinimalPostInfo } from "@/api/profile/types";
 import { useNavigation } from "@react-navigation/native";
 import { type Undefinable } from "@/types/app";
 
-interface CreatedPostModalProps {
+interface PostDetailModalProps {
     visible: boolean;
     onDimiss: () => void;
     viewItem: Undefinable<MinimalPostInfo>;
+    showSetting?: boolean;
 }
 
-const CreatedPostModal = ({
+const PostDetailModal = ({
     visible,
     onDimiss,
     viewItem,
-}: CreatedPostModalProps): ReactElement<CreatedPostModalProps> => {
+    showSetting = false,
+}: PostDetailModalProps): ReactElement<PostDetailModalProps> => {
     const rootNavigation =
         useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
@@ -73,17 +75,19 @@ const CreatedPostModal = ({
                             {PROFILE_POSTED_TITLE}
                         </Text>
                     </View>
-                    <View className="flex-1 justify-center items-end">
-                        <TouchableOpacity
-                            className="px-4 py-2 rounded-lg"
-                            onPress={showPostSetting}
-                        >
-                            <IonIcon
-                                name="ios-ellipsis-vertical-sharp"
-                                size={18}
-                            />
-                        </TouchableOpacity>
-                    </View>
+                    {showSetting && (
+                        <View className="flex-1 justify-center items-end">
+                            <TouchableOpacity
+                                className="px-4 py-2 rounded-lg"
+                                onPress={showPostSetting}
+                            >
+                                <IonIcon
+                                    name="ios-ellipsis-vertical-sharp"
+                                    size={18}
+                                />
+                            </TouchableOpacity>
+                        </View>
+                    )}
                 </View>
                 <InfiniteScroll
                     postIds={[
@@ -98,14 +102,19 @@ const CreatedPostModal = ({
                     showUserProfile={false}
                 />
             </Modal>
-            <CustomModal visible={postSettingOpen} onDismiss={hidePostSetting}>
-                <PostSettingMenu
-                    onEditPost={handleEditPost}
-                    onDeletePost={handleDeletePost}
-                />
-            </CustomModal>
+            {showSetting && (
+                <CustomModal
+                    visible={postSettingOpen}
+                    onDismiss={hidePostSetting}
+                >
+                    <PostSettingMenu
+                        onEditPost={handleEditPost}
+                        onDeletePost={handleDeletePost}
+                    />
+                </CustomModal>
+            )}
         </>
     );
 };
 
-export default CreatedPostModal;
+export default memo(PostDetailModal);

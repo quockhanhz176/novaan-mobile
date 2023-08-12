@@ -23,6 +23,7 @@ import { type MinimalPostInfo } from "@/api/profile/types";
 import InfiniteScroll from "@/pages/reel/InfiniteScrollv2";
 import IonIcon from "react-native-vector-icons/Ionicons";
 import MaterialIcon from "react-native-vector-icons/MaterialIcons";
+import PostDetailModal from "../created-post/components/PostDetailModal";
 
 type ViewCategory = "recipe" | "tips";
 
@@ -168,46 +169,11 @@ const SavedPosts = (): ReactElement => {
                     />
                 )}
             </View>
-            <Modal animationType="slide" visible={viewingItem}>
-                <View style={{ height: 50 }} className="flex-row">
-                    <View className="flex-1 justify-center items-start">
-                        <Pressable
-                            onPress={handleCloseItemView}
-                            className="px-4 py-2 rounded-lg"
-                        >
-                            <MaterialIcon name="arrow-back" size={24} />
-                        </Pressable>
-                    </View>
-                    <View className="flex-1 justify-center items-center">
-                        <Text className="text-base">
-                            {PROFILE_POSTED_TITLE}
-                        </Text>
-                    </View>
-                    <View className="flex-1 justify-center items-end">
-                        {/* TODO: Add delete + edit post options here */}
-                        <TouchableOpacity className="px-4 py-2 rounded-lg">
-                            <IonIcon
-                                name="ios-ellipsis-vertical-sharp"
-                                size={18}
-                            />
-                        </TouchableOpacity>
-                    </View>
-                </View>
-                {viewItem != null && (
-                    <InfiniteScroll
-                        postIds={[
-                            {
-                                postId: viewItem.id,
-                                postType:
-                                    viewItem.type === "recipe"
-                                        ? "Recipe"
-                                        : "CulinaryTip",
-                            },
-                        ]}
-                        showUserProfile={true}
-                    />
-                )}
-            </Modal>
+            <PostDetailModal
+                visible={viewingItem}
+                onDimiss={handleCloseItemView}
+                viewItem={viewItem}
+            />
         </View>
     );
 };

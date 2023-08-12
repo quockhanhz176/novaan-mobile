@@ -16,7 +16,7 @@ import CreatedPostList from "./components/CreatedPostList";
 import EmptyCreatedPost from "./components/EmptyCreatedPost";
 import { type Undefinable } from "@/types/app";
 import { type MinimalPostInfo } from "@/api/profile/types";
-import CreatedPostModal from "./components/CreatedPostModal";
+import PostDetailModal from "./components/PostDetailModal";
 
 type ViewCategory = "recipe" | "tips";
 
@@ -189,10 +189,11 @@ const CreatedPosts = ({
                     />
                 )}
             </View>
-            <CreatedPostModal
+            <PostDetailModal
                 visible={viewingItem}
                 onDimiss={handleCloseItemView}
                 viewItem={viewItem}
+                showSetting
             />
         </View>
     );
