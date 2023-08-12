@@ -75,8 +75,8 @@ const PostDetailModal = ({
                             {PROFILE_POSTED_TITLE}
                         </Text>
                     </View>
-                    {showSetting && (
-                        <View className="flex-1 justify-center items-end">
+                    <View className="flex-1 justify-center items-end">
+                        {showSetting && (
                             <TouchableOpacity
                                 className="px-4 py-2 rounded-lg"
                                 onPress={showPostSetting}
@@ -86,8 +86,8 @@ const PostDetailModal = ({
                                     size={18}
                                 />
                             </TouchableOpacity>
-                        </View>
-                    )}
+                        )}
+                    </View>
                 </View>
                 <InfiniteScroll
                     postIds={[
