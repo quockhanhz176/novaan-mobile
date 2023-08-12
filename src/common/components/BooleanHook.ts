@@ -23,11 +23,11 @@ const useBooleanHook = (
 
     const setFalse = useCallback((): void => {
         setValue(false);
-    }, [setValue]);
+    }, []);
 
     const setTrue = useCallback((): void => {
         setValue(true);
-    }, [setValue]);
+    }, []);
 
     return [value, setFalse, setTrue, setValue];
 };

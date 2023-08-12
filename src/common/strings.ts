@@ -235,6 +235,13 @@ export const PROFILE_UPDATE_PREF = "Cập nhật chế độ ăn";
 export const PROFILE_LOGOUT = "Đăng xuất";
 export const PROFILE_EDIT_POST = "Chỉnh sửa bài viết";
 export const PROFILE_DELETE_POST = "Xóa bài viết";
+export const PROFILE_POST_WARNING = "Thông báo hệ thống";
+export const PROFILE_POST_WARNING_ACCEPT = "Tôi đã hiểu";
+export const PROFILE_POST_REASON = "Lý do chi tiết:";
+export const PROFILE_POST_REPORTED_MSG =
+    "Bài viết của bạn đã bị báo cáo bởi một số người dùng! Vui lòng xem chi tiết để chỉnh sửa phù hợp";
+export const PROFILE_POST_REJECTED_MSG =
+    "Rất tiếc bài viết của bạn chưa được chấp nhận! Vui lòng xem chi tiết để chỉnh sửa phù hợp";
 
 // Reel screen
 export const REEL_DETAILS_RATING = "đánh giá";

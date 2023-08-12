@@ -28,8 +28,6 @@ const Search: FC<SearchProps> = ({ route, navigation }) => {
         navigation.setParams({ advancedSearchShown: false });
     }
 
-    console.log("render");
-
     const [advancedSearchVisible, hideAdvancedSearch, showAdvancedSearch] =
         useBooleanHook(undefined, advancedSearchShown);
     const [userSearchVisible, hideUserSearch, showUserSearch] =

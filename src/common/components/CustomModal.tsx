@@ -18,7 +18,7 @@ interface CusomModalProps {
 
 // TODO: not render CreatePostPopup when hidden without compromising animation
 const CustomModal: FC<CusomModalProps> = ({ visible, onDismiss, children }) => {
-    const [internalVisible, setInternalVisible] = useState(visible);
+    const [internalVisible, setInternalVisible] = useState(false);
 
     const dismissModal = (): void => {
         onDismiss?.();

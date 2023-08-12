@@ -107,7 +107,6 @@ const Comments = ({
             return;
         }
         const action = userComment == null ? "add" : "edit";
-        console.log(userComment);
 
         // Check if comment need to edit
         if (action === "edit") {

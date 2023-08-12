@@ -83,7 +83,6 @@ const UserSearch: FC<UserSearchProps> = ({ navigateBack }) => {
     }, []);
 
     const onItemPress = useCallback((userId: string) => {
-        console.log("userId", userId);
         setProfileId(userId);
         showProfile();
     }, []);
