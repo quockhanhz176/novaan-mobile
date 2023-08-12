@@ -7,28 +7,16 @@ import React, {
     useMemo,
     memo,
 } from "react";
-import { Modal, View, Text, TouchableOpacity } from "react-native";
-import InfiniteScroll from "@/pages/reel/InfiniteScrollv2";
-import MaterialIcon from "react-native-vector-icons/MaterialIcons";
-import IonIcon from "react-native-vector-icons/Ionicons";
-import {
-    PROFILE_EMPTY_RECIPE,
-    PROFILE_EMPTY_TIPS,
-    PROFILE_POSTED_TITLE,
-} from "@/common/strings";
+import { View } from "react-native";
+import { PROFILE_EMPTY_RECIPE, PROFILE_EMPTY_TIPS } from "@/common/strings";
 import { ToggleButton } from "react-native-paper";
 import CustomToggleButton from "./components/CustomToggleButton";
 import { UserProfileContext } from "../../UserProfile";
 import CreatedPostList from "./components/CreatedPostList";
 import EmptyCreatedPost from "./components/EmptyCreatedPost";
 import { type Undefinable } from "@/types/app";
-import CustomModal from "@/common/components/CustomModal";
-import useBooleanHook from "@/common/components/BooleanHook";
-import PostSettingMenu from "./components/PostSettingMenu";
-import { useNavigation } from "@react-navigation/native";
-import { type RootStackParamList } from "@/types/navigation";
-import { type NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { type MinimalPostInfo } from "@/api/profile/types";
+import CreatedPostModal from "./components/CreatedPostModal";
 
 type ViewCategory = "recipe" | "tips";
 
@@ -39,18 +27,18 @@ interface CreatedPostsProps {
 const CreatedPosts = ({
     showStatus = true,
 }: CreatedPostsProps): ReactElement<CreatedPostsProps> => {
-    const userProfileContext = useContext(UserProfileContext);
+    const { userInfo } = useContext(UserProfileContext);
     const {
         getNext: getNextRecipes,
         content: recipes,
         ended: recipesEnded,
-    } = useUserRecipes(userProfileContext.userInfo?.userId);
+    } = useUserRecipes(userInfo?.userId);
 
     const {
         getNext: getNextTips,
         content: tips,
         ended: tipsEnded,
-    } = useUserTips(userProfileContext.userInfo?.userId);
+    } = useUserTips(userInfo?.userId);
 
     const formatRecipes: MinimalPostInfo[] = useMemo(() => {
         if (recipes.length === 0) {
@@ -85,14 +73,8 @@ const CreatedPosts = ({
     const [viewCategory, setViewCategory] = useState<ViewCategory>("recipe");
     const [fetching, setFetching] = useState(false);
 
-    const [postSettingOpen, hidePostSetting, showPostSetting] =
-        useBooleanHook();
-
     const recipesEmpty = useMemo(() => recipes.length === 0, [recipes]);
     const tipsEmpty = useMemo(() => tips.length === 0, [tips]);
-
-    const rootNavigation =
-        useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
     // Fetch data if it is currently empty
     useEffect(() => {
@@ -121,43 +103,6 @@ const CreatedPosts = ({
         setFetching(false);
     };
 
-    // const postGetterProfile = async (index: number): Promise<Post | null> => {
-    //     // Only allow viewing current item for now
-    //     // TODO: Improve by adding option to navigate to a specific index in InfiniteScroll
-    //     if (index !== 0) {
-    //         return null;
-    //     }
-
-    //     if (viewItem === undefined) {
-    //         return null;
-    //     }
-
-    //     const userInfo = userProfileContext.userInfo;
-    //     if (userInfo == null) {
-    //         return null;
-    //     }
-
-    //     const isRecipe = (item: PostResponse): item is RecipeResponse => {
-    //         return "ingredients" in item;
-    //     };
-
-    //     if (viewCategory === "recipe" && isRecipe(viewItem)) {
-    //         return {
-    //             ...viewItem,
-    //             type: "recipe",
-    //             creator: userInfo,
-    //             prepTime: getRecipeTime(moment.duration(viewItem.prepTime)),
-    //             cookTime: getRecipeTime(moment.duration(viewItem.cookTime)),
-    //         };
-    //     }
-
-    //     return {
-    //         ...viewItem,
-    //         type: "tip",
-    //         creator: userInfo,
-    //     };
-    // };
-
     const handleItemPress = (item: MinimalPostInfo): void => {
         setViewingItem(true);
         setViewItem(item);
@@ -175,29 +120,7 @@ const CreatedPosts = ({
         setViewCategory(value);
     };
 
-    const handleEditPost = (): void => {
-        if (viewItem == null) {
-            return;
-        }
-
-        if (viewCategory === "recipe") {
-            hidePostSetting();
-            rootNavigation.navigate("CreateRecipe", { postId: viewItem.id });
-        } else {
-            hidePostSetting();
-            rootNavigation.push("CreateTip", { postId: viewItem.id });
-        }
-
-        setViewingItem(false);
-        setViewItem(undefined);
-    };
-
-    const handleDeletePost = (): void => {
-        console.log("Post delete");
-        hidePostSetting();
-    };
-
-    if (userProfileContext.userInfo == null) {
+    if (userInfo == null) {
         return <View></View>;
     }
 
@@ -266,54 +189,11 @@ const CreatedPosts = ({
                     />
                 )}
             </View>
-            <Modal animationType="slide" visible={viewingItem}>
-                <View style={{ height: 50 }} className="flex-row">
-                    <View className="flex-1 justify-center items-start">
-                        <TouchableOpacity
-                            onPress={handleCloseItemView}
-                            className="px-4 py-2 rounded-lg"
-                        >
-                            <MaterialIcon name="arrow-back" size={24} />
-                        </TouchableOpacity>
-                    </View>
-                    <View className="flex-1 justify-center items-center">
-                        <Text className="text-base">
-                            {PROFILE_POSTED_TITLE}
-                        </Text>
-                    </View>
-                    <View className="flex-1 justify-center items-end">
-                        <TouchableOpacity
-                            className="px-4 py-2 rounded-lg"
-                            onPress={showPostSetting}
-                        >
-                            <IonIcon
-                                name="ios-ellipsis-vertical-sharp"
-                                size={18}
-                            />
-                        </TouchableOpacity>
-                    </View>
-                </View>
-                {viewItem != null && (
-                    <InfiniteScroll
-                        postIds={[
-                            {
-                                postId: viewItem.id,
-                                postType:
-                                    viewCategory === "recipe"
-                                        ? "Recipe"
-                                        : "CulinaryTip",
-                            },
-                        ]}
-                        showUserProfile={false}
-                    />
-                )}
-            </Modal>
-            <CustomModal visible={postSettingOpen} onDismiss={hidePostSetting}>
-                <PostSettingMenu
-                    onEditPost={handleEditPost}
-                    onDeletePost={handleDeletePost}
-                />
-            </CustomModal>
+            <CreatedPostModal
+                visible={viewingItem}
+                onDimiss={handleCloseItemView}
+                viewItem={viewItem}
+            />
         </View>
     );
 };
