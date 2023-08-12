@@ -45,10 +45,6 @@ const CreatedPostItem = ({
         onItemPress(item, index);
     };
 
-    if (item.title === "Communication: Roosters") {
-        console.log(imageFailed);
-    }
-
     return (
         <View className="w-1/2 items-center my-2">
             <Card

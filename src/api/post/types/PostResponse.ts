@@ -2,6 +2,12 @@ import { type Undefinable } from "@/types/app";
 
 export type PostStatus = "Pending" | "Approved" | "Rejected" | "Reported";
 
+export interface AdminComment {
+    id: string | null;
+    comment: string;
+    createdAt: string;
+}
+
 export interface PostResponseBase {
     id: string;
     creatorId: string;
@@ -12,7 +18,7 @@ export interface PostResponseBase {
     status: PostStatus;
     createdAt?: Date; // 2023-06-29T20:11:06.124Z
     updatedAt?: Date;
-    adminComment?: string;
+    adminComment?: AdminComment;
     isLiked: boolean;
     isSaved: boolean;
     likeCount: number;

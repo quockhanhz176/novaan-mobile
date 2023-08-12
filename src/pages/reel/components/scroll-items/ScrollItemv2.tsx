@@ -32,6 +32,9 @@ import UserProfileTab from "./UserProfileTab";
 import { getUserIdFromToken } from "@/api/common/utils/TokenUtils";
 import { MD2Colors } from "react-native-paper";
 import { REEL_FAILED_TO_LOAD } from "@/common/strings";
+import CustomModal from "@/common/components/CustomModal";
+import useBooleanHook from "@/common/components/BooleanHook";
+import AdminComments from "./AdminComments";
 
 export type Page =
     | "Profile"
@@ -66,6 +69,9 @@ const ScrollItem = ({
     const [currentUserId, setCurrentUserId] =
         useState<Undefinable<string>>(undefined);
 
+    const [adminCommentOpen, hideAdminComment, showAdminComment] =
+        useBooleanHook();
+
     const { postInfo, fetchPostInfo } = usePostInfo();
 
     const [isFailed, setIsFailed] = useState(false);
@@ -91,6 +97,11 @@ const ScrollItem = ({
             if (result === undefined) {
                 setIsFailed(true);
                 return;
+            }
+
+            if (result.status === "Rejected" || result.status === "Reported") {
+                pauseVideo();
+                showAdminComment();
             }
 
             const { isLiked, isSaved, likeCount } = result;
@@ -188,6 +199,11 @@ const ScrollItem = ({
         setSaved(false);
     }, []);
 
+    const handleHideAdminComment = (): void => {
+        hideAdminComment();
+        resumeVideo();
+    };
+
     if (isFailed) {
         return (
             <View
@@ -218,6 +234,8 @@ const ScrollItem = ({
             </View>
         );
     }
+
+    console.log(adminCommentOpen);
 
     return (
         <ScrollItemContext.Provider
@@ -272,6 +290,14 @@ const ScrollItem = ({
                     <Details />
                 </View>
             </Swiper>
+            {adminCommentOpen && (
+                <CustomModal
+                    visible={adminCommentOpen}
+                    onDismiss={handleHideAdminComment}
+                >
+                    <AdminComments onDismiss={handleHideAdminComment} />
+                </CustomModal>
+            )}
         </ScrollItemContext.Provider>
     );
 };

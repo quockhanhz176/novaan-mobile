@@ -302,8 +302,6 @@ export const handleRecipeEdit = async (
 
     onRecipeValid?.();
 
-    console.log(recipeSubmission);
-
     const getTimeString = (time: RecipeTime): string => {
         const day = Math.floor(time.hour / 24);
         const hour = time.hour % 24;

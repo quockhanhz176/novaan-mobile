@@ -153,8 +153,6 @@ const useGetUserContentSwr = <T,>(
         timeout: 10000,
     });
 
-    console.log(data);
-
     useEffect(() => {
         if (data == null) {
             setEnded(true);

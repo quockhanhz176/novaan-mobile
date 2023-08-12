@@ -74,14 +74,11 @@ const InfiniteScroll: FC<InfiniteScrollProps> = ({
 
     const fetchPost = (startIndex: number, count: number = 2): void => {
         const postIdsSource = postIds != null ? postIds : postList;
-        console.log(startIndex, count, postIdsSource.length);
         if (startIndex >= postIdsSource.length) {
             return;
         }
 
         const newItems: MinimalPost[] = dataProvider.getAllData();
-        console.log(newItems);
-
         for (let i = 0; i < count; i++) {
             if (postIdsSource.length <= startIndex + i) {
                 continue;
