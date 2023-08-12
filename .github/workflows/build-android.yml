@@ -33,6 +33,7 @@ jobs:
           envkey_API_TIMEOUT: "5000"
           envkey_KEYCHAIN_ID: ${{secrets.NOVAAN_KEYCHAIN_ID}}
           envkey_GOOGLE_API_KEY: ${{secrets.NOVAAN_GG_API_KEY}}
+          envkey_NODE_ENV: production
 
       - name: Install Node dependencies
         run: npm ci
@@ -61,7 +62,7 @@ jobs:
         run: sdkmanager "platform-tools" "platforms;android-${{ matrix.android-version }}"
 
       - name: Create APK with EAS
-        run: API_URL=${{secrets.NOVAAN_API_URL}} API_TIMEOUT=5000 KEYCHAIN_ID=${{secrets.NOVAAN_KEYCHAIN_ID}} GOOGLE_API_KEY=${{secrets.NOVAAN_GG_API_KEY}} eas build -p android --profile production --local --output builds/novaan-mobile.apk --non-interactive
+        run: NODE_ENV=production API_URL=${{secrets.NOVAAN_API_URL}} API_TIMEOUT=5000 KEYCHAIN_ID=${{secrets.NOVAAN_KEYCHAIN_ID}} GOOGLE_API_KEY=${{secrets.NOVAAN_GG_API_KEY}} eas build -p android --profile production --local --output builds/novaan-mobile.apk --non-interactive
 
       - name: Upload APK to Firebase App Distribution
         uses: wzieba/Firebase-Distribution-Github-Action@v1
