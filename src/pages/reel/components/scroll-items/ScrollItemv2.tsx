@@ -92,6 +92,7 @@ const ScrollItem = ({
                 setIsFailed(true);
                 return;
             }
+
             const { isLiked, isSaved, likeCount } = result;
             setLikeInfo({
                 liked: isLiked,
@@ -166,14 +167,17 @@ const ScrollItem = ({
         if (likeInfo.liked) {
             return;
         }
-        setLikeInfo({ liked: true, likeCount: likeInfo.likeCount + 1 });
+        setLikeInfo((info) => ({ liked: true, likeCount: info.likeCount + 1 }));
     };
 
     const handleUnlike = (): void => {
         if (!likeInfo.liked) {
             return;
         }
-        setLikeInfo({ liked: false, likeCount: likeInfo.likeCount - 1 });
+        setLikeInfo((info) => ({
+            liked: false,
+            likeCount: info.likeCount - 1,
+        }));
     };
 
     const handleSave = useCallback((): void => {

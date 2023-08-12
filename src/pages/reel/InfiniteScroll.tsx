@@ -30,7 +30,7 @@ export type InternalPost = Post & {
 };
 
 const PRELOAD_AMOUNT = 2;
-const END_REACH_THRESHOLD = 2;
+const END_REACH_THRESHOLD = 1.99;
 
 const InfiniteScroll: FC<InfiniteScrollProps> = ({
     postGetter,

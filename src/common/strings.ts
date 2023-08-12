@@ -229,6 +229,7 @@ export const PROFILE_POSTED_TITLE = "Chi tiết bài đăng";
 export const PROFILE_EMPTY_RECIPE = "Oops, phần này chưa có công thức nào cả";
 export const PROFILE_EMPTY_TIPS = "Oops, phần này chưa có mẹo vặt nào cả";
 export const PROFILE_EMPTY_FOLLOWING = "Oops, bạn chưa theo dõi ai cả";
+export const PROFILE_EMPTY_FOLLOWER = "Oops, bạn chưa có ai theo dõi";
 export const PROFILE_PAGE_LABEL = "Trang cá nhân";
 export const PROFILE_UPDATE_PREF = "Cập nhật chế độ ăn";
 export const PROFILE_LOGOUT = "Đăng xuất";

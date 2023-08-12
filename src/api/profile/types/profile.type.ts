@@ -1,6 +1,7 @@
 import type PostResponse from "@/api/post/types/PostResponse";
 import { type Undefinable } from "@/types/app";
 import { type AllPreferenceResponse } from "./preference.type";
+import { type PostStatus } from "@/api/post/types/PostResponse";
 
 export interface Followership {
     id: string;
@@ -10,12 +11,13 @@ export interface Followership {
 
 export interface ProfileInfo {
     id: string;
-    username: string;
     userId: string;
+    username: string;
+    avatar: string;
     isFollowing: boolean;
     followersCount: number;
     followingCount: number;
-    avatar: string;
+    postCount: number;
     followerships: Followership[];
 }
 
@@ -38,7 +40,7 @@ export interface SavedPostResponse {
 }
 
 export type MinimalPostInfo = Pick<PostResponse, "id" | "type" | "title"> & {
-    status?: number;
+    status?: PostStatus;
     thumbnail?: string;
 };
 

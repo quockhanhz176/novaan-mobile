@@ -1,5 +1,7 @@
 import { type Undefinable } from "@/types/app";
 
+export type PostStatus = "Pending" | "Approved" | "Rejected" | "Reported";
+
 export interface PostResponseBase {
     id: string;
     creatorId: string;
@@ -7,7 +9,7 @@ export interface PostResponseBase {
     description: string;
     video: string;
     thumbnail: string;
-    status: "Pending" | "Approved" | "Rejected" | "Reported";
+    status: PostStatus;
     createdAt?: Date; // 2023-06-29T20:11:06.124Z
     updatedAt?: Date;
     adminComment?: string;

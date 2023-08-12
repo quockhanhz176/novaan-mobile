@@ -31,6 +31,7 @@ import { SceneMap, TabBar, TabView } from "react-native-tab-view";
 import useBooleanHook from "@/common/components/BooleanHook";
 import CustomModal from "@/common/components/CustomModal";
 import SettingMenu from "./components/SettingMenu";
+import Follower from "./pages/following/Follower";
 
 interface UserProfileProps {
     navigation?: BottomTabNavProp;
@@ -52,6 +53,7 @@ const userProfileRoute = [
     { key: "created" },
     { key: "saved" },
     { key: "following" },
+    { key: "follower" },
 ];
 
 const peopleProfileRoute = [{ key: "created" }];
@@ -82,17 +84,23 @@ const UserProfile = ({
     const { profileInfo, fetchPersonalProfile, fetchUserProfile } =
         useProfileInfo();
 
-    const [followingCount, setFollowingCount] = useState<number>(
-        profileInfo?.followingCount ?? 0
-    );
+    const [followingCount, setFollowingCount] = useState<number>(0);
 
     useEffect(() => {
         void handleFetchProfile();
     }, [userId]);
 
     useEffect(() => {
-        setFollowingCount(profileInfo?.followingCount ?? 0);
-    }, [profileInfo?.followingCount]);
+        if (profileInfo == null) {
+            return;
+        }
+
+        if (profileInfo.followingCount === followingCount) {
+            return;
+        }
+
+        setFollowingCount(profileInfo.followingCount);
+    }, [profileInfo]);
 
     const renderScene = useMemo(() => {
         if (isUserProfile) {
@@ -102,6 +110,7 @@ const UserProfile = ({
                 following: () => (
                     <Following setFollowingCount={setFollowingCount} />
                 ),
+                follower: () => <Follower />,
             });
         }
 
@@ -139,7 +148,9 @@ const UserProfile = ({
             case "saved":
                 return "bookmark-outline";
             case "following":
-                return "account-group-outline";
+                return "account-eye";
+            case "follower":
+                return "account-heart";
             default:
                 return "grid";
         }
@@ -154,7 +165,7 @@ const UserProfile = ({
         return <OverlayLoading />;
     }
 
-    const { username, followersCount, avatar } = profileInfo;
+    const { username, followersCount, postCount, avatar } = profileInfo;
 
     return (
         <View className="flex-1 bg-white">
@@ -211,7 +222,7 @@ const UserProfile = ({
                 {/* TODO: Add approved content count here (postCount) */}
                 <ProfileStatItem
                     label={PROFILE_CONTENT_COUNT_TITLE}
-                    value={0}
+                    value={postCount ?? 0}
                 />
                 <ProfileStatItem
                     label={PROFILE_FOLLOWER_COUNT_TITLE}

@@ -91,6 +91,9 @@ const IconLabelButton: FC<IconLabelButtonProps> = ({
             {...buttonProps}
             style={style}
             className={`flex-row items-center space-x-1 ${buttonClassName}`}
+            touchSoundDisabled={true}
+            hitSlop={4}
+            delayPressIn={0}
         >
             <>
                 {renderIcon()}

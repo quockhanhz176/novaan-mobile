@@ -1,3 +1,5 @@
+import { type PostStatus } from "./PostResponse";
+
 export interface MinimalPost {
     postId: string;
     postType: "Recipe" | "CulinaryTip";
@@ -14,7 +16,7 @@ export interface MinimalPostResponse {
     title: string;
     thumbnail: string;
     type: "Recipe" | "CulinaryTip";
-    status: number;
+    status: PostStatus;
 }
 
 type PostListResponse = MinimalPost[];
