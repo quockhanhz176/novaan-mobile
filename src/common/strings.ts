@@ -296,6 +296,7 @@ export const FILTER_TITLE = "Lọc kết quả";
 export const FILTER_CATEGORY_DIET = "Chế độ ăn";
 export const FILTER_CATEGORY_CUISINE = "Đặc sản";
 export const FILTER_CATEGORY_ALLERGEN = "Dị ứng";
+export const FILTER_CATEGORY_MEAL_TYPE = "Bữa ăn";
 
 // Search
 export const SEARCH_POST_DETAILS_TITLE = "Chi tiết kết quả tìm kiếm";

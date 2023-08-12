@@ -6,6 +6,7 @@ import {
     FILTER_CATEGORY_ALLERGEN,
     FILTER_CATEGORY_CUISINE,
     FILTER_CATEGORY_DIET,
+    FILTER_CATEGORY_MEAL_TYPE,
 } from "@/common/strings";
 import {
     type PostType,
@@ -78,6 +79,7 @@ const categoryNames: Record<keyof PreferenceSuite, string> = {
     diets: FILTER_CATEGORY_DIET,
     cuisines: FILTER_CATEGORY_CUISINE,
     allergens: FILTER_CATEGORY_ALLERGEN,
+    mealTypes: FILTER_CATEGORY_MEAL_TYPE,
 };
 
 const getPreferences = async (): Promise<PreferenceSuite | null> => {
@@ -90,27 +92,26 @@ const getPreferences = async (): Promise<PreferenceSuite | null> => {
     const userPreferenceResponse = await userPreferencePromise;
     // remove cuisines as they are not detrimental criterias
     const userPreferences = userPreferenceResponse.success
-        ? { ...userPreferenceResponse.value, cuisines: [] as string[] }
+        ? {
+              ...userPreferenceResponse.value,
+              cuisines: [] as string[],
+              mealTypes: [] as string[],
+          }
         : null;
-
-    let categoryIndex = 0;
 
     const suite: PreferenceSuite = objectMap(
         preferenceResponse.value,
         (preferenceResponses: PreferenceResponse[], k, _i) => {
-            let preferenceIndex = 0;
             return {
                 label: categoryNames[k],
                 preferences: preferenceResponses.map((preferenceResponse) => ({
                     ...preferenceResponse,
                     checked:
-                        userPreferences?.[k].find(
+                        userPreferences?.[k]?.find(
                             (userPreference) =>
                                 userPreference === preferenceResponse.id
                         ) != null,
-                    index: preferenceIndex++,
                 })),
-                index: categoryIndex++,
             };
         }
     );

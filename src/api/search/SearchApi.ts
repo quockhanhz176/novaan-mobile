@@ -34,7 +34,7 @@ const getPreferences = async (): Promise<
 };
 
 const getUserPreferences = async (): Promise<
-    FailableResponse<Record<keyof PreferenceSuiteResponse, string[]>>
+    FailableResponse<Record<keyof PreferenceSuiteResponse, string[] | undefined>>
 > => {
     return await baseApi.sendReceiveBase(
         USER_PREFERENCES_URL,

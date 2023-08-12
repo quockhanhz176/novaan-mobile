@@ -2,7 +2,6 @@ import { memo, type FC, type ReactElement, useCallback } from "react";
 import React, { ScrollView, TouchableOpacity, View, Text } from "react-native";
 import type PreferenceSuite from "../../types/PreferenceSuite";
 import FilterCategory from "./FilterCategory";
-import type PreferenceCategory from "../../types/PreferenceCategory";
 import IconAnt from "react-native-vector-icons/AntDesign";
 import { FILTER_TITLE } from "@/common/strings";
 import { type SuiteDispatchValue } from "./filterReducer";
@@ -15,16 +14,17 @@ interface FilterProps {
 
 const Filter: FC<FilterProps> = ({ suite, dispatchSuite, hideModal }) => {
     const renderItem = useCallback(
-        (category: PreferenceCategory, index: number): ReactElement => {
+        (key: keyof PreferenceSuite, index: number): ReactElement => {
             return (
                 <FilterCategory
                     key={index}
-                    category={category}
+                    category={suite[key]}
+                    propertyKey={key}
                     dispatchSuite={dispatchSuite}
                 />
             );
         },
-        [dispatchSuite]
+        [suite, dispatchSuite]
     );
 
     return (
@@ -45,7 +45,7 @@ const Filter: FC<FilterProps> = ({ suite, dispatchSuite, hideModal }) => {
             </View>
             <View className="flex-1 pt-7">
                 <ScrollView className="px-3 pb-10">
-                    {Object.values(suite).map(renderItem)}
+                    {Object.keys(suite).map(renderItem)}
                 </ScrollView>
             </View>
         </View>

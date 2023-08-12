@@ -7,6 +7,7 @@ type PreferenceSuiteResponse = {
     diets: PreferenceResponse[];
     cuisines: PreferenceResponse[];
     allergens: PreferenceResponse[];
+    mealTypes: PreferenceResponse[];
 }
 
 export default PreferenceSuiteResponse;

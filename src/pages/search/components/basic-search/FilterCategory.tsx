@@ -14,11 +14,12 @@ import FilterItem, {
 import type PreferenceCategory from "../../types/PreferenceCategory";
 import IconLabelButton from "@/common/components/IconLabelButton";
 import { type SuiteDispatchValue } from "./filterReducer";
-import { getPreferenceProperty } from "../../types/PreferenceSuite";
+import type PreferenceSuite from "../../types/PreferenceSuite";
 import type Preference from "../../types/Preference";
 
 interface FilterCategoryProps {
     category: PreferenceCategory;
+    propertyKey: keyof PreferenceSuite;
     dispatchSuite: (value: SuiteDispatchValue) => void;
 }
 
@@ -26,6 +27,7 @@ const ITEM_LIST_PADDING_TOP = 16;
 
 const FilterCategory: FC<FilterCategoryProps> = ({
     category,
+    propertyKey,
     dispatchSuite,
 }) => {
     const dropDownAnimation = useRef(new Animated.Value(0)).current;
@@ -46,15 +48,13 @@ const FilterCategory: FC<FilterCategoryProps> = ({
 
     const dispatchPreference = useCallback(
         (value: FilterItemDispatchValue): void => {
-            const currentCategory = getPreferenceProperty(category.index);
-
             dispatchSuite({
                 type: "change_preference",
-                category: currentCategory,
+                category: propertyKey,
                 ...value,
             });
         },
-        [category.index]
+        [propertyKey]
     );
 
     const renderItem = useCallback(
@@ -63,6 +63,7 @@ const FilterCategory: FC<FilterCategoryProps> = ({
                 <FilterItem
                     key={index}
                     preference={preference}
+                    index={index}
                     dispatchPreference={dispatchPreference}
                 />
             );

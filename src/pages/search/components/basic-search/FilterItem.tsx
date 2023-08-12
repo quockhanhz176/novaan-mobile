@@ -12,6 +12,7 @@ export type FilterItemDispatchValue = Omit<
 
 interface FilterItemProps {
     preference: Preference;
+    index: number;
     dispatchPreference: (value: FilterItemDispatchValue) => void;
 }
 
@@ -19,12 +20,12 @@ export const FILTER_ITEM_HEIGHT = 50;
 
 const FilterItem: FC<FilterItemProps> = ({
     preference,
+    index,
     dispatchPreference,
 }) => {
     const onValueChange = (value: boolean): void => {
-        dispatchPreference({ preferenceIndex: preference.index, value });
+        dispatchPreference({ preferenceIndex: index, value });
     };
-
     return (
         <View
             className="py-3 w-full flex-row justify-between items-center"

@@ -20,6 +20,7 @@ export const suiteReducer = (
         case "new_value":
             return action.value;
         case "change_preference":
+            console.log("change preference", action);
             if (suite == null) {
                 return suite;
             }
