@@ -168,23 +168,26 @@ const InfiniteScroll: FC<InfiniteScrollProps> = ({
         []
     );
 
-    const renderRow = (
-        type: string | number,
-        data: MinimalPost,
-        index: number,
-        extendedState?: { currentPage: number }
-    ): ReactElement => {
-        return (
-            <ScrollItem
-                key={data.postId}
-                post={data}
-                showUserProfile={showUserProfile}
-                onPageChange={onScrollItemPageChange}
-                isVideoPaused={index !== extendedState?.currentPage ?? 0}
-                nextVideo={nextVideo}
-            />
-        );
-    };
+    const renderRow = useCallback(
+        (
+            type: string | number,
+            data: MinimalPost,
+            index: number,
+            extendedState?: { currentPage: number }
+        ): ReactElement => {
+            return (
+                <ScrollItem
+                    key={data.postId}
+                    post={data}
+                    showUserProfile={showUserProfile}
+                    onPageChange={onScrollItemPageChange}
+                    isVideoPaused={index !== extendedState?.currentPage ?? 0}
+                    nextVideo={nextVideo}
+                />
+            );
+        },
+        []
+    );
 
     if (dataProvider.getSize() === 0) {
         return <OverlayLoading />;
