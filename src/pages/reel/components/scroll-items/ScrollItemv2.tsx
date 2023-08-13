@@ -35,6 +35,7 @@ import { REEL_FAILED_TO_LOAD } from "@/common/strings";
 import CustomModal from "@/common/components/CustomModal";
 import useBooleanHook from "@/common/components/BooleanHook";
 import AdminComments from "./AdminComments";
+import DetailsTab from "./DetailsTab";
 
 export type Page =
     | "Profile"
@@ -235,8 +236,6 @@ const ScrollItem = ({
         );
     }
 
-    console.log(adminCommentOpen);
-
     return (
         <ScrollItemContext.Provider
             value={{
@@ -287,7 +286,7 @@ const ScrollItem = ({
                     />
                 </View>
                 <View className="flex-1">
-                    <Details />
+                    <DetailsTab visible={currentPage === 2} />
                 </View>
             </Swiper>
             {adminCommentOpen && (

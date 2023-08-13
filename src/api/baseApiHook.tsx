@@ -7,7 +7,12 @@ import { type RootStackParamList } from "@/types/navigation";
 import { responseObjectValid } from "./common/utils/ResponseUtils";
 import { type Undefinable } from "@/types/app";
 import { getPayloadFromToken } from "./common/utils/TokenUtils";
-import useSwr, { type Key, type SWRResponse } from "swr";
+import { type Arguments } from "swr";
+import useSWRInfinite, {
+    type SWRInfiniteResponse,
+    type SWRInfiniteKeyLoader,
+} from "swr/infinite";
+import { PAGE_SIZE, getSwrQueryParams } from "./profile/ProfileApi";
 
 // GLOBAL IN-MEMORY VARIABLE (DO NOT TOUCH)
 let tokenExpTimestamp: number = -1;
@@ -293,21 +298,54 @@ export const useFetch = (config?: RequestConfig): UseFetchReturn => {
     return { getReq, postReq, putReq, deleteReq };
 };
 
+export const mutateGetKey = (url: string) => (pageIndex, previousPageData) => {
+    if (
+        pageIndex !== 0 &&
+        (previousPageData == null || previousPageData.length < PAGE_SIZE)
+    ) {
+        return null;
+    }
+
+    return `${url}${getSwrQueryParams(pageIndex)}`;
+};
+
 export const useFetchSwr = (
-    url: Key,
+    url: string,
     config?: RequestConfig
-): Pick<SWRResponse, "data" | "error" | "isLoading"> => {
+): Pick<
+    SWRInfiniteResponse,
+    "data" | "error" | "isLoading" | "size" | "setSize"
+> => {
     const { getReq } = useFetch(config);
 
-    const getReqWrap = async ([url, queryParams = ""]: [
-        url: string,
-        queryParams: string
-    ]): Promise<any> => {
-        const urlWithParam = `${url}${queryParams}`;
-        return await getReq(urlWithParam);
+    const getKey: SWRInfiniteKeyLoader<any[]> = (
+        pageIndex,
+        previousPageData
+    ): Arguments => {
+        if (
+            pageIndex !== 0 &&
+            (previousPageData == null || previousPageData.length < PAGE_SIZE)
+        ) {
+            return null;
+        }
+
+        return `${url}${getSwrQueryParams(pageIndex)}`;
     };
 
-    const { data, isLoading, error } = useSwr(url, getReqWrap);
+    const getReqWrap = async (requestUrl: string): Promise<void> => {
+        if (requestUrl == null || requestUrl === "") {
+            return;
+        }
+        return await getReq(requestUrl);
+    };
 
-    return { data, isLoading, error };
+    const { data, isLoading, error, size, setSize } = useSWRInfinite(
+        getKey,
+        getReqWrap,
+        {
+            revalidateOnMount: false,
+        }
+    );
+
+    return { data, isLoading, error, size, setSize };
 };

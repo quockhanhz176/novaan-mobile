@@ -1,6 +1,6 @@
 import { getData, storeData } from "@/common/AsyncStorageService";
 import { type Undefinable } from "@/types/app";
-import { useFetch } from "../baseApiHook";
+import { mutateGetKey, useFetch } from "../baseApiHook";
 import { useState } from "react";
 import {
     type MinimalComment,
@@ -24,7 +24,7 @@ import mime from "react-native-mime-types";
 import { type CommentFormInfo } from "./types/CommentInformation";
 import { responseObjectValid } from "../common/utils/ResponseUtils";
 import { getUserIdFromToken } from "../common/utils/TokenUtils";
-import { useSWRConfig } from "swr";
+import { unstable_serialize, useSWRConfig } from "swr";
 import { getUserSavedUrl } from "../profile/ProfileApi";
 
 const POST_LIST_URL = "content/posts";
@@ -301,10 +301,7 @@ export const usePostInteract = (): UsePostSaveReturn => {
         }
 
         // Trigger revalidation for profile/saved-post when send successfully
-        const userSavedPostUrl = getUserSavedUrl(userId);
-        await mutate(
-            (key) => Array.isArray(key) && key[0] === userSavedPostUrl
-        );
+        await mutate(unstable_serialize(mutateGetKey(getUserSavedUrl(userId))));
 
         return true;
     };

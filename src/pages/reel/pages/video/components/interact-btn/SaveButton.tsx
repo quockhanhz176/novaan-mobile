@@ -12,8 +12,9 @@ import { usePostInteract } from "@/api/post/PostApiHook";
 import { debounce } from "lodash";
 import { ScrollItemContext } from "@/pages/reel/components/scroll-items/ScrollItemv2";
 import { type PostInteraction } from "@/api/post/types/hooks.type";
-import { useSWRConfig } from "swr";
+import { unstable_serialize, useSWRConfig } from "swr";
 import { getUserSavedUrl } from "@/api/profile/ProfileApi";
+import { mutateGetKey } from "@/api/baseApiHook";
 
 const SaveButton = (): ReactElement => {
     const { currentPost, currentUserId, saved, handleSave, handleUnsave } =
@@ -40,10 +41,9 @@ const SaveButton = (): ReactElement => {
                 };
                 await savePost(interaction, currentUserId);
                 await mutate(
-                    // Only creator can edit their own post so it's safe to assume currentUserId === postInfo.creator.userId
-                    (key) =>
-                        Array.isArray(key) &&
-                        key[0] === getUserSavedUrl(currentUserId)
+                    unstable_serialize(
+                        mutateGetKey(getUserSavedUrl(currentUserId))
+                    )
                 );
             },
             1000,
