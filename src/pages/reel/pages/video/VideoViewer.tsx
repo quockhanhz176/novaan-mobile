@@ -102,6 +102,7 @@ const VideoViewer = ({
     };
 
     const onSeek = (progress: number): void => {
+        setCurrentTimeStamp(videoDuration * progress);
         videoRef.current?.seek(progress * videoDuration);
     };
 
@@ -144,7 +145,7 @@ const VideoViewer = ({
                     }}
                     onProgress={({ currentTime }) => {
                         // Update timestamp each 2 seconds to avoid re-rendering
-                        if (currentTime - currentTimeStamp <= 2) {
+                        if (currentTime - currentTimeStamp <= 1.2) {
                             return;
                         }
                         setCurrentTimeStamp(currentTime);
