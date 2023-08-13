@@ -23,9 +23,6 @@ const ViewIngredients = (): ReactElement => {
     const { isEditing, ingredients, setIngredients } = useContext(
         recipeInformationContext
     );
-
-    const [refreshIndicator, setRefreshIndicator] = useState(false);
-
     const [selectedIngredient, setSelectedIngredient] =
         useState<Undefinable<Ingredient>>(undefined);
     const [showAddIngredient, setShowAddIngredient] = useState(false);
@@ -42,14 +39,15 @@ const ViewIngredients = (): ReactElement => {
     };
 
     const deleteIngredient = (id: number): void => {
-        const index = ingredients.findIndex((i) => i.id === id);
-        if (index === -1) {
-            return;
-        }
+        setIngredients((ings) => {
+            const index = ings.findIndex((i) => i.id === id);
+            if (index === -1) {
+                return ings;
+            }
 
-        ingredients.splice(index, 1);
-        setIngredients(ingredients);
-        setRefreshIndicator(!refreshIndicator);
+            ings.splice(index, 1);
+            return [...ings];
+        });
     };
 
     const handleCloseAddIngredient = (): void => {
@@ -113,7 +111,6 @@ const ViewIngredients = (): ReactElement => {
                 data={ingredients}
                 renderItem={renderItem}
                 keyExtractor={(item) => item.id.toString()}
-                extraData={refreshIndicator}
             />
             <AddIngredient
                 ingredient={selectedIngredient}

@@ -1,4 +1,4 @@
-import { type FC } from "react";
+import { memo, type FC } from "react";
 import type Instruction from "../../../types/Instruction";
 import React, { Image, Text, TouchableOpacity, View } from "react-native";
 import IconFA from "react-native-vector-icons/FontAwesome5";
@@ -62,4 +62,4 @@ const InstructionItem: FC<InstructionItemProps> = ({
     );
 };
 
-export default InstructionItem;
+export default memo(InstructionItem);

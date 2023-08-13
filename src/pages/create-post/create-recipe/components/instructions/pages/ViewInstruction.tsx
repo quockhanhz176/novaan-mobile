@@ -1,5 +1,4 @@
 import React, {
-    useRef,
     useState,
     type ReactElement,
     useContext,
@@ -19,63 +18,69 @@ import InstructionItem from "../components/InstructionItem";
 import { recipeInformationContext } from "../../../types/RecipeParams";
 import { type Undefinable } from "@/types/app";
 import AddInstruction from "./AddInstruction";
+import useBooleanHook from "@/common/components/BooleanHook";
 
 const ViewInstruction = (): ReactElement => {
     const { isEditing, instructions, setInstructions } = useContext(
         recipeInformationContext
     );
-    const [refreshIndicator, setRefreshIndicator] = useState(false);
-
     const [selectedInstruction, setSelectedInstruction] =
         useState<Undefinable<Instruction>>(undefined);
-    const [showAddInstruction, setShowAddInstruction] = useState(false);
+    const [addInstructionShown, hideAddInstruction, showAddInstruction] =
+        useBooleanHook();
 
     const labelClassName = "text-base font-medium uppercase";
-    const lastInstruction = useRef(0);
 
-    const openAddInstruction = (): void => {
-        setShowAddInstruction(true);
-    };
+    const openEditInstruction = useCallback(
+        (instruction: Instruction): void => {
+            setSelectedInstruction(instruction);
+            showAddInstruction();
+        },
+        []
+    );
 
-    const openEditInstruction = (instruction: Instruction): void => {
-        setSelectedInstruction(instruction);
-        setShowAddInstruction(true);
-    };
-
-    const deleteInstruction = (id: number): void => {
-        const index = instructions.findIndex((s) => s.id === id);
-        if (index === -1) {
-            return;
-        }
-
-        instructions.splice(index, 1);
-        instructions.forEach((_, i, instructions) => {
-            if (i < index) {
-                return;
+    const deleteInstruction = useCallback((id: number): void => {
+        setInstructions((ins) => {
+            console.log("delete", id);
+            console.log("instructions", ins);
+            const index = ins.findIndex((s) => s.id === id);
+            if (index === -1) {
+                return ins;
             }
-            instructions[i].step--;
+
+            ins.splice(index, 1);
+            ins.forEach((_, i, ins) => {
+                if (i < index) {
+                    return;
+                }
+                ins[i].step--;
+            });
+            return [...ins];
         });
-        lastInstruction.current--;
+    }, []);
 
-        setInstructions(instructions);
-        setRefreshIndicator(!refreshIndicator);
-    };
-
-    const handleCloseAddInstruction = (): void => {
+    const handleCloseAddInstruction = useCallback((): void => {
         setSelectedInstruction(undefined);
-        setShowAddInstruction(false);
-    };
+        hideAddInstruction();
+    }, []);
+
+    const onDeletePress = useCallback(
+        (instruction: Instruction) => {
+            deleteInstruction(instruction.id);
+        },
+        [deleteInstruction]
+    );
+
+    const onEditPress = useCallback((instruction: Instruction) => {
+        openEditInstruction(instruction);
+    }, []);
 
     const renderItem = useCallback(({ item }: { item: Instruction }) => {
         return (
             <InstructionItem
                 instruction={item}
-                onDeletePress={() => {
-                    deleteInstruction(item.id);
-                }}
-                onEditPress={() => {
-                    openEditInstruction(item);
-                }}
+                onDeletePress={onDeletePress}
+                onEditPress={onEditPress}
             />
         );
     }, []);
@@ -101,7 +106,7 @@ const ViewInstruction = (): ReactElement => {
                 ListFooterComponent={
                     instructions.length < 20 ? (
                         <TouchableOpacity
-                            onPress={openAddInstruction}
+                            onPress={showAddInstruction}
                             className="flex-row space-x-2 justify-center items-center p-3
                          border-cprimary-500 rounded-full mx-5 my-7"
                             style={{ borderWidth: 1 }}
@@ -122,11 +127,10 @@ const ViewInstruction = (): ReactElement => {
                 data={instructions}
                 renderItem={renderItem}
                 keyExtractor={(item) => item.id.toString()}
-                extraData={refreshIndicator}
             />
             <AddInstruction
                 instruction={selectedInstruction}
-                isShown={showAddInstruction}
+                isShown={addInstructionShown}
                 onClose={handleCloseAddInstruction}
             />
         </>

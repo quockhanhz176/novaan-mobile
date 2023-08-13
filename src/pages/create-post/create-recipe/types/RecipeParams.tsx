@@ -18,7 +18,7 @@ import {
 import type Ingredient from "./Ingredient";
 import type Instruction from "./Instruction";
 import type RecipeTime from "./RecipeTime";
-import { type Setter } from "@/common/utils";
+import { type StateDispatcher } from "@/common/utils";
 import { type PreferenceObj } from "./PreferenceObj";
 
 export interface AdditionalRecipeInformation {
@@ -37,7 +37,7 @@ export interface AdditionalRecipeInformation {
 
 export type RecipeStates = TDVStates &
     AdditionalRecipeInformation &
-    Setter<AdditionalRecipeInformation> & { isEditing: boolean };
+    StateDispatcher<AdditionalRecipeInformation> & { isEditing: boolean };
 
 export const recipeInformationContext = React.createContext<RecipeStates>({
     isEditing: false,

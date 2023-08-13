@@ -1,4 +1,4 @@
-import { type Context } from "react";
+import { type SetStateAction, type Context, type Dispatch } from "react";
 import { Dimensions } from "react-native";
 
 export const validateText = (
@@ -17,10 +17,10 @@ export type ExtractGenericContext<Type> = Type extends Context<infer X>
     ? X
     : never;
 
-export type Setter<Type> = {
-    [Property in keyof Type as `set${Capitalize<string & Property>}`]: (
-        value: Type[Property]
-    ) => void;
+export type StateDispatcher<Type> = {
+    [Property in keyof Type as `set${Capitalize<string & Property>}`]: Dispatch<
+        SetStateAction<Type[Property]>
+    >;
 };
 
 export const getUrlExtension = (url: string): string => {

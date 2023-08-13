@@ -1,5 +1,5 @@
-import React, { type FC, useContext, useMemo } from "react";
-import { View, Text, TextInput, ScrollView } from "react-native";
+import React, { type FC, useContext, useMemo, useEffect, useRef } from "react";
+import { View, Text, TextInput, ScrollView, Keyboard } from "react-native";
 import WarningAsterisk from "@/common/components/WarningAeterisk";
 import { type NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { recipeInformationContext } from "../types/RecipeParams";
@@ -39,6 +39,30 @@ const PortionDificultyTime: FC<TitleDescriptionVideoProps> = (
         setCookTime,
         setPrepTime,
     } = useContext(recipeInformationContext);
+
+    const inputRefs = [
+        useRef<TextInput>(null),
+        useRef<TextInput>(null),
+        useRef<TextInput>(null),
+        useRef<TextInput>(null),
+        useRef<TextInput>(null),
+    ];
+
+    useEffect(() => {
+        // setup input
+        const keyboardDidHideSubscription = Keyboard.addListener(
+            "keyboardDidHide",
+            () => {
+                inputRefs.forEach((ref) => {
+                    ref.current?.blur();
+                });
+            }
+        );
+
+        return () => {
+            keyboardDidHideSubscription?.remove();
+        };
+    }, []);
 
     const difficultyDropdownItems = useMemo(
         () =>
@@ -117,13 +141,14 @@ const PortionDificultyTime: FC<TitleDescriptionVideoProps> = (
                 </Text>
                 <View className="z-10 flex-row space-x-2 justify-center mt-2 px-20">
                     <TextInput
+                        ref={inputRefs[0]}
                         value={
                             portionQuantity === 0 ? "" : String(portionQuantity)
                         }
                         placeholder="0"
                         keyboardType="decimal-pad"
                         textAlign={"center"}
-                        className="text-base flex-1 py-2 border-cgrey-platinum bg-cgrey-seasalt rounded-md border-b"
+                        className="text-base flex-1 py-2 bg-cgrey-seasalt rounded-md"
                         onChangeText={setQuantity}
                     />
                     <View className="flex-2">
@@ -206,6 +231,8 @@ const PortionDificultyTime: FC<TitleDescriptionVideoProps> = (
                         value={prepTime}
                         onHourChange={setPrepHour}
                         onMinuteChange={setPrepMinute}
+                        hourInputRef={inputRefs[1]}
+                        minuteInputRef={inputRefs[2]}
                     />
                 </View>
                 <View className="flex-row justify-between mt-10 items-center">
@@ -217,6 +244,8 @@ const PortionDificultyTime: FC<TitleDescriptionVideoProps> = (
                         value={cookTime}
                         onHourChange={setCookHour}
                         onMinuteChange={setCookMinute}
+                        hourInputRef={inputRefs[3]}
+                        minuteInputRef={inputRefs[4]}
                     />
                 </View>
             </View>

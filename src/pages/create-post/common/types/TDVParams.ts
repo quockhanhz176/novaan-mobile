@@ -2,7 +2,7 @@ import { type Context } from "react";
 import { type Asset } from "react-native-image-picker";
 import { recipeParams } from "../../create-recipe/types/RecipeParams";
 import { tipTDVParams } from "../../create-tip/types/TipParams";
-import { type Setter } from "@/common/utils";
+import { type StateDispatcher } from "@/common/utils";
 
 export interface TDVInformation {
     title: string;
@@ -11,7 +11,7 @@ export interface TDVInformation {
     thumbnail: string | null;
 }
 
-export type TDVStates = TDVInformation & Setter<TDVInformation>;
+export type TDVStates = TDVInformation & StateDispatcher<TDVInformation>;
 
 // props required for the TitleDescriptionVideo screen
 export interface TDVParams<T extends TDVStates> {

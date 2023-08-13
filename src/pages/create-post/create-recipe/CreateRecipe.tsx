@@ -51,6 +51,7 @@ import Cuisines from "./components/Cuisines";
 import Allergens from "./components/Allergens";
 import OverlayLoading from "@/common/components/OverlayLoading";
 import { type PreferenceObj } from "./types/PreferenceObj";
+import Segments from "./components/Segments";
 
 interface CreateRecipeProps {
     navigation: NativeStackNavigationProp<RootStackParamList, "CreateTip">;
@@ -310,6 +311,60 @@ const CreateRecipe = ({
         rootNavigation.pop();
     };
 
+    const contextProviderValue = useMemo(
+        () => ({
+            isEditing,
+            title,
+            setTitle,
+            description,
+            setDescription,
+            video,
+            setVideo,
+            thumbnail,
+            setThumbnail,
+            difficulty,
+            setDifficulty,
+            portionType,
+            setPortionType,
+            portionQuantity,
+            setPortionQuantity,
+            prepTime,
+            setPrepTime,
+            cookTime,
+            setCookTime,
+            ingredients,
+            setIngredients,
+            instructions,
+            setInstructions,
+            diets,
+            setDiets,
+            mealTypes,
+            setMealTypes,
+            cuisines,
+            setCuisines,
+            allergens,
+            setAllergens,
+        }),
+        [
+            isEditing,
+            title,
+            description,
+            video,
+            thumbnail,
+            difficulty,
+            portionType,
+            portionQuantity,
+            prepTime,
+            cookTime,
+            ingredients,
+            instructions,
+            diets,
+            mealTypes,
+            cuisines,
+            allergens,
+        ]
+    );
+
     if (isLoading) {
         return (
             <View className="flex-1">
@@ -349,50 +404,21 @@ const CreateRecipe = ({
                     </Text>
                 </TouchableOpacity>
             </View>
-            <Bar
-                width={null}
-                progress={progress}
-                color={customColors.csecondary}
-                borderWidth={0}
-                unfilledColor={customColors.cgrey.platinum}
-                borderRadius={0}
-                animated={true}
-            />
-            <recipeInformationContext.Provider
-                value={{
-                    isEditing,
-                    title,
-                    setTitle,
-                    description,
-                    setDescription,
-                    video,
-                    setVideo,
-                    thumbnail,
-                    setThumbnail,
-                    difficulty,
-                    setDifficulty,
-                    portionType,
-                    setPortionType,
-                    portionQuantity,
-                    setPortionQuantity,
-                    prepTime,
-                    setPrepTime,
-                    cookTime,
-                    setCookTime,
-                    ingredients,
-                    setIngredients,
-                    instructions,
-                    setInstructions,
-                    diets,
-                    setDiets,
-                    mealTypes,
-                    setMealTypes,
-                    cuisines,
-                    setCuisines,
-                    allergens,
-                    setAllergens,
-                }}
-            >
+            <View>
+                <Bar
+                    width={null}
+                    progress={progress}
+                    color={customColors.csecondary}
+                    borderWidth={0}
+                    unfilledColor={customColors.cgrey.platinum}
+                    borderRadius={0}
+                    animated={true}
+                />
+                <View className="absolute top-0 bottom-0 left-0 right-0">
+                    <Segments count={screens.length} />
+                </View>
+            </View>
+            <recipeInformationContext.Provider value={contextProviderValue}>
                 <NavigationContainer independent={true} ref={recipeTabRef}>
                     <RecipeTab.Navigator
                         screenOptions={{

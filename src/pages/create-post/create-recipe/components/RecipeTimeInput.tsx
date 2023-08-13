@@ -1,6 +1,6 @@
 import { CREATE_RECIPE_HOUR, CREATE_RECIPE_MINUTE } from "@/common/strings";
 import { customColors } from "@root/tailwind.config";
-import { useState, type FC, useEffect } from "react";
+import { useState, type FC, useEffect, type LegacyRef } from "react";
 import React, { Text, TextInput, View } from "react-native";
 import type RecipeTime from "../types/RecipeTime";
 
@@ -8,6 +8,8 @@ interface RecipeTimeInputProps {
     value?: RecipeTime;
     onHourChange?: (value: number) => void;
     onMinuteChange?: (value: number) => void;
+    hourInputRef?: LegacyRef<TextInput>;
+    minuteInputRef?: LegacyRef<TextInput>;
 }
 const MAX_HOUR = 72;
 const MAX_MINUTE = 59;
@@ -16,6 +18,8 @@ const RecipeTimeInput: FC<RecipeTimeInputProps> = ({
     value,
     onHourChange,
     onMinuteChange,
+    hourInputRef,
+    minuteInputRef,
 }: RecipeTimeInputProps) => {
     const [hour, setHour] = useState("");
     const [minute, setMinute] = useState("");
@@ -68,6 +72,7 @@ const RecipeTimeInput: FC<RecipeTimeInputProps> = ({
     return (
         <View className="flex-row space-x-2 items-center">
             <TextInput
+                ref={hourInputRef}
                 textAlign={"center"}
                 keyboardType="number-pad"
                 placeholder="0"
@@ -78,6 +83,7 @@ const RecipeTimeInput: FC<RecipeTimeInputProps> = ({
             />
             <Text>{CREATE_RECIPE_HOUR}</Text>
             <TextInput
+                ref={minuteInputRef}
                 textAlign={"center"}
                 keyboardType="number-pad"
                 placeholder="0"
