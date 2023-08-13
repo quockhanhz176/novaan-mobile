@@ -1,23 +1,17 @@
-import React, { memo, useEffect, type ReactElement, useState } from "react";
+import React, { type ReactElement } from "react";
 import { View } from "react-native";
 import Details from "../../pages/details/Details";
+import OverlayLoading from "@/common/components/OverlayLoading";
 
-interface UserProfileTabProps {
-    visible: boolean;
+interface DetailsTabProps {
+    detailsTabVisible: boolean;
 }
 
 const DetailsTab = ({
-    visible,
-}: UserProfileTabProps): ReactElement<UserProfileTabProps> => {
-    const [rendered, setRendered] = useState(false);
-    useEffect(() => {
-        if (!rendered && visible) {
-            setRendered(true);
-        }
-    }, [visible]);
-
-    if (!visible || !rendered) {
-        return <View></View>;
+    detailsTabVisible,
+}: DetailsTabProps): ReactElement<DetailsTabProps> => {
+    if (!detailsTabVisible) {
+        return <OverlayLoading />;
     }
 
     return (
@@ -27,4 +21,4 @@ const DetailsTab = ({
     );
 };
 
-export default memo(DetailsTab);
+export default DetailsTab;

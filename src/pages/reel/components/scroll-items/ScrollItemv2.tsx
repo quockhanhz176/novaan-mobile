@@ -34,6 +34,7 @@ import { REEL_FAILED_TO_LOAD } from "@/common/strings";
 import CustomModal from "@/common/components/CustomModal";
 import useBooleanHook from "@/common/components/BooleanHook";
 import AdminComments from "./AdminComments";
+import OverlayLoading from "@/common/components/OverlayLoading";
 import DetailsTab from "./DetailsTab";
 
 export type Page =
@@ -123,9 +124,7 @@ const ScrollItem = ({
 
     const onIndexChanged = (index: number): void => {
         // Record the first time user view profile
-        if (showUserProfile && index === 0 && currentPage !== 0) {
-            setCurrentPage(index);
-        }
+        setCurrentPage(index);
 
         let page: Page = "Profile";
         switch (index) {
@@ -235,6 +234,8 @@ const ScrollItem = ({
         );
     }
 
+    console.log(currentPage === 2);
+
     return (
         <ScrollItemContext.Provider
             value={{
@@ -259,6 +260,9 @@ const ScrollItem = ({
                 index={showUserProfile ? 1 : 0}
                 onScrollBeginDrag={onScrollBeginDrag}
                 onMomentumScrollEnd={onScrollEndDrag}
+                loadMinimal={true}
+                loadMinimalSize={1}
+                loadMinimalLoader={<OverlayLoading />}
             >
                 {showUserProfile && postInfo?.creator?.userId != null && (
                     <View className="flex-1 justify-center items-center bg-white">
@@ -284,8 +288,8 @@ const ScrollItem = ({
                         onShowProfile={scrollToProfile}
                     />
                 </View>
-                <View className="flex-1">
-                    <DetailsTab visible={currentPage === 2} />
+                <View className="flex-1 justify-center items-center bg-white">
+                    <DetailsTab detailsTabVisible={currentPage === 2} />
                 </View>
             </Swiper>
             {adminCommentOpen && (

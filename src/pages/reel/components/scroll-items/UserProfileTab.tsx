@@ -1,4 +1,4 @@
-import React, { memo, useEffect, type ReactElement, useState } from "react";
+import React, { memo, type ReactElement } from "react";
 import UserProfile from "@/pages/user-profile/UserProfile";
 import { View } from "react-native";
 
@@ -13,14 +13,7 @@ const UserProfileTab = ({
     showBackButton,
     userProfileVisible,
 }: UserProfileTabProps): ReactElement<UserProfileTabProps> => {
-    const [rendered, setRendered] = useState(false);
-    useEffect(() => {
-        if (!rendered && userProfileVisible) {
-            setRendered(true);
-        }
-    }, [userProfileVisible]);
-
-    if (!userProfileVisible || !rendered) {
+    if (!userProfileVisible) {
         return <View></View>;
     }
 
