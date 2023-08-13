@@ -6,6 +6,7 @@ import React, {
     useEffect,
     memo,
     useMemo,
+    type ReactElement,
 } from "react";
 import ScrollItem from "./components/scroll-items/ScrollItemv2";
 import {
@@ -23,7 +24,6 @@ import {
     DataProvider,
     LayoutProvider,
     RecyclerListView,
-    type WindowCorrection,
     type RecyclerListViewProps,
 } from "recyclerlistview";
 import { type RecyclerListViewState } from "recyclerlistview/dist/reactnative/core/RecyclerListView";
@@ -53,7 +53,6 @@ const InfiniteScroll: FC<InfiniteScrollProps> = ({
         new DataProvider((r1: MinimalPost, r2: MinimalPost) => r1 !== r2)
     );
 
-    const scrollHeight = useRef(1);
     const listRef =
         useRef<RecyclerListView<RecyclerListViewProps, RecyclerListViewState>>(
             null
@@ -95,8 +94,6 @@ const InfiniteScroll: FC<InfiniteScrollProps> = ({
             return;
         }
 
-        console.log("Refreshing post list ?");
-
         fetchPost(0, 2);
     }, [postList]);
 
@@ -123,8 +120,10 @@ const InfiniteScroll: FC<InfiniteScrollProps> = ({
         e: NativeSyntheticEvent<NativeScrollEvent>
     ): void => {
         const page = Math.round(
-            e.nativeEvent.contentOffset.y / scrollHeight.current
+            e.nativeEvent.contentOffset.y / SCROLL_ITEM_HEIGHT
         );
+        console.log("scroll end", page);
+
         setCurrentPage(page);
     };
 
@@ -173,35 +172,23 @@ const InfiniteScroll: FC<InfiniteScrollProps> = ({
         []
     );
 
-    const applyWindowCorrection = (
-        offsetX: number,
-        offsetY: number,
-        windowCorrection: WindowCorrection
-    ): void => {
-        const currentOffset = currentPage * SCROLL_ITEM_HEIGHT;
-
-        windowCorrection = {
-            startCorrection: 0,
-            endCorrection: 0,
-            windowShift: offsetY - currentOffset,
-        };
+    const renderRow = (
+        type: string | number,
+        data: MinimalPost,
+        index: number,
+        extendedState?: { currentPage: number }
+    ): ReactElement => {
+        return (
+            <ScrollItem
+                key={data.postId}
+                post={data}
+                showUserProfile={showUserProfile}
+                onPageChange={onScrollItemPageChange}
+                isVideoPaused={index !== extendedState?.currentPage ?? 0}
+                nextVideo={nextVideo}
+            />
+        );
     };
-
-    const renderRow = useCallback(
-        (type: string | number, data: MinimalPost, index: number) => {
-            return (
-                <ScrollItem
-                    key={data.postId}
-                    post={data}
-                    showUserProfile={showUserProfile}
-                    onPageChange={onScrollItemPageChange}
-                    isVideoPaused={index !== currentPage}
-                    nextVideo={nextVideo}
-                />
-            );
-        },
-        [currentPage]
-    );
 
     if (dataProvider.getSize() === 0) {
         return <OverlayLoading />;
@@ -227,13 +214,13 @@ const InfiniteScroll: FC<InfiniteScrollProps> = ({
                 // renderItem={renderItem}
                 onEndReachedThreshold={END_REACH_THRESHOLD}
                 onEndReached={fetchNextData}
-                applyWindowCorrection={applyWindowCorrection}
                 scrollViewProps={{
                     scrollEnabled,
                     snapToInterval: SCROLL_ITEM_HEIGHT,
                     disableIntervalMomentum: true,
                     onMomentumScrollEnd,
                 }}
+                extendedState={{ currentPage }}
                 // onLayout={onLayout}
                 // getItemLayout={(data, index) => ({
                 //     length: SCROLL_ITEM_HEIGHT,
