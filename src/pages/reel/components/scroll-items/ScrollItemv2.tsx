@@ -234,8 +234,6 @@ const ScrollItem = ({
         );
     }
 
-    console.log(currentPage === 2);
-
     return (
         <ScrollItemContext.Provider
             value={{

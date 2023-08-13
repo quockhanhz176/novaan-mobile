@@ -99,8 +99,6 @@ const InfiniteScroll: FC<InfiniteScrollProps> = ({
 
     const fetchNextData = async (): Promise<void> => {
         const currentSize = dataProvider.getSize();
-        console.log(currentSize);
-
         if (currentSize === 0) {
             return;
         }
@@ -122,8 +120,6 @@ const InfiniteScroll: FC<InfiniteScrollProps> = ({
         const page = Math.round(
             e.nativeEvent.contentOffset.y / SCROLL_ITEM_HEIGHT
         );
-        console.log("scroll end", page);
-
         setCurrentPage(page);
     };
 
