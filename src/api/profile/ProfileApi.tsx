@@ -17,7 +17,6 @@ import { getData, storeData } from "@/common/AsyncStorageService";
 import moment from "moment";
 import { type AllPreferenceResponse } from "./types/preference.type";
 import { type MinimalPostResponse } from "../post/types/PostListResponse";
-import { type WithId } from "@/types/app";
 
 export const PAGE_SIZE = 4;
 
@@ -139,7 +138,7 @@ const useGetUserContent = <T,>(
     return { getNext, refresh, content, ended };
 };
 
-const useGetUserContentSwr = <T extends WithId>(
+const useGetUserContentSwr = <T,>(
     getContentUrl: (userId?: string) => string,
     userId?: string
 ): PaginationHookReturn<T> => {
@@ -162,38 +161,6 @@ const useGetUserContentSwr = <T extends WithId>(
         if (data[data.length - 1].length < PAGE_SIZE) {
             setEnded(true);
         }
-
-        console.log(newContent);
-
-        // // Merge two data set
-        // let i = 0; // index for content
-        // let j = 0; // index for data
-        // while (true) {
-        //     // Out of bound for content
-        //     if (i > content.length - 1) {
-        //         break;
-        //     }
-        //     // Out of bound for data
-        //     if (j > data.length - 1) {
-        //         break;
-        //     }
-
-        //     if (content[i].id !== data[j].id) {
-        //         i++;
-        //         continue;
-        //     }
-
-        //     // Replace data when it is the same id
-        //     content[i] = data[j];
-        //     i++;
-        //     j++;
-        // }
-
-        // // Push remaining item (new items)
-        // while (j < data.length) {
-        //     content.push(data[j]);
-        //     j++;
-        // }
 
         setContent([...newContent]);
     }, [data]);

@@ -16,7 +16,6 @@ import {
 } from "react-native";
 import Swiper from "react-native-swiper";
 import { type SwiperInternals } from "react-native-swiper";
-import Details from "../../pages/details/Details";
 import VideoViewer from "../../pages/video/VideoViewer";
 import { SCROLL_ITEM_HEIGHT } from "../../commons/constants";
 import { windowWidth } from "@/common/utils";

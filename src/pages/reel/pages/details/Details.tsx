@@ -1,10 +1,4 @@
-import React, {
-    useContext,
-    type ReactElement,
-    memo,
-    useMemo,
-    useCallback,
-} from "react";
+import React, { useContext, type ReactElement, memo, useCallback } from "react";
 import { ScrollView, View, Text } from "react-native";
 import { Avatar, Divider } from "react-native-paper";
 import { customColors } from "@root/tailwind.config";
