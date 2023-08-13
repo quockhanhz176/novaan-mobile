@@ -22,7 +22,7 @@ import type AutocompeletePostResponse from "@/api/search/types/AutocompletePostR
 
 const mapCategory = (category: PreferenceCategory): string[] | undefined => {
     const result = category.preferences.flatMap((value) =>
-        value.checked ? value.title : []
+        value.checked ? value.id : []
     );
     return result.length === 0 ? undefined : result;
 };
