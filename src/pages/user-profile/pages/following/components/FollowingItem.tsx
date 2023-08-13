@@ -63,9 +63,9 @@ const FollowingItem = ({
 
     const changeFollowApi = useCallback(
         debounce((value: boolean) => {
-            void followApi.setFollow(followInfo.userId, value);
+            void followApi.setFollow(followInfo.id, value);
         }, 1000),
-        [followInfo.userId]
+        [followInfo.id]
     );
 
     const handleFollowingPress = (): void => {

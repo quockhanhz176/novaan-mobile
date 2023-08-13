@@ -29,12 +29,12 @@ export interface UseProfileInfoReturn {
 
 export interface MinimalUserInfo {
     username: string;
-    userId: string;
+    id: string;
     avatar: string;
 }
 
 export interface SavedPostResponse {
-    postId: string;
+    id: string;
     postTitle: string;
     postType: "Recipe" | "CulinaryTip";
 }

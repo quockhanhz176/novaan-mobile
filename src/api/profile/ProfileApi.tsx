@@ -17,12 +17,18 @@ import { getData, storeData } from "@/common/AsyncStorageService";
 import moment from "moment";
 import { type AllPreferenceResponse } from "./types/preference.type";
 import { type MinimalPostResponse } from "../post/types/PostListResponse";
+import { type WithId } from "@/types/app";
 
 const PAGE_SIZE = 4;
 
 const GET_PREFERENCES_URL = "preference/all";
 const USER_PREFRENCES_URL = "preference/me";
 const USER_PREFRENCES_CHECK_URL = "preference/me/check";
+
+const getSwrQueryParams = (currentPage: number): string => {
+    const start = currentPage * PAGE_SIZE;
+    return `?Start=${start}&Limit=${PAGE_SIZE}`;
+};
 
 export const useProfileInfo = (): UseProfileInfoReturn => {
     const { getReq } = useFetch({
@@ -133,7 +139,7 @@ const useGetUserContent = <T,>(
     return { getNext, refresh, content, ended };
 };
 
-const useGetUserContentSwr = <T,>(
+const useGetUserContentSwr = <T extends WithId>(
     getContentUrl: (userId?: string) => string,
     userId?: string
 ): PaginationHookReturn<T> => {
@@ -141,14 +147,9 @@ const useGetUserContentSwr = <T,>(
     const [currentPage, setCurrentPage] = useState(0);
     const [content, setContent] = useState<T[]>([]);
 
-    const queryParams = useMemo(
-        () => `?Start=0&Limit=${(currentPage + 1) * PAGE_SIZE}`,
-        [currentPage]
-    );
-
     const url = useMemo(() => getContentUrl(userId), [userId]);
 
-    const { data } = useFetchSwr([url, queryParams], {
+    const { data } = useFetchSwr([url, getSwrQueryParams(currentPage)], {
         authorizationRequired: true,
         timeout: 10000,
     });
@@ -165,10 +166,41 @@ const useGetUserContentSwr = <T,>(
             return;
         }
 
-        if (data.length === 0 || data.length < PAGE_SIZE * (currentPage + 1)) {
+        if (data.length === 0 || data.length < PAGE_SIZE) {
             setEnded(true);
         }
-        setContent(data);
+
+        // Merge two data set
+        let i = 0; // index for content
+        let j = 0; // index for data
+        while (true) {
+            // Out of bound for content
+            if (i > content.length - 1) {
+                break;
+            }
+            // Out of bound for data
+            if (j > data.length - 1) {
+                break;
+            }
+
+            if (content[i].id !== data[j].id) {
+                i++;
+                continue;
+            }
+
+            // Replace data when it is the same id
+            content[i] = data[j];
+            i++;
+            j++;
+        }
+
+        // Push remaining item (new items)
+        while (j < data.length) {
+            content.push(data[j]);
+            j++;
+        }
+
+        setContent([...content]);
     }, [data]);
 
     const getNext = async (): Promise<void> => {
@@ -235,7 +267,7 @@ export const useUserFollower = (
 export const useUserSavedPost = (
     userId?: string
 ): PaginationHookReturn<SavedPostResponse> => {
-    return useGetUserContentSwr(getUserSavedUrl, userId);
+    return useGetUserContentSwr<SavedPostResponse>(getUserSavedUrl, userId);
 };
 
 // For getting available preferences
