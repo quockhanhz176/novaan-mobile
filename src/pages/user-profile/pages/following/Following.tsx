@@ -78,7 +78,7 @@ const Following = ({
                 <FlatList
                     data={content}
                     className="w-full"
-                    keyExtractor={(item) => item.userId}
+                    keyExtractor={(item) => item.id}
                     contentContainerStyle={{ marginTop: 8 }}
                     renderItem={renderItem}
                     getItemLayout={(_, index) => ({
@@ -93,7 +93,7 @@ const Following = ({
             )}
             <Modal animationType="slide" visible={viewingProfile}>
                 <UserProfile
-                    userId={selectedProfile?.userId}
+                    userId={selectedProfile?.id}
                     onClose={handleFetchProfileFailed}
                 />
             </Modal>

@@ -55,7 +55,7 @@ const SavedPosts = (): ReactElement => {
             .filter((post) => post.postType === "Recipe")
             .map(
                 (item): MinimalPostInfo => ({
-                    id: item.postId,
+                    id: item.id,
                     type: "recipe",
                     title: item.postTitle,
                 })
@@ -70,7 +70,7 @@ const SavedPosts = (): ReactElement => {
             .filter((tip) => tip.postType === "CulinaryTip")
             .map(
                 (item): MinimalPostInfo => ({
-                    id: item.postId,
+                    id: item.id,
                     type: "tip",
                     title: item.postTitle,
                 })

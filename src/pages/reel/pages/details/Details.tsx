@@ -1,4 +1,4 @@
-import React, { useContext, type ReactElement, memo, useMemo } from "react";
+import React, { useContext, type ReactElement, memo, useCallback } from "react";
 import { ScrollView, View, Text } from "react-native";
 import { Avatar, Divider } from "react-native-paper";
 import { customColors } from "@root/tailwind.config";
@@ -31,14 +31,21 @@ const Details = (): ReactElement => {
         handleUnsave,
     } = useContext(ScrollItemContext);
 
-    const handleLikePress = useMemo(
-        () => (likeInfo.liked ? handleUnlike : handleLike),
-        [likeInfo.liked]
-    );
-    const handleSavePress = useMemo(
-        () => (saved ? handleUnsave : handleSave),
-        [saved]
-    );
+    const handleLikePress = useCallback(() => {
+        if (currentPost == null || currentPost.status !== "Approved") {
+            return;
+        }
+
+        likeInfo.liked ? handleUnlike() : handleLike();
+    }, [currentPost, likeInfo.liked]);
+
+    const handleSavePress = useCallback(() => {
+        if (currentPost == null || currentPost.status !== "Approved") {
+            return;
+        }
+
+        saved ? handleUnsave() : handleSave();
+    }, [currentPost, saved]);
 
     if (currentPost == null) {
         return <OverlayLoading />;

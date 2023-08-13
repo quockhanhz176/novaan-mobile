@@ -190,7 +190,7 @@ const searchUser = async (
         ? result.value.map((value) => ({
               ...value,
               followed:
-                  followings?.find((item) => item.userId === value.id) != null,
+                  followings?.find((item) => item.id === value.id) != null,
           }))
         : null;
 };

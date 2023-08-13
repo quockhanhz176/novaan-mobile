@@ -39,6 +39,9 @@ import { useSWRConfig } from "swr";
 import { getUserTipsUrl } from "@/api/profile/ProfileApi";
 import Toast from "react-native-toast-message";
 import { getUserIdFromToken } from "@/api/common/utils/TokenUtils";
+import { useResourceUrl } from "@/api/utils/resourceHooks";
+import { unstable_serialize } from "swr/infinite";
+import { mutateGetKey } from "@/api/baseApiHook";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const defaultThumbnail = require("@root/assets/default-video.png");
@@ -59,7 +62,7 @@ const CreateTip: FC<CreateTipProps> = ({
     const [thumbnailUri, setThumbnailUri] = useState<string | null>();
 
     const { postInfo, fetchPostInfo } = usePostInfo();
-    // const { resourceUrl, fetchUrl } = useFetchResourceUrl();
+    const { fetchUrl } = useResourceUrl();
 
     const { mutate } = useSWRConfig();
 
@@ -77,7 +80,7 @@ const CreateTip: FC<CreateTipProps> = ({
         });
     }, []);
 
-    useEffect(() => {
+    const handleSetTips = async (): Promise<void> => {
         if (postInfo === undefined) {
             return;
         }
@@ -85,8 +88,12 @@ const CreateTip: FC<CreateTipProps> = ({
         setTitle(postInfo.title);
         setDescription(postInfo.description);
 
-        // Pull thumbnail into thumbnailUri
-        // void fetchUrl(postInfo.thumbnail)
+        const thumbnail = await fetchUrl(postInfo.thumbnail);
+        setThumbnailUri(thumbnail);
+    };
+
+    useEffect(() => {
+        void handleSetTips();
     }, [postInfo]);
 
     const onTitleChange = (text: string): void => {
@@ -138,9 +145,7 @@ const CreateTip: FC<CreateTipProps> = ({
         // Revalidate user profile created tips
         const currentUserId = await getUserIdFromToken();
         await mutate(
-            // Only creator can edit their own post so it's safe to assume currentUserId === postInfo.creator.userId
-            (key) =>
-                Array.isArray(key) && key[0] === getUserTipsUrl(currentUserId)
+            unstable_serialize(mutateGetKey(getUserTipsUrl(currentUserId)))
         );
     };
 

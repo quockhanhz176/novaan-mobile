@@ -27,11 +27,7 @@ const Seeker: FC<SeekerProps> = ({ progress = 0, onSeek }) => {
     };
 
     return (
-        <View
-            onLayout={onLayout}
-            className="pt-6"
-            onTouchEnd={onTouchEnd}
-        >
+        <View onLayout={onLayout} className="pt-6" onTouchEnd={onTouchEnd}>
             <Bar
                 unfilledColor={customColors.seeker.background}
                 color={customColors.seeker.foreground}

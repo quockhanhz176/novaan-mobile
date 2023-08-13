@@ -18,11 +18,16 @@ import moment from "moment";
 import { type AllPreferenceResponse } from "./types/preference.type";
 import { type MinimalPostResponse } from "../post/types/PostListResponse";
 
-const PAGE_SIZE = 4;
+export const PAGE_SIZE = 4;
 
 const GET_PREFERENCES_URL = "preference/all";
 const USER_PREFRENCES_URL = "preference/me";
 const USER_PREFRENCES_CHECK_URL = "preference/me/check";
+
+export const getSwrQueryParams = (currentPage: number): string => {
+    const start = currentPage * PAGE_SIZE;
+    return `?Start=${start}&Limit=${PAGE_SIZE}`;
+};
 
 export const useProfileInfo = (): UseProfileInfoReturn => {
     const { getReq } = useFetch({
@@ -137,55 +142,41 @@ const useGetUserContentSwr = <T,>(
     getContentUrl: (userId?: string) => string,
     userId?: string
 ): PaginationHookReturn<T> => {
-    const [ended, setEnded] = useState(false);
-    const [currentPage, setCurrentPage] = useState(0);
     const [content, setContent] = useState<T[]>([]);
-
-    const queryParams = useMemo(
-        () => `?Start=0&Limit=${(currentPage + 1) * PAGE_SIZE}`,
-        [currentPage]
-    );
+    const [ended, setEnded] = useState(false);
 
     const url = useMemo(() => getContentUrl(userId), [userId]);
 
-    const { data } = useFetchSwr([url, queryParams], {
+    const { data, setSize } = useFetchSwr(url, {
         authorizationRequired: true,
         timeout: 10000,
     });
 
     useEffect(() => {
         if (data == null) {
-            setEnded(true);
             return;
         }
 
-        // Something is wrong...
-        if (!Array.isArray(data)) {
-            setContent([]);
-            return;
-        }
-
-        if (data.length === 0 || data.length < PAGE_SIZE * (currentPage + 1)) {
+        const newContent = data.flat();
+        if (data[data.length - 1].length < PAGE_SIZE) {
             setEnded(true);
         }
-        setContent(data);
+
+        setContent([...newContent]);
     }, [data]);
 
     const getNext = async (): Promise<void> => {
-        // Avoid re-fetching data
         if (ended) {
             return;
         }
-        setCurrentPage((page) => page + 1);
+        await setSize((size) => size + 1);
     };
 
     const refresh = (): void => {
-        setEnded(false);
-        setCurrentPage(0);
         setContent([]);
     };
 
-    return { getNext, refresh, content, ended };
+    return { content, getNext, refresh, ended };
 };
 
 export const getUserRecipesUrl = (userId: string): string => {
@@ -235,7 +226,7 @@ export const useUserFollower = (
 export const useUserSavedPost = (
     userId?: string
 ): PaginationHookReturn<SavedPostResponse> => {
-    return useGetUserContentSwr(getUserSavedUrl, userId);
+    return useGetUserContentSwr<SavedPostResponse>(getUserSavedUrl, userId);
 };
 
 // For getting available preferences

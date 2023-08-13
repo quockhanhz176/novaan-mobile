@@ -35,7 +35,8 @@ import { type UploadResponse } from "@/api/post/types/UploadResponse";
 import { type PreferenceObj } from "../types/PreferenceObj";
 import { getUserIdFromToken } from "@/api/common/utils/TokenUtils";
 import { getUserRecipesUrl } from "@/api/profile/ProfileApi";
-import { mutate } from "swr";
+import { mutate, unstable_serialize } from "swr";
+import { mutateGetKey } from "@/api/baseApiHook";
 
 const validateRecipeSubmission = ({
     title,
@@ -253,10 +254,7 @@ export const handleRecipeSubmission = async (
         // Revalidate data and navigate back
         const currentUserId = await getUserIdFromToken();
         await mutate(
-            // Only creator can edit their own post so it's safe to assume currentUserId === postInfo.creator.userId
-            (key) =>
-                Array.isArray(key) &&
-                key[0] === getUserRecipesUrl(currentUserId)
+            unstable_serialize(mutateGetKey(getUserRecipesUrl(currentUserId)))
         );
 
         // Notify the user when upload is success
@@ -376,10 +374,7 @@ export const handleRecipeEdit = async (
         // Revalidate data and navigate back
         const currentUserId = await getUserIdFromToken();
         await mutate(
-            // Only creator can edit their own post so it's safe to assume currentUserId === postInfo.creator.userId
-            (key) =>
-                Array.isArray(key) &&
-                key[0] === getUserRecipesUrl(currentUserId)
+            unstable_serialize(mutateGetKey(getUserRecipesUrl(currentUserId)))
         );
 
         // Notify the user when upload is success
