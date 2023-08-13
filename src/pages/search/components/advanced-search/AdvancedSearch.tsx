@@ -61,6 +61,8 @@ const styles = StyleSheet.create({
 
 const SEARCH_BATCH_SIZE = 10000;
 
+const defaultIngredients = ["granola", "đường", "nước"];
+
 const AdvancedSearch: FC<AdvancedSearchParams> = ({
     setReelParams,
     showReel,
@@ -68,13 +70,7 @@ const AdvancedSearch: FC<AdvancedSearchParams> = ({
 }) => {
     const [ingredients, dispatchIngredients] = useReducer(
         ingredientsReducer,
-        new Set<string>([
-            "thịt bò tươi",
-            "rượu vang đỏ",
-            "quả gấc",
-            "cà rốt",
-            "gừng",
-        ])
+        new Set<string>(defaultIngredients)
     );
     const [ingredientString, setIngredientString] = useState("");
 

@@ -126,7 +126,9 @@ const Details = (): ReactElement => {
                     />
                 </View>
                 <Text className="text-base text-cprimary-300">
-                    {currentPost.averageRating.toFixed(1)}
+                    {isNaN(currentPost.averageRating)
+                        ? 0
+                        : currentPost.averageRating.toFixed(1)}
                 </Text>
                 <Text className="text-base text-cprimary-300 ml-2">
                     ({currentPost.ratingCount})
