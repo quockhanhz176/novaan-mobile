@@ -59,7 +59,7 @@ const searchPost = async (
 
     const postInfos = result.success
         ? result.value.map((value) => {
-              return { ...value, type: postType };
+              return { ...value, type: postType, thumbnail: value.thumbnails };
           })
         : null;
 
