@@ -7,6 +7,7 @@ import StarRating from "react-native-star-rating";
 import { customColors } from "@root/tailwind.config";
 import "moment/locale/vi";
 import IconMaterial from "react-native-vector-icons/MaterialIcons";
+import FastImage from "react-native-fast-image";
 
 interface CommentItemProps {
     comment: PostComment;
@@ -36,21 +37,28 @@ const CommentItem = ({
     };
 
     return (
-        <View className="px-4 py-3 flex-row space-x-4">
-            <ResourceImage
-                resourceId={comment.avatar}
-                className="w-[25] h-[25] rounded-full bg-xanthous items-center justify-center overflow-hidden"
-                defaultView={<IconFeather name="user" size={17} />}
-            />
-            <View className="flex-1">
-                <View className="flex-row items-center">
-                    <Text className="mr-3 text-cgrey-battleship text-sm font-semibold">
+        <View className="px-4 py-3 flex-row">
+            <View className="w-[25] h-[25] rounded-full bg-xanthous items-center justify-center overflow-hidden">
+                <View className="absolute top-0 bottom-0 left-0 right-0">
+                    <IconFeather name="user" size={17} />
+                </View>
+                <FastImage
+                    className="w-full h-full"
+                    source={{ uri: comment.avatar }}
+                />
+            </View>
+            <View className="flex-1 ml-4 mr-2">
+                <View className="flex-row items-center overflow-hidden">
+                    <Text
+                        className="mr-3 text-cgrey-battleship text-xs font-semibold"
+                        numberOfLines={1}
+                    >
                         {comment.username} •{" "}
                         {comment.createdAt.locale("vi").fromNow()}
                     </Text>
                     <StarRating
-                        starSize={13}
-                        containerStyle={{ width: 90 }}
+                        starSize={11}
+                        containerStyle={{ width: 60 }}
                         fullStarColor={customColors.star}
                         emptyStar={"star"}
                         emptyStarColor={customColors.cgrey.platinum}
@@ -77,7 +85,6 @@ const CommentItem = ({
                             name="more-vert"
                             color={customColors.cgrey.battleship}
                             size={24}
-                            className="p-2"
                         />
                     </TouchableOpacity>
                 </View>
@@ -92,7 +99,6 @@ const CommentItem = ({
                             name="more-vert"
                             color={customColors.cgrey.battleship}
                             size={24}
-                            className="p-2"
                         />
                     </TouchableOpacity>
                 </View>
