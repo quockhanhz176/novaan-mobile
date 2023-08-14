@@ -13,12 +13,12 @@ import { getDifficultyLabel } from "@/pages/create-post/create-recipe/types/Diff
 import DetailTime from "./components/DetailTime";
 import IconLabelButton from "@/common/components/IconLabelButton";
 import DetailInstruction from "./components/DetailInstruction";
-import ResourceImage from "@/common/components/ResourceImage";
 import { getPortionLabel } from "@/pages/create-post/create-recipe/types/PortionTypeItems";
 import { ScrollItemContext } from "../../components/scroll-items/ScrollItemv2";
 import OverlayLoading from "@/common/components/OverlayLoading";
 import StarRating from "react-native-star-rating";
 import ViewMoreText from "react-native-view-more-text";
+import FastImage from "react-native-fast-image";
 
 const Details = (): ReactElement => {
     const {
@@ -50,6 +50,8 @@ const Details = (): ReactElement => {
     if (currentPost == null) {
         return <OverlayLoading />;
     }
+
+    console.log("post", currentPost);
 
     return (
         <ScrollView className="w-full h-full bg-white">
@@ -136,13 +138,13 @@ const Details = (): ReactElement => {
             </View>
             <View className="flex-row justify-between items-center mx-4 mt-8">
                 <View className="flex-row justify-start items-center">
-                    <View>
+                    <View className="w-[36] h-[36] rounded-full overflow-hidden">
                         {currentPost.creator.avatar == null ||
                         currentPost.creator.avatar === "" ? (
                             <Avatar.Icon icon="account-outline" size={36} />
                         ) : (
-                            <ResourceImage
-                                resourceId={currentPost.creator.avatar}
+                            <FastImage
+                                source={{ uri: currentPost.creator.avatar }}
                                 className="h-full w-full"
                             />
                         )}

@@ -26,6 +26,7 @@ import { responseObjectValid } from "../common/utils/ResponseUtils";
 import { getUserIdFromToken } from "../common/utils/TokenUtils";
 import { unstable_serialize, useSWRConfig } from "swr";
 import { getUserSavedUrl } from "../profile/ProfileApi";
+import PostApi from "./PostApi";
 
 const POST_LIST_URL = "content/posts";
 
@@ -104,12 +105,17 @@ export const usePostInfo = (): UsePostInfoReturn => {
         if (!responseObjectValid(postResponse)) {
             return undefined;
         }
+        const authorResponse = await PostApi.getProfile(postResponse.creatorId);
+        const author = authorResponse.success
+            ? authorResponse.value
+            : undefined;
 
         // Format response based on postType
         postResponse.type = postType;
         postResponse.creator = {
             username: postResponse.creatorName,
             userId: postResponse.creatorId,
+            avatar: author?.avatar,
         };
         if (postType === "recipe") {
             postResponse.prepTime = getRecipeTime(

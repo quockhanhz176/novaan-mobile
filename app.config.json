@@ -1,6 +1,6 @@
 {
     "expo": {
-        "name": "novaan-mobile",
+        "name": "Novaan",
         "owner": "saltytuna",
         "slug": "novaan-mobile",
         "currentFullName": "Novaan",
@@ -28,6 +28,7 @@
             "policy": "sdkVersion"
         },
         "scheme": "novaanapp",
-        "plugins": ["react-native-compressor"]
+        "plugins": ["react-native-compressor"],
+        "icon": "assets/app-icon.png"
     }
 }

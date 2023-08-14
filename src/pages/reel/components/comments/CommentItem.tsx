@@ -50,7 +50,7 @@ const CommentItem = ({
             <View className="flex-1 ml-4 mr-2">
                 <View className="flex-row items-center overflow-hidden">
                     <Text
-                        className="mr-3 text-cgrey-battleship text-xs font-semibold"
+                        className="mr-3 text-cgrey-battleship text-xs font-semibold basis-auto shrink"
                         numberOfLines={1}
                     >
                         {comment.username} •{" "}

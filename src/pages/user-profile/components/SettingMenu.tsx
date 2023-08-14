@@ -9,6 +9,7 @@ import { type NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { customColors } from "@root/tailwind.config";
 import React, { type ReactElement } from "react";
 import { View } from "react-native";
+import userProfileServices from "../services/userProfileServices";
 
 interface SettingMenuProps {
     onDimiss: () => void;
@@ -34,7 +35,8 @@ const SettingMenu = ({
         await invalidateData("reelsData");
         await invalidateData("userPreferenceData");
         await invalidateData("haveUserSetPreference");
-
+        await invalidateData("userProfile");
+        userProfileServices.cachedUserProfile = undefined;
         await deleteKeychainValue(KEYCHAIN_ID);
 
         // To login

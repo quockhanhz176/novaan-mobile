@@ -7,7 +7,10 @@ import { type RootStackParamList } from "@/types/navigation";
 import { type NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useEffect, type FC } from "react";
 import React, { View, Text } from "react-native";
-import IconCommunity from "react-native-vector-icons/MaterialCommunityIcons";
+import FastImage from "react-native-fast-image";
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const appIcon = require("@root/assets/app-icon.png");
 
 export const handleSignInSuccessRedirect = async (
     navigation: NativeStackNavigationProp<
@@ -25,13 +28,13 @@ export const handleSignInSuccessRedirect = async (
         }
 
         if (!notFirstTime) {
-            navigation.navigate("Greet");
+            navigation.replace("Greet");
             return;
         }
 
-        navigation.navigate("MainScreens");
+        navigation.replace("MainScreens");
     } catch (e) {
-        navigation.navigate("MainScreens");
+        navigation.replace("MainScreens");
     }
 };
 
@@ -51,21 +54,21 @@ const SplashScreen: FC<SplashScreenProps> = ({ navigation }) => {
         try {
             const currentUserToken = await getPayloadFromToken<TokenPayload>();
             if (currentUserToken.exp == null) {
-                navigation.navigate("SignIn");
+                navigation.replace("SignIn");
                 return;
             }
 
             void handleSignInSuccessRedirect(navigation, haveUserSetPreference);
         } catch (e) {
             // Continue with normal sign in
-            navigation.navigate("SignIn");
+            navigation.replace("SignIn");
         }
     };
 
     return (
         <View className="justify-center items-center flex-1">
-            <View className="pr-[4]">
-                <IconCommunity name="silverware-fork-knife" size={90} />
+            <View className="items-center">
+                <FastImage source={appIcon} className="h-[100] w-[100]"/>
             </View>
             <Text className="text-5xl font-bold mt-8">
                 {SPLASH_SCREEN_APP_NAME}
