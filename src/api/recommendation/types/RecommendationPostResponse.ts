@@ -1,4 +1,4 @@
-interface RecommendationPostResponseBase {
+export interface RecommendationPostResponseBase {
     id: string;
     authorId: string;
     avatar: string;
@@ -8,6 +8,7 @@ interface RecommendationPostResponseBase {
     averageRating: number;
     likeCount: number;
     popularityScore: number;
+    postType?: "Recipe" | "CulinaryTip";
 }
 
 export type RecommendationTipResponse = RecommendationPostResponseBase;

@@ -6,6 +6,7 @@ import {
     type RecommendationTip,
 } from "../types/RecommendationPost";
 import { type RecommendationPostResponse } from "@/api/recommendation/types/RecommendationPostResponse";
+import { type PostType } from "@/api/post/types/PostResponse";
 
 const getTrendingAuthors = async (): Promise<
     RecommendationUserResponse[] | null
@@ -17,10 +18,16 @@ const getTrendingAuthors = async (): Promise<
 const toRecommendationPost = (
     response: RecommendationPostResponse
 ): RecommendationPost => {
+    let postType: PostType = "recipe";
+    if (response.postType == null) {
+        postType = "cookTime" in response ? "recipe" : "tip";
+    } else {
+        postType = response.postType === "Recipe" ? "recipe" : "tip";
+    }
     return {
         cookTime: "",
         ...response,
-        type: "cookTime" in response ? "recipe" : "tip",
+        type: postType,
     };
 };
 

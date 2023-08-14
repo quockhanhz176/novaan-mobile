@@ -105,7 +105,7 @@ const UserProfile = ({
     const renderScene = useMemo(() => {
         if (isUserProfile) {
             return SceneMap({
-                created: CreatedPosts,
+                created: () => <CreatedPosts isUserProfile={isUserProfile} />,
                 saved: SavedPosts,
                 following: () => (
                     <Following setFollowingCount={setFollowingCount} />
@@ -115,7 +115,12 @@ const UserProfile = ({
         }
 
         return SceneMap({
-            created: () => <CreatedPosts showStatus={false} />,
+            created: () => (
+                <CreatedPosts
+                    showStatus={false}
+                    isUserProfile={isUserProfile}
+                />
+            ),
         });
     }, [isUserProfile]);
 

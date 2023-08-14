@@ -40,6 +40,7 @@ import { type PostType } from "@/api/post/types/PostResponse";
 import { type RecommendationPost } from "./types/RecommendationPost";
 import type RecommendationUserResponse from "@/api/recommendation/types/RecommendationUserResponse";
 import { MD2Colors } from "react-native-paper";
+import { type Undefinable } from "@/types/app";
 
 interface HomeProps {
     navigation: BottomTabNavigationProp<BottomTabParamList, "Home">;
@@ -60,8 +61,10 @@ const Home: FC<HomeProps> = ({ navigation }: HomeProps) => {
     const [profileVisible, hideProfile, showProfile] = useBooleanHook();
     const profileIdRef = useRef<string>();
     const [fullPostVisible, hideFullPost, showFullPost] = useBooleanHook();
-    const postRef = useRef<MinimalPost>();
     const [loading, setLoading] = useState(true);
+
+    const [viewItem, setViewItem] =
+        useState<Undefinable<MinimalPost>>(undefined);
 
     useEffect(() => {
         Promise.all([
@@ -94,10 +97,10 @@ const Home: FC<HomeProps> = ({ navigation }: HomeProps) => {
     }, []);
 
     const onPostClick = useCallback((postId: string, postType: PostType) => {
-        postRef.current = {
+        setViewItem({
             postId,
             postType: postType === "recipe" ? "Recipe" : "CulinaryTip",
-        };
+        });
         showFullPost();
     }, []);
 
@@ -200,6 +203,7 @@ const Home: FC<HomeProps> = ({ navigation }: HomeProps) => {
                     className="flex-row justify-between items-center"
                 >
                     <TouchableOpacity
+                        delayPressIn={0}
                         onPress={hideFullPost}
                         className="px-4 py-2 rounded-lg"
                     >
@@ -211,9 +215,7 @@ const Home: FC<HomeProps> = ({ navigation }: HomeProps) => {
                         </Text>
                     </View>
                 </View>
-                {postRef.current != null && (
-                    <InfiniteScroll postIds={[postRef.current]} />
-                )}
+                {viewItem != null && <InfiniteScroll postIds={[viewItem]} />}
             </Modal>
         </View>
     );
