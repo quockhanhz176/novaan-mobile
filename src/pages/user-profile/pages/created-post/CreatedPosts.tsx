@@ -22,10 +22,12 @@ type ViewCategory = "recipe" | "tips";
 
 interface CreatedPostsProps {
     showStatus?: boolean;
+    isUserProfile: boolean;
 }
 
 const CreatedPosts = ({
     showStatus = true,
+    isUserProfile,
 }: CreatedPostsProps): ReactElement<CreatedPostsProps> => {
     const { userInfo } = useContext(UserProfileContext);
     const {
@@ -193,7 +195,7 @@ const CreatedPosts = ({
                 visible={viewingItem}
                 onDimiss={handleCloseItemView}
                 viewItem={viewItem}
-                showSetting
+                showSetting={isUserProfile}
             />
         </View>
     );
