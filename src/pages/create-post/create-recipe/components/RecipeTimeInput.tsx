@@ -21,8 +21,8 @@ const RecipeTimeInput: FC<RecipeTimeInputProps> = ({
     hourInputRef,
     minuteInputRef,
 }: RecipeTimeInputProps) => {
-    const [hour, setHour] = useState("");
-    const [minute, setMinute] = useState("");
+    const [hour, setHour] = useState("0");
+    const [minute, setMinute] = useState("0");
 
     useEffect(() => {
         if (value == null) {
@@ -63,15 +63,24 @@ const RecipeTimeInput: FC<RecipeTimeInputProps> = ({
     };
 
     const onHourTextChange = (text: string): void => {
+        if (text === "") {
+            setHour("0");
+            return;
+        }
         checkNumberInput(text, setHour, 0, MAX_HOUR, onHourChange);
     };
     const onMinuteTextChange = (text: string): void => {
+        if (text === "") {
+            setMinute("0");
+            return;
+        }
         checkNumberInput(text, setMinute, 0, MAX_MINUTE, onMinuteChange);
     };
 
     return (
         <View className="flex-row space-x-2 items-center">
             <TextInput
+                maxLength={2}
                 ref={hourInputRef}
                 textAlign={"center"}
                 keyboardType="number-pad"
@@ -83,6 +92,7 @@ const RecipeTimeInput: FC<RecipeTimeInputProps> = ({
             />
             <Text>{CREATE_RECIPE_HOUR}</Text>
             <TextInput
+                maxLength={2}
                 ref={minuteInputRef}
                 textAlign={"center"}
                 keyboardType="number-pad"

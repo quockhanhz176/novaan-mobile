@@ -63,13 +63,18 @@ const Comments = ({
     const [selectedComment, setSelectedComment] =
         useState<Undefinable<string>>(undefined);
 
-    const userComment: Undefinable<PostComment> = useMemo(() => {
+    const [userComment, setUserComment] =
+        useState<Undefinable<PostComment>>(undefined);
+
+    useEffect(() => {
         if (comments.length === 0) {
-            return undefined;
+            return;
         }
 
-        return comments.find((comment) => comment.userId === currentUserId);
-    }, [comments]);
+        setUserComment(
+            comments.find((comment) => comment.userId === currentUserId)
+        );
+    }, [comments, currentUserId]);
 
     const minimalPostInfo = useMemo((): Undefinable<MinimalPost> => {
         if (currentPost == null) {
@@ -100,9 +105,15 @@ const Comments = ({
         closeComments?.();
     };
 
+    const handleOpenEditComment = (): void => {
+        hideCommentMenu();
+        showAddEdit();
+    };
+
     const handleSubmitComment = async (
         commentInfo: CommentInformation
     ): Promise<void> => {
+        hideCommentMenu();
         if (currentPost == null) {
             return;
         }
@@ -136,10 +147,11 @@ const Comments = ({
             return;
         }
         await refreshComments();
-        hideCommentMenu();
     };
 
     const handleDeleteComment = async (): Promise<void> => {
+        hideCommentMenu();
+
         if (minimalPostInfo == null) {
             return;
         }
@@ -148,7 +160,7 @@ const Comments = ({
         if (!result) {
             return;
         }
-        await fetchComments(minimalPostInfo);
+        await refreshComments();
     };
 
     const handleOpenReportMenu = (commentId: string): void => {
@@ -293,7 +305,7 @@ const Comments = ({
                             onDismiss={hideCommentMenu}
                         >
                             <CommentMenu
-                                handleEditComment={showAddEdit}
+                                handleEditComment={handleOpenEditComment}
                                 handleDeleteComment={handleDeleteComment}
                             />
                         </CustomModal>

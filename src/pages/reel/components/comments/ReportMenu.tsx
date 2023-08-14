@@ -14,7 +14,7 @@ const ReportMenu = ({
     return (
         <View className="flex-1 justify-end mb-2">
             <View
-                className="bg-white rounded-xl py-2 h-1/6"
+                className="bg-white rounded-xl py-2 h-1/6 m-2"
                 onTouchStart={(e) => {
                     e.stopPropagation();
                 }}

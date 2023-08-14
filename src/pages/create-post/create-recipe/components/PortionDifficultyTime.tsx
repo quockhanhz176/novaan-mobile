@@ -1,5 +1,5 @@
-import React, { type FC, useContext, useMemo, useEffect, useRef } from "react";
-import { View, Text, TextInput, ScrollView, Keyboard } from "react-native";
+import React, { type FC, useContext, useMemo } from "react";
+import { View, Text, TextInput, ScrollView } from "react-native";
 import WarningAsterisk from "@/common/components/WarningAeterisk";
 import { type NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { recipeInformationContext } from "../types/RecipeParams";
@@ -40,29 +40,29 @@ const PortionDificultyTime: FC<TitleDescriptionVideoProps> = (
         setPrepTime,
     } = useContext(recipeInformationContext);
 
-    const inputRefs = [
-        useRef<TextInput>(null),
-        useRef<TextInput>(null),
-        useRef<TextInput>(null),
-        useRef<TextInput>(null),
-        useRef<TextInput>(null),
-    ];
+    // const inputRefs = [
+    //     useRef<TextInput>(null),
+    //     useRef<TextInput>(null),
+    //     useRef<TextInput>(null),
+    //     useRef<TextInput>(null),
+    //     useRef<TextInput>(null),
+    // ];
 
-    useEffect(() => {
-        // setup input
-        const keyboardDidHideSubscription = Keyboard.addListener(
-            "keyboardDidHide",
-            () => {
-                inputRefs.forEach((ref) => {
-                    ref.current?.blur();
-                });
-            }
-        );
+    // useEffect(() => {
+    //     // setup input
+    //     const keyboardDidHideSubscription = Keyboard.addListener(
+    //         "keyboardDidHide",
+    //         () => {
+    //             inputRefs.forEach((ref) => {
+    //                 ref.current?.blur();
+    //             });
+    //         }
+    //     );
 
-        return () => {
-            keyboardDidHideSubscription?.remove();
-        };
-    }, []);
+    //     return () => {
+    //         keyboardDidHideSubscription?.remove();
+    //     };
+    // }, []);
 
     const difficultyDropdownItems = useMemo(
         () =>
@@ -86,9 +86,11 @@ const PortionDificultyTime: FC<TitleDescriptionVideoProps> = (
 
     const setQuantity = (value: string): void => {
         if (value === "") {
-            value = "0";
+            value = "1";
         }
-        setPortionQuantity(parseFloat(value));
+
+        const parseValue = parseFloat(value);
+        setPortionQuantity(isNaN(parseValue) ? 0 : parseValue);
     };
 
     const setCookHour = (value: number): void => {
@@ -128,7 +130,10 @@ const PortionDificultyTime: FC<TitleDescriptionVideoProps> = (
     };
 
     return (
-        <ScrollView className="flex-1 bg-white">
+        <ScrollView
+            className="flex-1 bg-white"
+            keyboardShouldPersistTaps="always"
+        >
             {!isEditing && (
                 <Text className="text-base p-5 bg-ctertiary">
                     {CREATE_RECIPE_PDT_SUBTITLE}
@@ -141,13 +146,16 @@ const PortionDificultyTime: FC<TitleDescriptionVideoProps> = (
                 </Text>
                 <View className="z-10 flex-row space-x-2 justify-center mt-2 px-20">
                     <TextInput
-                        ref={inputRefs[0]}
+                        // ref={inputRefs[0]}
                         value={
-                            portionQuantity === 0 ? "" : String(portionQuantity)
+                            portionQuantity === 0
+                                ? ""
+                                : portionQuantity.toString()
                         }
+                        maxLength={4}
                         placeholder="0"
                         keyboardType="decimal-pad"
-                        textAlign={"center"}
+                        textAlign="center"
                         className="text-base flex-1 py-2 bg-cgrey-seasalt rounded-md"
                         onChangeText={setQuantity}
                     />
@@ -231,8 +239,8 @@ const PortionDificultyTime: FC<TitleDescriptionVideoProps> = (
                         value={prepTime}
                         onHourChange={setPrepHour}
                         onMinuteChange={setPrepMinute}
-                        hourInputRef={inputRefs[1]}
-                        minuteInputRef={inputRefs[2]}
+                        // hourInputRef={inputRefs[1]}
+                        // minuteInputRef={inputRefs[2]}
                     />
                 </View>
                 <View className="flex-row justify-between mt-10 items-center">
@@ -244,8 +252,8 @@ const PortionDificultyTime: FC<TitleDescriptionVideoProps> = (
                         value={cookTime}
                         onHourChange={setCookHour}
                         onMinuteChange={setCookMinute}
-                        hourInputRef={inputRefs[3]}
-                        minuteInputRef={inputRefs[4]}
+                        // hourInputRef={inputRefs[3]}
+                        // minuteInputRef={inputRefs[4]}
                     />
                 </View>
             </View>

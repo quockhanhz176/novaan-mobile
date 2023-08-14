@@ -28,7 +28,15 @@
             "policy": "sdkVersion"
         },
         "scheme": "novaanapp",
-        "plugins": ["react-native-compressor"],
+        "plugins": [
+            "react-native-compressor",
+            [
+                "./src/androidConfig/android-manifest",
+                {
+                    "android:windowSoftInputMode": "stateAlwaysHidden|adjustPan"
+                }
+            ]
+        ],
         "icon": "assets/app-icon.png"
     }
 }
