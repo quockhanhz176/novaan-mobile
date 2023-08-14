@@ -33,7 +33,7 @@
             [
                 "./src/androidConfig/android-manifest",
                 {
-                    "android:windowSoftInputMode": "adjustPan"
+                    "android:windowSoftInputMode": "stateAlwaysHidden|adjustPan"
                 }
             ]
         ],

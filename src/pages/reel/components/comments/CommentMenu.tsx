@@ -20,7 +20,7 @@ const CommentMenu = ({
     return (
         <View className="flex-1 justify-end mb-2">
             <View
-                className="bg-white rounded-xl h-1/6"
+                className="bg-white rounded-xl h-1/6 m-2 py-2"
                 onTouchStart={(e) => {
                     e.stopPropagation();
                 }}
@@ -34,7 +34,7 @@ const CommentMenu = ({
                     <IconLabelButton
                         iconPack="Community"
                         iconProps={{
-                            name: "delete-outline",
+                            name: "pencil-outline",
                             size: 24,
                             color: customColors.black,
                         }}

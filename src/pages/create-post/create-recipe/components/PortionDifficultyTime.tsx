@@ -1,5 +1,5 @@
-import React, { type FC, useContext, useMemo, useEffect, useRef } from "react";
-import { View, Text, TextInput, ScrollView, Keyboard } from "react-native";
+import React, { type FC, useContext, useMemo } from "react";
+import { View, Text, TextInput, ScrollView } from "react-native";
 import WarningAsterisk from "@/common/components/WarningAeterisk";
 import { type NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { recipeInformationContext } from "../types/RecipeParams";
@@ -18,7 +18,6 @@ import RecipeTimeInput from "./RecipeTimeInput";
 import portionTypeItems from "../types/PortionTypeItems";
 import difficultyItems from "../types/DifficultyItems";
 import { type RootStackParamList } from "@/types/navigation";
-import { TouchableWithoutFeedback } from "react-native-gesture-handler";
 
 export interface TitleDescriptionVideoProps {
     navigation?: NativeStackNavigationProp<RootStackParamList, "CreateTip">;
@@ -87,7 +86,7 @@ const PortionDificultyTime: FC<TitleDescriptionVideoProps> = (
 
     const setQuantity = (value: string): void => {
         if (value === "") {
-            value = "0";
+            value = "1";
         }
 
         const parseValue = parseFloat(value);
@@ -133,9 +132,7 @@ const PortionDificultyTime: FC<TitleDescriptionVideoProps> = (
     return (
         <ScrollView
             className="flex-1 bg-white"
-            keyboardShouldPersistTaps="handled"
-            showsVerticalScrollIndicator={false}
-            scrollEnabled={false}
+            keyboardShouldPersistTaps="always"
         >
             {!isEditing && (
                 <Text className="text-base p-5 bg-ctertiary">
@@ -155,6 +152,7 @@ const PortionDificultyTime: FC<TitleDescriptionVideoProps> = (
                                 ? ""
                                 : portionQuantity.toString()
                         }
+                        maxLength={4}
                         placeholder="0"
                         keyboardType="decimal-pad"
                         textAlign="center"

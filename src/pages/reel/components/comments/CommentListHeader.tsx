@@ -88,6 +88,4 @@ const CommentListHeader = ({
     );
 };
 
-export default memo(CommentListHeader, (prev, next) => {
-    return prev.userComment === next.userComment;
-});
+export default memo(CommentListHeader);

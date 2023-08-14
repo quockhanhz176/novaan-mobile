@@ -107,9 +107,4 @@ const CommentItem = ({
     );
 };
 
-export default memo(CommentItem, (prev, next) => {
-    return (
-        prev.comment.comment === next.comment.comment &&
-        prev.comment.image === next.comment.image
-    );
-});
+export default memo(CommentItem);

@@ -63,13 +63,18 @@ const Comments = ({
     const [selectedComment, setSelectedComment] =
         useState<Undefinable<string>>(undefined);
 
-    const userComment: Undefinable<PostComment> = useMemo(() => {
+    const [userComment, setUserComment] =
+        useState<Undefinable<PostComment>>(undefined);
+
+    useEffect(() => {
         if (comments.length === 0) {
-            return undefined;
+            return;
         }
 
-        return comments.find((comment) => comment.userId === currentUserId);
-    }, [comments]);
+        setUserComment(
+            comments.find((comment) => comment.userId === currentUserId)
+        );
+    }, [comments, currentUserId]);
 
     const minimalPostInfo = useMemo((): Undefinable<MinimalPost> => {
         if (currentPost == null) {
@@ -98,6 +103,11 @@ const Comments = ({
 
     const onClosePress = (): void => {
         closeComments?.();
+    };
+
+    const handleOpenEditComment = (): void => {
+        hideCommentMenu();
+        showAddEdit();
     };
 
     const handleSubmitComment = async (
@@ -135,8 +145,9 @@ const Comments = ({
             });
             return;
         }
+
+        console.log("Refreshing comments", currentPost.id);
         await refreshComments();
-        hideCommentMenu();
     };
 
     const handleDeleteComment = async (): Promise<void> => {
@@ -293,7 +304,7 @@ const Comments = ({
                             onDismiss={hideCommentMenu}
                         >
                             <CommentMenu
-                                handleEditComment={showAddEdit}
+                                handleEditComment={handleOpenEditComment}
                                 handleDeleteComment={handleDeleteComment}
                             />
                         </CustomModal>
