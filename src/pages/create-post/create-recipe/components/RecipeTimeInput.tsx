@@ -10,7 +10,6 @@ interface RecipeTimeInputProps {
     onMinuteChange?: (value: number) => void;
     hourInputRef?: LegacyRef<TextInput>;
     minuteInputRef?: LegacyRef<TextInput>;
-    onInputTouch?: () => void;
 }
 const MAX_HOUR = 72;
 const MAX_MINUTE = 59;
@@ -21,7 +20,6 @@ const RecipeTimeInput: FC<RecipeTimeInputProps> = ({
     onMinuteChange,
     hourInputRef,
     minuteInputRef,
-    onInputTouch,
 }: RecipeTimeInputProps) => {
     const [hour, setHour] = useState("0");
     const [minute, setMinute] = useState("0");
@@ -84,7 +82,6 @@ const RecipeTimeInput: FC<RecipeTimeInputProps> = ({
             <TextInput
                 maxLength={2}
                 ref={hourInputRef}
-                onPressIn={onInputTouch}
                 textAlign={"center"}
                 keyboardType="number-pad"
                 placeholder="0"
