@@ -1,4 +1,9 @@
-import React, { View, Text, TouchableOpacity } from "react-native";
+import React, {
+    View,
+    Text,
+    TouchableOpacity,
+    type GestureResponderEvent,
+} from "react-native";
 import type PostComment from "../../types/PostComment";
 import { memo, type ReactElement } from "react";
 import ResourceImage from "@/common/components/ResourceImage";
@@ -22,7 +27,8 @@ const CommentItem = ({
     showCommentMenu,
     showReportMenu,
 }: CommentItemProps): ReactElement<CommentItemProps> => {
-    const handleShowCommentMenu = (): void => {
+    const handleShowCommentMenu = (e: GestureResponderEvent): void => {
+        e.stopPropagation();
         if (showCommentMenu == null) {
             return;
         }

@@ -113,6 +113,7 @@ const Comments = ({
     const handleSubmitComment = async (
         commentInfo: CommentInformation
     ): Promise<void> => {
+        hideCommentMenu();
         if (currentPost == null) {
             return;
         }
@@ -145,12 +146,12 @@ const Comments = ({
             });
             return;
         }
-
-        console.log("Refreshing comments", currentPost.id);
         await refreshComments();
     };
 
     const handleDeleteComment = async (): Promise<void> => {
+        hideCommentMenu();
+
         if (minimalPostInfo == null) {
             return;
         }
@@ -159,7 +160,7 @@ const Comments = ({
         if (!result) {
             return;
         }
-        await fetchComments(minimalPostInfo);
+        await refreshComments();
     };
 
     const handleOpenReportMenu = (commentId: string): void => {
