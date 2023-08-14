@@ -1,5 +1,3 @@
-import { type PostType } from "@/api/post/types/PostResponse";
-
 export interface RecommendationPostResponseBase {
     id: string;
     authorId: string;
