@@ -58,6 +58,7 @@ const SavedPosts = (): ReactElement => {
                     id: item.id,
                     type: "recipe",
                     title: item.postTitle,
+                    thumbnail: item.thumbnail,
                 })
             );
     }, [content]);
@@ -73,6 +74,7 @@ const SavedPosts = (): ReactElement => {
                     id: item.id,
                     type: "tip",
                     title: item.postTitle,
+                    thumbnail: item.thumbnail,
                 })
             );
     }, [content]);

@@ -37,6 +37,7 @@ export interface SavedPostResponse {
     id: string;
     postTitle: string;
     postType: "Recipe" | "CulinaryTip";
+    thumbnail: string;
 }
 
 export type MinimalPostInfo = Pick<PostResponse, "id" | "type" | "title"> & {
