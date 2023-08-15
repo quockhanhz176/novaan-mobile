@@ -13,7 +13,8 @@
             }
         },
         "android": {
-            "package": "com.saltytuna.novaanmobile"
+            "package": "com.saltytuna.novaanmobile",
+            "windowSoftInputMode": "stateAlwaysHidden|adjustPan"
         },
         "ios": {
             "bundleIdentifier": "com.saltytuna.novaanmobile"

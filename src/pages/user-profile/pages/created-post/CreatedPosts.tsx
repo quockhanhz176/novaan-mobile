@@ -8,7 +8,12 @@ import React, {
     memo,
 } from "react";
 import { View } from "react-native";
-import { PROFILE_EMPTY_RECIPE, PROFILE_EMPTY_TIPS } from "@/common/strings";
+import {
+    PROFILE_EMPTY_RECIPE,
+    PROFILE_EMPTY_TIPS,
+    PROFILE_RECIPE_CATEGORY,
+    PROFILE_TIP_CATEGORY,
+} from "@/common/strings";
 import { ToggleButton } from "react-native-paper";
 import CustomToggleButton from "./components/CustomToggleButton";
 import { UserProfileContext } from "../../UserProfile";
@@ -143,7 +148,7 @@ const CreatedPosts = ({
                         borderRadius: 8,
                         borderWidth: viewCategory === "recipe" ? 0 : 1,
                     }}
-                    label="Recipe"
+                    label={PROFILE_RECIPE_CATEGORY}
                     value="recipe"
                     isChecked={viewCategory === "recipe"}
                 />
@@ -154,7 +159,7 @@ const CreatedPosts = ({
                         borderRadius: 8,
                         borderWidth: viewCategory === "tips" ? 0 : 1,
                     }}
-                    label="Tips"
+                    label={PROFILE_TIP_CATEGORY}
                     value="tips"
                     isChecked={viewCategory === "tips"}
                 />

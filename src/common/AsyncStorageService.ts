@@ -56,3 +56,37 @@ export const invalidateData = async <T extends keyof StorageKey>(
         // Ignore error
     }
 };
+
+export const unsafeStoreData = async (
+    key: string,
+    value: WithExp<object>
+): Promise<void> => {
+    try {
+        const jsonValue = JSON.stringify(value);
+        await AsyncStorage.setItem(key, jsonValue);
+    } catch (e) {
+        console.error(e);
+    }
+};
+
+export const unsafeLoadData = async <T>(
+    key: string
+): Promise<WithExp<T> | null> => {
+    try {
+        const jsonValue = await AsyncStorage.getItem(key);
+        return jsonValue != null && jsonValue !== ""
+            ? JSON.parse(jsonValue)
+            : null;
+    } catch (e) {
+        console.error(e);
+        return null;
+    }
+};
+
+export const unsafeInvalidateData = async (key: string): Promise<void> => {
+    try {
+        await AsyncStorage.removeItem(key);
+    } catch {
+        // Ignore error
+    }
+};

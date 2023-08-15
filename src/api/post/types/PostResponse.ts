@@ -11,6 +11,8 @@ export interface AdminComment {
 export interface PostResponseBase {
     id: string;
     creatorId: string;
+    creatorName: string;
+    creatorAvatar: string;
     title: string;
     description: string;
     video: string;

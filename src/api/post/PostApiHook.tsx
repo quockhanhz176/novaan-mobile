@@ -1,4 +1,10 @@
-import { getData, storeData } from "@/common/AsyncStorageService";
+import {
+    getData,
+    storeData,
+    unsafeInvalidateData,
+    unsafeLoadData,
+    unsafeStoreData,
+} from "@/common/AsyncStorageService";
 import { type Undefinable } from "@/types/app";
 import { mutateGetKey, useFetch } from "../baseApiHook";
 import { useState } from "react";
@@ -26,7 +32,7 @@ import { responseObjectValid } from "../common/utils/ResponseUtils";
 import { getUserIdFromToken } from "../common/utils/TokenUtils";
 import { unstable_serialize, useSWRConfig } from "swr";
 import { getUserSavedUrl } from "../profile/ProfileApi";
-import PostApi from "./PostApi";
+import { type WithExp } from "@/common/utils";
 
 const POST_LIST_URL = "content/posts";
 
@@ -42,6 +48,44 @@ const INTERACT_POST_LIKE = "content/interaction/like";
 const INTERACT_REPORT = "content/interaction/report";
 
 const REELS_DATA_EXP = 24 * 60 * 60 * 1000; // 1 day in milliseconds
+
+const POST_CACHE_DURATION = 5 * 60 * 1000; // 5 MINUTES
+
+const storePostData = async (key: string, value: Post): Promise<boolean> => {
+    try {
+        await unsafeStoreData(key, {
+            ...value,
+            exp: moment().add(5, "minutes").unix(),
+        });
+    } catch {
+        return false;
+    }
+
+    // Auto clean cache
+    setTimeout(() => {
+        void unsafeInvalidateData(key);
+    }, POST_CACHE_DURATION);
+
+    return true;
+};
+
+const loadPostData = async <T,>(key: string): Promise<WithExp<T> | null> => {
+    try {
+        const cache = await unsafeLoadData<T>(key);
+        if (cache == null) {
+            return null;
+        }
+
+        const isExpired = moment.unix(cache.exp).diff(moment()) < 0;
+        if (isExpired) {
+            return null;
+        }
+
+        return cache;
+    } catch {
+        return null;
+    }
+};
 
 // For getting reel's data
 export const usePostList = (): UsePostListReturn => {
@@ -97,25 +141,30 @@ export const usePostInfo = (): UsePostInfoReturn => {
     const fetchPostInfo = async (
         info: MinimalPost
     ): Promise<Undefinable<Post>> => {
-        const requestUrl =
-            info.postType === "Recipe" ? GET_RECIPE_URL : GET_TIP_URL;
+        const cachePost = await loadPostData(info.postId);
+
+        let postResponse: any;
         const postType: Post["type"] =
             info.postType === "Recipe" ? "recipe" : "tip";
-        const postResponse = await getReq(`${requestUrl}/${info.postId}`);
-        if (!responseObjectValid(postResponse)) {
-            return undefined;
+        if (cachePost == null) {
+            const requestUrl =
+                info.postType === "Recipe" ? GET_RECIPE_URL : GET_TIP_URL;
+
+            postResponse = await getReq(`${requestUrl}/${info.postId}`);
+            if (!responseObjectValid(postResponse)) {
+                return undefined;
+            }
+        } else {
+            console.log("Cache hit");
+            postResponse = cachePost;
         }
-        const authorResponse = await PostApi.getProfile(postResponse.creatorId);
-        const author = authorResponse.success
-            ? authorResponse.value
-            : undefined;
 
         // Format response based on postType
         postResponse.type = postType;
         postResponse.creator = {
             username: postResponse.creatorName,
             userId: postResponse.creatorId,
-            avatar: author?.avatar,
+            avatar: postResponse.creatorAvatar,
         };
         if (postType === "recipe") {
             postResponse.prepTime = getRecipeTime(
@@ -124,6 +173,11 @@ export const usePostInfo = (): UsePostInfoReturn => {
             postResponse.cookTime = getRecipeTime(
                 moment.duration(postResponse.cookTime)
             );
+        }
+
+        if (cachePost == null) {
+            console.log("Cache stored");
+            await storePostData(info.postId, postResponse);
         }
 
         setPostInfo(postResponse);

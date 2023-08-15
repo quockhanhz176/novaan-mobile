@@ -10,7 +10,12 @@ import React, {
 import { UserProfileContext } from "../../UserProfile";
 import { ToggleButton } from "react-native-paper";
 import CustomToggleButton from "../created-post/components/CustomToggleButton";
-import { PROFILE_EMPTY_RECIPE, PROFILE_EMPTY_TIPS } from "@/common/strings";
+import {
+    PROFILE_EMPTY_RECIPE,
+    PROFILE_EMPTY_TIPS,
+    PROFILE_RECIPE_CATEGORY,
+    PROFILE_TIP_CATEGORY,
+} from "@/common/strings";
 import CreatedPostList from "../created-post/components/CreatedPostList";
 import EmptyCreatedPost from "../created-post/components/EmptyCreatedPost";
 import { type Undefinable } from "@/types/app";
@@ -120,7 +125,7 @@ const SavedPosts = (): ReactElement => {
                         borderRadius: 8,
                         borderWidth: viewCategory === "recipe" ? 0 : 1,
                     }}
-                    label="Recipe"
+                    label={PROFILE_RECIPE_CATEGORY}
                     value="recipe"
                     isChecked={viewCategory === "recipe"}
                 />
@@ -131,7 +136,7 @@ const SavedPosts = (): ReactElement => {
                         borderRadius: 8,
                         borderWidth: viewCategory === "tips" ? 0 : 1,
                     }}
-                    label="Tips"
+                    label={PROFILE_TIP_CATEGORY}
                     value="tips"
                     isChecked={viewCategory === "tips"}
                 />

@@ -31,6 +31,7 @@ import { windowWidth } from "@/common/utils";
 
 interface InfiniteScrollProps {
     postIds?: MinimalPost[];
+    appendId?: MinimalPost;
     showUserProfile?: boolean;
 }
 
@@ -40,8 +41,19 @@ export type InternalPost = Post & {
 
 const END_REACH_THRESHOLD = 2;
 
+/**
+ *
+ * @param postIds?: MinimalPost[] - Use this when you want to see one post only
+ * @param appendId?: MinimalPost - Use this when you want to see your posts first, then it will load reels content for you
+ * @param showUserProfile: booelan - Use this when you want to show user profile when user swipe to left
+ *
+ * If there is postIds, reels content won't be loaded from server. It will only show the post with the id you passed in
+ *
+ * @returns Infinite scrolling component :3
+ */
 const InfiniteScroll: FC<InfiniteScrollProps> = ({
     postIds,
+    appendId,
     showUserProfile = true,
 }) => {
     const { postList, fetchPostList } = usePostList();
@@ -72,18 +84,28 @@ const InfiniteScroll: FC<InfiniteScrollProps> = ({
     }, []);
 
     const fetchPost = (startIndex: number, count: number = 2): void => {
-        const postIdsSource = postIds != null ? postIds : postList;
-        if (startIndex >= postIdsSource.length) {
+        const minimalPostSource = postIds != null ? postIds : postList;
+        if (startIndex >= minimalPostSource.length) {
             return;
         }
 
         const newItems: MinimalPost[] = dataProvider.getAllData();
+        if (appendId != null && startIndex === 0) {
+            newItems.push(appendId);
+        }
+
         for (let i = 0; i < count; i++) {
-            if (postIdsSource.length <= startIndex + i) {
+            if (minimalPostSource.length <= startIndex + i) {
                 continue;
             }
-            const postId = postIdsSource[startIndex + i];
-            newItems.push(postId);
+            const minimalPost = minimalPostSource[startIndex + i];
+
+            // Ignore appendId to avoid seeing it again
+            if (appendId != null && minimalPost.postId === appendId.postId) {
+                continue;
+            }
+
+            newItems.push(minimalPost);
         }
 
         setDataProvider(dataProvider.cloneWithRows([...newItems], startIndex));
@@ -113,6 +135,12 @@ const InfiniteScroll: FC<InfiniteScrollProps> = ({
             setScrollEnabled(false);
         }
     }, []);
+
+    const onMomentumScrollStart = (): void => {
+        // Just change page so the current video paused
+        // Current page will be update again when mometumScrollEnd
+        setCurrentPage(-1);
+    };
 
     const onMomentumScrollEnd = (
         e: NativeSyntheticEvent<NativeScrollEvent>
@@ -217,6 +245,7 @@ const InfiniteScroll: FC<InfiniteScrollProps> = ({
                     scrollEnabled,
                     snapToInterval: SCROLL_ITEM_HEIGHT,
                     disableIntervalMomentum: true,
+                    onScroll: onMomentumScrollStart,
                     onMomentumScrollEnd,
                 }}
                 extendedState={{ currentPage }}

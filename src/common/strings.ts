@@ -243,6 +243,9 @@ export const PROFILE_POST_REPORTED_MSG =
 export const PROFILE_POST_REJECTED_MSG =
     "Rất tiếc bài viết của bạn chưa được chấp nhận! Vui lòng xem chi tiết để chỉnh sửa phù hợp";
 
+export const PROFILE_RECIPE_CATEGORY = "Công thức";
+export const PROFILE_TIP_CATEGORY = "Mẹo vặt";
+
 // Reel screen
 export const REEL_DETAILS_RATING = "đánh giá";
 export const REEL_DETAILS_DIFFICULTY_TITLE = "Độ khó";

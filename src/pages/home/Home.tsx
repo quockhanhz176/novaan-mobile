@@ -215,7 +215,7 @@ const Home: FC<HomeProps> = ({ navigation }: HomeProps) => {
                         </Text>
                     </View>
                 </View>
-                {viewItem != null && <InfiniteScroll postIds={[viewItem]} />}
+                {viewItem != null && <InfiniteScroll appendId={viewItem} />}
             </Modal>
         </View>
     );
